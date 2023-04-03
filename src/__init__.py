@@ -21,35 +21,39 @@ class main_window_gui(tk.Tk):
         b_exit.pack(side = 'right',padx = 20, pady=10)
 
     def OpenBeadExtractor(self):
+        """Loadding Extractor widget window"""
         child1 = BEGUI_cls.BeadExtractionGUI(self)
         pass
 
     def OpenDeconvolution(self):
+        """Loadding Deconvolution widget window"""
         child2 = DeGUI_cls.DeconvolutionGUI(self)
         pass
 
     def OpenNNDeconvolution(self):
+        """Loadding NN deconvolution widget window"""
         pass
 
     def Authors(self):
-            child = tk.Toplevel()
-            tk.Label(child, text="").grid(row=0, column=0)
-            tk.Label(child, text="AUTHORS").grid(row=1, column=5)
-            tk.Label(child, text="").grid(row=2, column=0)
+        """Loadding Authors List widget window"""
+        child = tk.Toplevel()
+        tk.Label(child, text="").grid(row=0, column=0)
+        tk.Label(child, text="AUTHORS").grid(row=1, column=5)
+        tk.Label(child, text="").grid(row=2, column=0)
 
-            tk.Label(child, text="Chukanov V.").grid(row=3, column=1)
-            tk.Label(child, text="").grid(row=3, column=2)
-            tk.Label(child, text="Pchitskaya E.").grid(row=3, column=3)
-            tk.Label(child, text="").grid(row=3, column=4)
+        tk.Label(child, text="Chukanov V.").grid(row=3, column=1)
+        tk.Label(child, text="").grid(row=3, column=2)
+        tk.Label(child, text="Pchitskaya E.").grid(row=3, column=3)
+        tk.Label(child, text="").grid(row=3, column=4)
 
-            tk.Label(child, text="").grid(row=3, column=6)
-            tk.Label(child, text="Gerasimenko A.").grid(row=3, column=7)
-            tk.Label(child, text="").grid(row=3, column=8)
-            tk.Label(child, text="Sachuk A.").grid(row=3, column=9)
-            tk.Label(child, text="").grid(row=3, column=10)
+        tk.Label(child, text="").grid(row=3, column=6)
+        tk.Label(child, text="Gerasimenko A.").grid(row=3, column=7)
+        tk.Label(child, text="").grid(row=3, column=8)
+        tk.Label(child, text="Sachuk A.").grid(row=3, column=9)
+        tk.Label(child, text="").grid(row=3, column=10)
 
-            tk.Label(child, text="").grid(row=4, column=0)
-            return
+        tk.Label(child, text="").grid(row=4, column=0)
+        return
     def CloseApplication(self):
         self.quit()
 
