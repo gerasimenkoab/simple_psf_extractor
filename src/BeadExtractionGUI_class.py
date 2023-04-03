@@ -945,7 +945,7 @@ class BeadExtractionGUI(Tk):
             figUpsc, figUpscAxs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
             figUpsc.suptitle("Image preview")
             figUpscAxs[0].pcolormesh(bead[bead.shape[0] // 2, :, :], cmap=cm.jet)
-            figUpscAxs[1].pcolormesh(bead[:, beadInterp.shape[1] // 2, :], cmap=cm.jet)
+            figUpscAxs[1].pcolormesh(bead[:, bead.shape[1] // 2, :], cmap=cm.jet)
             figUpscAxs[2].pcolormesh(bead[:, :, bead.shape[2] // 2], cmap=cm.jet)
 
             newWin = Toplevel(self)
@@ -1154,7 +1154,7 @@ class BeadExtractionGUI(Tk):
             txt_prefix = "Airy_r_"
         if txt_folder == "":
             txt_folder = str(os.getcwd()) + "\\" + "airy_bead_folder"
-        if not path.isdir(txt_folder):
+        if not os.path.isdir(txt_folder):
             print("creating dir")
             os.mkdir(txt_folder)
         tiffBit = self.tiffMenuBitDict[self.tiffSaveBitType.get()]
@@ -1178,7 +1178,7 @@ class BeadExtractionGUI(Tk):
             txt_prefix = "Airy_r_"
         if txt_folder == "":
             txt_folder = str(os.getcwd()) + "\\" + "airy_bead_folder"
-        if not path.isdir(txt_folder):
+        if not os.path.isdir(txt_folder):
             print("creating dir")
             os.mkdir(txt_folder)
         tiffBit = self.tiffMenuBitDict[self.tiffSaveBitType.get()]
