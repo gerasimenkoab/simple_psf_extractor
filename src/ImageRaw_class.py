@@ -2,6 +2,10 @@ import numpy as np
 import itertools
 from scipy.interpolate import interpn
 from scipy.interpolate import RegularGridInterpolator
+from tkinter import *
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.cm as cm
 
 
 class ImageRaw:
