@@ -829,7 +829,6 @@ class BeadExtractionGUI(Tk):
         else:
             self.sideHalf = abs(int(float(tmp) / 2))
 
-
     def ExtractBeads(self):
         """Extracting bead stacks from picture set and centering them"""
         self.selectedBeads = []
@@ -847,7 +846,7 @@ class BeadExtractionGUI(Tk):
             iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
             zc = int(elem.shape[0] / 2)
             shift = zc - iMax[0]
-            elem = np.roll(elem,shift = shift, axis = 0)
+            elem = np.roll(elem, shift=shift, axis=0)
             iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
             self.selectedBeads.append(elem)
 
