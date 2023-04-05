@@ -829,8 +829,9 @@ class BeadExtractionGUI(Tk):
         else:
             self.sideHalf = abs(int(float(tmp) / 2))
 
+
     def ExtractBeads(self):
-        """Extracting bead stacks from picture set"""
+        """Extracting bead stacks from picture set and centering them"""
         self.selectedBeads = []
         d = self.sideHalf
         print(self.imgCnvArr.shape)
@@ -842,6 +843,12 @@ class BeadExtractionGUI(Tk):
             bound2 = int(i[1] + d)
             #                  print("coords: ",bound1,bound2,bound3,bound4)
             elem = self.imgCnvArr[:, bound1:bound2, bound3:bound4]
+            # shifting array max intesity toward center along Z axis
+            iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
+            zc = int(elem.shape[0] / 2)
+            shift = zc - iMax[0]
+            elem = np.roll(elem,shift = shift, axis = 0)
+            iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
             self.selectedBeads.append(elem)
 
     def SaveSelectedBeads(self):
