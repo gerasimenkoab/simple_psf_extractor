@@ -23,6 +23,7 @@ class main_window_gui(tk.Tk):
     def OpenBeadExtractor(self):
         """Loadding Extractor widget window"""
         child1 = BEGUI_cls.BeadExtractionGUI(self)
+        child1.grab_set()
         pass
 
     def OpenDeconvolution(self):
@@ -53,7 +54,7 @@ class main_window_gui(tk.Tk):
         tk.Label(child, text="").grid(row=3, column=10)
 
         tk.Label(child, text="").grid(row=4, column=0)
-        return
+    
     def CloseApplication(self):
         self.quit()
 

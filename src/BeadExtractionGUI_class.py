@@ -35,8 +35,9 @@ import file_inout as fio
 class BeadExtractionGUI(Toplevel):
     """Class provides instruments for extraction of beads from microscope multilayer photo."""
 
-    def __init__(self, master=None, wwidth=600, wheight=600):
-        super().__init__()
+#    def __init__(self, master = None, wwidth=600, wheight=600):
+    def __init__(self, master = None, wwidth=600, wheight=600):
+        Toplevel.__init__(self,master)
         # new  class properties
         self.beadCoords = []  # Coordinates of beads on the canvas
         self.beadMarks = []  # rectangle pics on the canvas
@@ -663,7 +664,7 @@ class BeadExtractionGUI(Toplevel):
         # updating label on interface
         self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
         # preparing image for canvas from desired frame
-        self.imgCnv = ImageTk.PhotoImage(self.imgBeadsRaw)
+        self.imgCnv = ImageTk.PhotoImage(image = self.imgBeadsRaw, master = self.cnv1)
         # replacing image on the canvas
         self.cnv1.create_image(0, 0, image=self.imgCnv, anchor=NW)
         # updating scrollers
