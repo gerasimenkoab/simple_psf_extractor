@@ -32,7 +32,7 @@ import file_inout as fio
 """
 
 
-class BeadExtractionGUI(Tk):
+class BeadExtractionGUI(Toplevel):
     """Class provides instruments for extraction of beads from microscope multilayer photo."""
 
     def __init__(self, master=None, wwidth=600, wheight=600):

@@ -79,7 +79,7 @@ class GetStringPopup(Frame):
             self.dialogWindow = None
 
 
-class DeconvolutionGUI(Tk):
+class DeconvolutionGUI(Toplevel):
     def __init__(self, master=None, wwidth=800, wheight=2000):
         # super().__init__(self, master)
         super().__init__()
