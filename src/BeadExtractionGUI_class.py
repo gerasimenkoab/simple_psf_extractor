@@ -666,7 +666,7 @@ class BeadExtractionGUI(Toplevel):
         # preparing image for canvas from desired frame
         self.imgCnv = ImageTk.PhotoImage(image = self.imgBeadsRaw, master = self.cnv1)
         # replacing image on the canvas
-        self.cnv1.create_image(0, 0, image=self.imgCnv, anchor=NW)
+        self.cnv1.create_image((0, 0), image=self.imgCnv, state = 'normal', anchor=NW)
         # updating scrollers
         self.cnv1.configure(scrollregion=self.cnv1.bbox("all"))
 

@@ -81,8 +81,8 @@ class GetStringPopup(Frame):
 
 class DeconvolutionGUI(Toplevel):
     def __init__(self, master=None, wwidth=800, wheight=2000):
-        # super().__init__(self, master)
-        super().__init__()
+        Toplevel.__init__(self, master)
+        #super().__init__()
         self.imgBeadRawLoad = FALSE
 
         self.beadVoxelSize = [
