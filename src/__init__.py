@@ -29,6 +29,7 @@ class main_window_gui(tk.Tk):
     def OpenDeconvolution(self):
         """Loadding Deconvolution widget window"""
         child2 = DeGUI_cls.DeconvolutionGUI(self)
+        child2.grab_set()
         pass
 
     def OpenNNDeconvolution(self):
