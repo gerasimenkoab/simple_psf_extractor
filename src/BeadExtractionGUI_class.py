@@ -5,6 +5,7 @@ from scipy.interpolate import interpn
 from scipy.interpolate import RegularGridInterpolator
 import itertools
 from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showerror, showinfo, askokcancel
 from tkinter.filedialog import (
@@ -32,12 +33,12 @@ import file_inout as fio
 """
 
 
-class BeadExtractionGUI(Toplevel):
+class BeadExtractionGUI(tk.Toplevel):
     """Class provides instruments for extraction of beads from microscope multilayer photo."""
 
 #    def __init__(self, master = None, wwidth=600, wheight=600):
-    def __init__(self, master = None, wwidth=600, wheight=600):
-        Toplevel.__init__(self,master)
+    def __init__(self, parent, wwidth=600, wheight=600):
+        super().__init__(parent)
         # new  class properties
         self.beadCoords = []  # Coordinates of beads on the canvas
         self.beadMarks = []  # rectangle pics on the canvas

@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter as tk
 from tkinter.messagebox import showerror, showinfo, askokcancel
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.filedialog import askopenfilenames
@@ -79,10 +80,9 @@ class GetStringPopup(Frame):
             self.dialogWindow = None
 
 
-class DeconvolutionGUI(Toplevel):
-    def __init__(self, master=None, wwidth=800, wheight=2000):
-        Toplevel.__init__(self, master)
-        #super().__init__()
+class DeconvolutionGUI(tk.Toplevel):
+    def __init__(self, parent, wwidth=800, wheight=2000):
+        super().__init__(parent)
         self.imgBeadRawLoad = FALSE
 
         self.beadVoxelSize = [
