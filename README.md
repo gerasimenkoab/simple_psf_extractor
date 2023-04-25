@@ -1,7 +1,7 @@
 # simple_psf_extractor
 implemintation of simple extractor of experimental PSF
 
-## Recent fixes TODO:
+## 25/04/2023 TODO:
 - подписи осей
 - выровнять масштабы осей
 - поправить выскакивающие окошки с ФРТ
