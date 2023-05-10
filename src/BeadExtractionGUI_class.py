@@ -25,6 +25,7 @@ import os
 from logging import raiseExceptions
 
 import file_inout as fio
+from plot_for_gui import FigureCanvasTkFrom3DArray, FigureCanvasTk3DFrom3DArray
 
 # from  ImageRaw_class import ImageRaw
 
@@ -69,7 +70,7 @@ class BeadExtractionGUI(tk.Toplevel):
         self.yr = 0
 
         # new window widgets
-        self.title("Bead extraction window.")
+        self.title("Bead extraction.")
         self.resizable(False, False)
         Label(
             self,
@@ -418,38 +419,15 @@ class BeadExtractionGUI(tk.Toplevel):
 
     def PlotBead3D(self, bead, treshold=np.exp(-1) * 255.0):
         """Plot 3D view of a given bead"""
-        # теперь разбрасываем бид по отдельным массивам .
-        zcoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        xcoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        ycoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        voxelVal = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        nn = 0
-        bead = bead / np.amax(bead) * 255.0
-        for i, j, k in itertools.product(
-            range(bead.shape[0]), range(bead.shape[1]), range(bead.shape[2])
-        ):
-            zcoord[nn] = i
-            xcoord[nn] = j
-            ycoord[nn] = k
-            voxelVal[nn] = bead[i, j, k]
-            nn = nn + 1
-        fig1 = plt.figure()
-        ax = fig1.add_subplot(111, projection="3d")
-        selection = voxelVal > treshold
-        im = ax.scatter(
-            xcoord[selection],
-            ycoord[selection],
-            zcoord[selection],
-            c=voxelVal[selection],
-            alpha=0.5,
-            cmap=cm.jet,
-        )
-        fig1.colorbar(im)
-        ax.set_xlabel("X Label")
-        ax.set_ylabel("Y Label")
-        ax.set_zlabel("Z Label")
-
-        plt.show()
+        # popup window creation with canvas and exit button
+        child_tmp = tk.Toplevel(self)
+        child_tmp.title("3D Bead Preview") 
+        cnvPlot = tk.Canvas(child_tmp,width=300,height=300)
+        cnvPlot.pack(side='top')
+        Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side='top')
+      
+        FigureCanvasTk3DFrom3DArray( bead, cnvPlot ).get_tk_widget().pack(side='top')
+    
 
     def UpscaleBead3D(self, bead, plotPreview=False):
         """Upscale of a given bead"""
@@ -893,22 +871,23 @@ class BeadExtractionGUI(tk.Toplevel):
                 try:
                     self.imgBeadRaw = self.selectedBeads[int(tmp)]
                     # creating figure with matplotlib
-                    fig, axs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-                    axs[0].pcolormesh(
-                        self.imgBeadRaw[self.imgBeadRaw.shape[0] // 2, :, :],
-                        cmap=cm.jet,
-                    )
-                    axs[1].pcolormesh(
-                        self.imgBeadRaw[:, self.imgBeadRaw.shape[1] // 2, :],
-                        cmap=cm.jet,
-                    )
-                    axs[2].pcolormesh(
-                        self.imgBeadRaw[:, :, self.imgBeadRaw.shape[2] // 2],
-                        cmap=cm.jet,
-                    )
+                    # fig, axs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
+                    # axs[0].pcolormesh(
+                    #     self.imgBeadRaw[self.imgBeadRaw.shape[0] // 2, :, :],
+                    #     cmap=cm.jet,
+                    # )
+                    # axs[1].pcolormesh(
+                    #     self.imgBeadRaw[:, self.imgBeadRaw.shape[1] // 2, :],
+                    #     cmap=cm.jet,
+                    # )
+                    # axs[2].pcolormesh(
+                    #     self.imgBeadRaw[:, :, self.imgBeadRaw.shape[2] // 2],
+                    #     cmap=cm.jet,
+                    # )
                     # plt.show()
                     # Instead of plt.show creating Tkwidget from figure
-                    self.figIMG_canvas_agg = FigureCanvasTkAgg(fig, self.cnvImg)
+                    self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imgBeadRaw, self.cnvImg, plotName = "Bead 2D")
+                    #FigureCanvasTkAgg(fig, self.cnvImg)
                     self.figIMG_canvas_agg.get_tk_widget().grid(
                         row=1, column=5, rowspan=10, sticky=(N, E, S, W)
                     )
@@ -1136,11 +1115,6 @@ class BeadExtractionGUI(tk.Toplevel):
                     np.array([i, j, k]), imgCenter, lightIntensity
                 )
             self.PlotBead3D(tiffDraw, 1)
-            # fig, axs = plt.subplots(3, 1, sharex = False, figsize=(2,6))
-            # axs[0].pcolormesh(tiffDraw[imgMidCoord,:,:],cmap=cm.jet)
-            # axs[1].pcolormesh(tiffDraw[:,imgMidCoord,:],cmap=cm.jet)
-            # axs[2].pcolormesh(tiffDraw[:,:,imgMidCoord],cmap=cm.jet)
-            # plt.show()
         elif sphere_type == "plane":
             print("Not Implemented")
             return
