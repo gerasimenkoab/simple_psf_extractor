@@ -11,6 +11,7 @@ from os import path
 import time
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.ticker as plticker
 import matplotlib.cm as cm
 from scipy.ndimage import gaussian_filter
 
@@ -221,6 +222,56 @@ class DeconvolutionGUI(tk.Toplevel):
         if askokcancel("Close", "Close Deconvolution Widget?"):
             self.destroy()
 
+
+    def FigureCanvasTkFrom3DArray(self, arr3D, cnv, plotName = "Plot"):
+        '''Function create FigureCanvasTk  object of figure with 3 slices of 3D array.
+           this object can be used to get widget for Tkinter object.get_tk_widget()
+           Input: arr3d - 3d ndarray
+                  cnv - canvas
+                  plotName - plot header name
+            Returns:
+                  FigureCanvasTk  object 
+                  hint: use FigureCanvasTk.get_tk_widget().pack/grid() after to plot
+        '''
+        # creating figure with matplotlib
+        fig, axs = plt.subplots(nrows=3, sharex=False, figsize=(2, 6), layout='constrained')
+        fig.suptitle(plotName)
+        cmap = cm.jet
+        loc = plticker.MultipleLocator(base = 10.0) # ticks step setup
+
+        i = 0
+        # axs[i].set_title("X-Y")
+        axs[i].set_xlabel("x")
+        axs[i].set_ylabel("y")
+        axs[i].set_xlim(0,arr3D.shape[2])
+        axs[i].set_ylim(0,arr3D.shape[1])
+        axs[i].set_box_aspect(1)
+        axs[i].xaxis.set_major_locator(loc)
+        axs[i].yaxis.set_major_locator(loc)
+        i = 1
+        axs[i].set_xlabel("y")
+        axs[i].set_ylabel("z")
+        axs[i].set_xlim(0,arr3D.shape[1])
+        axs[i].set_ylim(0,arr3D.shape[0])
+        axs[i].set_box_aspect(1)
+        axs[i].xaxis.set_major_locator(loc)
+        axs[i].yaxis.set_major_locator(loc)
+        i = 2
+        axs[i].set_xlabel("x")
+        axs[i].set_ylabel("z")
+        axs[i].set_xlim(0,arr3D.shape[2])
+        axs[i].set_ylim(0,arr3D.shape[0])
+        axs[i].set_box_aspect(1)
+        axs[i].xaxis.set_major_locator(loc)
+        axs[i].yaxis.set_major_locator(loc)
+
+        axs[0].pcolormesh( arr3D[arr3D.shape[0] // 2, :, :], cmap=cmap )
+        axs[1].pcolormesh( arr3D[:, arr3D.shape[1] // 2, :], cmap=cmap )
+        axs[2].pcolormesh( arr3D[:, :, arr3D.shape[2] // 2], cmap=cmap )
+        # plt.show()
+        # Instead of plt.show creating Tkwidget from figure on the canvas self.cnvImg
+        return  FigureCanvasTkAgg( fig, cnv )
+
     def BlurImage(self, bead):
         """
         Blur bead with gauss
@@ -343,6 +394,7 @@ class DeconvolutionGUI(tk.Toplevel):
                 beadImPath, self.GetVoxelDialog(), fio.ReadTiffStackFile(beadImPath)
             )
             self.img.ShowClassInfo()
+        
         self.img.imArray = self.BlurImage(self.img.imArray)
         fig, axs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
         fig.suptitle("Bead")
@@ -357,7 +409,7 @@ class DeconvolutionGUI(tk.Toplevel):
         )
         # plt.show()
         # Instead of plt.show creating Tkwidget from figure
-        self.figIMG_canvas_agg = FigureCanvasTkAgg(fig, self.cnvImg)
+        self.figIMG_canvas_agg = self.FigureCanvasTkFrom3DArray(self.img.imArray, self.cnvImg, plotName = "Bead")
         self.figIMG_canvas_agg.get_tk_widget().grid(
             row=1, column=5, rowspan=10, sticky=(N, E, S, W)
         )
@@ -386,37 +438,23 @@ class DeconvolutionGUI(tk.Toplevel):
             #            # preparing image for canvas from desired frame
             #            self.cnvBeadImg = ImageTk.PhotoImage(self.imgBeadRaw)
             print("Open path: ", self.beadImgPath)
-            self.imgBeadRaw = fio.ReadTiffStackFileTFF(self.beadImgPath)
-            # creating figure with matplotlib
-            fig, axs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-            fig.suptitle("Bead")
-            axs[0].pcolormesh(
-                self.imgBeadRaw[self.imgBeadRaw.shape[0] // 2, :, :], cmap=cm.jet
-            )
-            axs[1].pcolormesh(
-                self.imgBeadRaw[:, self.imgBeadRaw.shape[1] // 2, :], cmap=cm.jet
-            )
-            axs[2].pcolormesh(
-                self.imgBeadRaw[:, :, self.imgBeadRaw.shape[2] // 2], cmap=cm.jet
-            )
-            # plt.show()
-            # Instead of plt.show creating Tkwidget from figure
-            self.figIMG_canvas_agg = FigureCanvasTkAgg(fig, self.cnvImg)
-            self.figIMG_canvas_agg.get_tk_widget().grid(
-                row=1, column=5, rowspan=10, sticky=(N, E, S, W)
-            )
-
+            self.imgBeadRaw = fio.ReadTiffStackFile(self.beadImgPath)
         except:
             showerror("LoadBeadImageFile: Error", "Can't read file.")
             return
-        # updating scrollers
-        # self.cnv1.configure(scrollregion = self.cnv1.bbox('all'))
+
+        self.figIMG_canvas_agg = self.FigureCanvasTkFrom3DArray(self.imgBeadRaw, self.cnvImg, "Bead")
+        self.figIMG_canvas_agg.get_tk_widget().grid(
+            row=1, column=5, rowspan=10, sticky=(N, E, S, W)
+        )
+
+
 
     def LoadCompareImageFile(self):
         """Loading raw bead photo from file at self.beadImgPath"""
         beadCompPath = askopenfilename(title="Load Beads Photo")
         try:
-            self.imgBeadComp = fio.ReadTiffStackFileTFF(beadCompPath)
+            self.imgBeadComp = fio.ReadTiffStackFile(beadCompPath)
         except:
             showerror("Load compare image: Error", "Can't read file.")
             return
@@ -522,21 +560,21 @@ class DeconvolutionGUI(tk.Toplevel):
             except:
                 showerror("Error. Can't finish convolution properly.")
                 return
-            #            self.PlotBead3D(self.imgPSF)
-            self.figPSF, axs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-            self.figPSF.suptitle("PSF")
-            axs[0].pcolormesh(
-                self.imgPSF[self.imgBeadRaw.shape[0] // 2, :, :], cmap=cm.jet
-            )
-            axs[1].pcolormesh(
-                self.imgPSF[:, self.imgBeadRaw.shape[0] // 2, :], cmap=cm.jet
-            )
-            axs[2].pcolormesh(
-                self.imgPSF[:, :, self.imgBeadRaw.shape[0] // 2], cmap=cm.jet
-            )
+            # #            self.PlotBead3D(self.imgPSF)
+            # self.figPSF, axs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
+            # self.figPSF.suptitle("PSF")
+            # axs[0].pcolormesh(
+            #     self.imgPSF[self.imgBeadRaw.shape[0] // 2, :, :], cmap=cm.jet
+            # )
+            # axs[1].pcolormesh(
+            #     self.imgPSF[:, self.imgBeadRaw.shape[0] // 2, :], cmap=cm.jet
+            # )
+            # axs[2].pcolormesh(
+            #     self.imgPSF[:, :, self.imgBeadRaw.shape[0] // 2], cmap=cm.jet
+            # )
             # plt.show()
             # Instead of plt.show creating Tkwidget from figure
-            self.figPSF_canvas_agg = FigureCanvasTkAgg(self.figPSF, self.cnvPSF)
+            self.figPSF_canvas_agg = self.FigureCanvasTkFrom3DArray(self.imgPSF, self.cnvPSF, plotName = "PSF")
             self.figPSF_canvas_agg.get_tk_widget().grid(
                 row=1, column=6, rowspan=10, sticky=(N, E, S, W)
             )
@@ -578,7 +616,7 @@ class DeconvolutionGUI(tk.Toplevel):
                     print("creating dir")
                     os.mkdir(txt_folder)
                     break
-            fio.SaveTiffStack(self.imgDecon, txt_folder, txt_prefix)
+            fio.SaveTiffStack(self.imgPSF, txt_folder, txt_prefix)
             showinfo("PSF File saved at:", txt_folder)
 
     def SaveDeconvImgSingle(self):
@@ -728,5 +766,5 @@ class DeconvolutionGUI(tk.Toplevel):
 
 
 if __name__ == "__main__":
-    rootWin = DeconvolutionGUI()
+    rootWin = DeconvolutionGUI(Tk())
     rootWin.mainloop()

@@ -1,11 +1,10 @@
 import numpy as np
 from PIL import Image
-import tifffile as tff  #  https://pypi.org/project/tifffile/
 
 
 def ReadTiffStackFile(fileName):
     """Function ReadTiffStackFile() reads tiff stack from file and return np.array"""
-    print("Loading Image from tiff stack file..... ")
+    print("Loading Image from tiff stack file..... ", end=" ")
     try:
         image_tiff = Image.open(fileName)
         ncols, nrows = image_tiff.size
@@ -52,19 +51,6 @@ def ReadTiffMultFiles(fileNameList):
     except FileNotFoundError:
         print("ReadTiffStackFile: Error. File not found!")
         return 0
-
-
-def ReadTiffStackFileTFF(fileName):
-    """Function ReadTiffStackFile() reads tiff stack from file and return np.array"""
-    print("Loading Image from tiff stack file..... ", end=" ")
-    try:
-        image_stack = tff.imread(fileName)
-        print("Done.")
-        return image_stack
-    except FileNotFoundError:
-        print("ReadTiffStackFileTFF: Error. File not found!")
-        return 0
-
 
 def SaveTiffFiles(tiffDraw=np.zeros([3, 4, 6]), dirName="img", filePrefix=""):
     """Print files for any input arrray of intensity values
@@ -129,15 +115,3 @@ def SaveAsTiffStack_tag(tiffDraw=np.zeros([3, 4, 6]), filename="img", outtype="u
     )
     print("File saved in one tiff", filename)
 
-
-def SaveTiffStackTFF(
-    tiffDraw=np.zeros([3, 4, 6]), dirName="img", filePrefix="!stack", outtype="uint8"
-):
-    """Print files for any input arrray of intensity values
-    tiffDraw - numpy ndarray of intensity values"""
-    print("trying to save file", outtype)
-    outTiff = np.rint(tiffDraw).astype(outtype)
-    print("outTiff type: ", tiffDraw.dtype)
-    #    tff.imwrite(dirName+"\\"+filePrefix+".tiff", outTiff)
-    tff.imwrite(dirName + "\\" + filePrefix + ".tiff", tiffDraw, dtype=tiffDraw.dtype)
-    print("file saved in one tiff", dirName + "\\" + filePrefix + ".tiff")

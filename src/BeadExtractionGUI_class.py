@@ -1199,5 +1199,5 @@ class BeadExtractionGUI(tk.Toplevel):
 
 
 if __name__ == "__main__":
-    base1 = BeadExtractionGUI()
+    base1 = BeadExtractionGUI(Tk())
     base1.mainloop()
