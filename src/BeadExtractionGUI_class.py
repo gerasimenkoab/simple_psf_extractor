@@ -870,24 +870,7 @@ class BeadExtractionGUI(tk.Toplevel):
             else:
                 try:
                     self.imgBeadRaw = self.selectedBeads[int(tmp)]
-                    # creating figure with matplotlib
-                    # fig, axs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-                    # axs[0].pcolormesh(
-                    #     self.imgBeadRaw[self.imgBeadRaw.shape[0] // 2, :, :],
-                    #     cmap=cm.jet,
-                    # )
-                    # axs[1].pcolormesh(
-                    #     self.imgBeadRaw[:, self.imgBeadRaw.shape[1] // 2, :],
-                    #     cmap=cm.jet,
-                    # )
-                    # axs[2].pcolormesh(
-                    #     self.imgBeadRaw[:, :, self.imgBeadRaw.shape[2] // 2],
-                    #     cmap=cm.jet,
-                    # )
-                    # plt.show()
-                    # Instead of plt.show creating Tkwidget from figure
                     self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imgBeadRaw, self.cnvImg, plotName = "Bead 2D")
-                    #FigureCanvasTkAgg(fig, self.cnvImg)
                     self.figIMG_canvas_agg.get_tk_widget().grid(
                         row=1, column=5, rowspan=10, sticky=(N, E, S, W)
                     )
