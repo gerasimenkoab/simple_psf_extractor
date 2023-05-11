@@ -3,10 +3,11 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.ticker as plticker
 import matplotlib.cm as cm
+from tkinter import Canvas
 import itertools
 
 
-def FigureCanvasTkFrom3DArray(arr3D, cnv, plotName="Plot"):
+def FigureCanvasTkFrom3DArray(arr3D: np.ndarray, cnv:Canvas, plotName="Plot"):
     """Function create FigureCanvasTk  object of figure with 3 slices of 3D array.
     this object can be used to get widget for Tkinter object.get_tk_widget()
     Input: arr3d - 3d ndarray
@@ -57,8 +58,16 @@ def FigureCanvasTkFrom3DArray(arr3D, cnv, plotName="Plot"):
     return FigureCanvasTkAgg(fig, cnv)
 
 
-def FigureCanvasTk3DFrom3DArray(arr3D, cnv, treshold=np.exp(-1) * 255.0):
-    """Plot 3D view of a given bead"""
+def FigureCanvasTk3DFrom3DArray(arr3D: np.ndarray, cnv:Canvas, treshold=np.exp(-1) * 255.0):
+    """Function create FigureCanvasTk  object 3D view of a given  3D array.
+    this object can be used to get widget for Tkinter object.get_tk_widget()
+    Input: arr3d - 3d ndarray
+            cnv - canvas
+            plotName - plot header name. if plotName= " " then no plotName.
+    Returns:
+            FigureCanvasTk  object
+            hint: use FigureCanvasTk.get_tk_widget().pack/grid() after to plot
+    """ 
     # теперь разбрасываем бид по отдельным массивам .
     zcoord = np.zeros(arr3D.shape[0] * arr3D.shape[1] * arr3D.shape[2])
     xcoord = np.zeros(arr3D.shape[0] * arr3D.shape[1] * arr3D.shape[2])
