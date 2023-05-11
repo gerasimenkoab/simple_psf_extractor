@@ -307,14 +307,7 @@ class DeconvolutionGUI(tk.Toplevel):
             print("read one file", beadImPath)
             self.imArr1 = fio.ReadTiffStackFile(beadImPath)
         self.imArr1 = self.BlurImage(self.imArr1)
-        fig, axs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-        fig.suptitle("Bead")
-        axs[0].pcolormesh(self.imArr1[self.imArr1.shape[0] // 2, :, :], cmap=cm.jet)
-        axs[1].pcolormesh(self.imArr1[:, self.imArr1.shape[1] // 2, :], cmap=cm.jet)
-        axs[2].pcolormesh(self.imArr1[:, :, self.imArr1.shape[2] // 2], cmap=cm.jet)
-        # plt.show()
-        # Instead of plt.show creating Tkwidget from figure
-        self.figIMG_canvas_agg = FigureCanvasTkAgg(fig, self.cnvImg)
+        self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imArr1, self.cnvImg, plotName="Bead")
         self.figIMG_canvas_agg.get_tk_widget().grid(
             row=1, column=5, rowspan=10, sticky=(N, E, S, W)
         )
@@ -367,18 +360,11 @@ class DeconvolutionGUI(tk.Toplevel):
             showerror("Error", "Bead image path empty!")
             return
         try:
-            #            self.imgBeadRaw = Image.open(self.beadImgPath)
-            #            print("Number of frames: ", self.imgBeadRaw.n_frames)
-            #            frameNumber = int( self.imgBeadRaw.n_frames / 2)
-            #            print("Frame number for output: ", frameNumber)
-            #            # setting imgTmp to desired number
-            #            self.imgBeadRaw.seek(frameNumber)
-            #            # preparing image for canvas from desired frame
-            #            self.cnvBeadImg = ImageTk.PhotoImage(self.imgBeadRaw)
             print("Open path: ", self.beadImgPath)
             self.imgBeadRaw = fio.ReadTiffStackFile(self.beadImgPath)
-        except:
+        except Exception as exc:
             showerror("LoadBeadImageFile: Error", "Can't read file.")
+            print(exc)
             return
 
         self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imgBeadRaw, self.cnvImg, "Bead")
@@ -393,8 +379,9 @@ class DeconvolutionGUI(tk.Toplevel):
         beadCompPath = askopenfilename(title="Load Beads Photo")
         try:
             self.imgBeadComp = fio.ReadTiffStackFile(beadCompPath)
-        except:
+        except Exception as exc:
             showerror("Load compare image: Error", "Can't read file.")
+            print(exc)
             return
 
     def CenteringImageInt(self):
@@ -406,26 +393,14 @@ class DeconvolutionGUI(tk.Toplevel):
             #                imgBeadRaw = imtrans.CenterImageIntensity(self.imgBeadRaw)
             # FIXME: центровка работает как то странно. надо проверить и поправить.
             self.imgBeadRaw = imtrans.ShiftWithPadding(self.imgBeadRaw)
-            # creating figure with matplotlib
-            fig, axs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-            axs[0].pcolormesh(
-                self.imgBeadRaw[self.imgBeadRaw.shape[0] // 2, :, :], cmap=cm.jet
-            )
-            axs[1].pcolormesh(
-                self.imgBeadRaw[:, self.imgBeadRaw.shape[1] // 2, :], cmap=cm.jet
-            )
-            axs[2].pcolormesh(
-                self.imgBeadRaw[:, :, self.imgBeadRaw.shape[2] // 2], cmap=cm.jet
-            )
-            # plt.show()
-            # Instead of plt.show creating Tkwidget from figure
-            self.figIMG_canvas_agg = FigureCanvasTkAgg(fig, self.cnvImg)
+
+            self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imgBeadRaw, self.cnvImg, plotName="Raw Bead")
             self.figIMG_canvas_agg.get_tk_widget().grid(
                 row=1, column=5, rowspan=10, sticky=(N, E, S, W)
             )
-
-        except:
+        except Exception as exc:
             showerror("centering error")
+            print(exc)
 
     def CalculatePSF(self):
         txt_beadSizenm = self.beadSizeWgt.get()
@@ -511,30 +486,11 @@ class DeconvolutionGUI(tk.Toplevel):
     def SaveDeconvImgSingle(self):
         """Save deconvolved image as multi-page tiff"""
         if hasattr(self, "imgDecon"):
-            # txt_folder = self.folderPSFWgt.get()
-            # txt_prefix = self.filePrfxPSFWgt.get()
-            # if txt_prefix == '':
             fname = asksaveasfilename(title="Save image as")
-            # print("Save as:",filename)
-            # txt_prefix = "deconv_img"
-            # txt_folder = str(os.getcwd()) + "\\"+"deconv_folder"
-            # if not path.isdir(txt_folder):
-            #     print("creating dir")
-            #     os.mkdir(txt_folder)
-            #            fio.SaveTiffStack(self.imgDecon, txt_folder, txt_prefix)
-            #            fio.SaveAsTiffStack_tag(self.imgDecon, fname)
             try:
                 fio.SaveAsTiffStack(self.imgDecon, fname)
-            #                fio.SaveAsTiffStack_tag(self.imgDecon, fname)
-            #                  pass
             except:
                 showinfo("Can't save file as ", fname)
-
-    #            showinfo("PSF File saved at:", txt_folder)
-
-    def BeadExtractPlugin(self):
-        #        self.BeadExtraction = BeadExtraction()
-        return
 
     def LoadPSFImageFile(self):
         """Loading raw bead photo from file at self.beadImgPath"""
@@ -545,15 +501,7 @@ class DeconvolutionGUI(tk.Toplevel):
             self.imgPSF = fio.ReadTiffStackFile(imgPSFPath)
             self.beadVoxelSize = self.GetVoxelDialog()
             print("print voxel:", self.beadVoxelSize)
-            # creating figure with matplotlib
-            self.figPSF, axs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-            self.figPSF.suptitle("PSF")
-            axs[0].pcolormesh(self.imgPSF[self.imgPSF.shape[0] // 2, :, :], cmap=cm.jet)
-            axs[1].pcolormesh(self.imgPSF[:, self.imgPSF.shape[0] // 2, :], cmap=cm.jet)
-            axs[2].pcolormesh(self.imgPSF[:, :, self.imgPSF.shape[0] // 2], cmap=cm.jet)
-            # plt.show()
-            # Instead of plt.show creating Tkwidget from figure
-            self.figPSF_canvas_agg = FigureCanvasTkAgg(self.figPSF, self.cnvPSF)
+            self.figPSF_canvas_agg = FigureCanvasTkFrom3DArray(self.figPSF, self.cnvPSF, plotName="PSF")
             self.figPSF_canvas_agg.get_tk_widget().grid(
                 row=1, column=6, rowspan=10, sticky=(N, E, S, W)
             )
@@ -561,8 +509,6 @@ class DeconvolutionGUI(tk.Toplevel):
         except:
             showerror("LoadBeadImageFile: Error", "Can't read file.")
             return
-        # updating scrollers
-        # self.cnv1.configure(scrollregion = self.cnv1.bbox('all'))
 
     def LoadPSFImage(self):
         """Loading PSF from file"""
@@ -587,8 +533,6 @@ class DeconvolutionGUI(tk.Toplevel):
             return
         # replacing image on the canvas
         self.cnvImg.create_image(0, 0, image=self.cnvBeadImg, anchor=NW)
-        # updating scrollers
-        # self.cnv1.configure(scrollregion = self.cnv1.bbox('all'))
 
     def DeconvolveIt(self):
         """Deconvolution of image with calculated PSF
@@ -623,19 +567,11 @@ class DeconvolutionGUI(tk.Toplevel):
                 return
             print("decon output shape:", self.imgDecon.shape)
             print("Deconvolution time: %s seconds " % (time.time() - start_time))
-        except:
+        except Exception as exc:
             showerror("Error. Can't finish convolution properly.")
+            print(exc)
             return
-        #       plotting image
-        self.figDec, axs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-        self.figDec.suptitle("Deconvolved")
-        dN = self.imgDecon.shape
-        axs[0].pcolormesh(self.imgDecon[dN[0] // 2, :, :], cmap=cm.jet)
-        axs[1].pcolormesh(self.imgDecon[:, dN[1] // 2, :], cmap=cm.jet)
-        axs[2].pcolormesh(self.imgDecon[:, :, dN[2] // 2], cmap=cm.jet)
-        # plt.show()
-        # Instead of plt.show creating Tkwidget from figure
-        self.figDec_canvas_agg = FigureCanvasTkAgg(self.figDec, self.cnvDecon)
+        self.figDec_canvas_agg = FigureCanvasTkFrom3DArray(self.imgDecon, self.cnvDecon, "Deconvolved")
         self.figDec_canvas_agg.get_tk_widget().grid(
             row=1, column=6, rowspan=10, sticky=(N, E, S, W)
         )
