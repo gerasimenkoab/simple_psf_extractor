@@ -3,4 +3,4 @@ implemintation of simple extractor of experimental PSF
 
 TODO:
 
-- добавить возможность усреднения нескольких псф в одну.
+- deconvolution revision
