@@ -4,3 +4,5 @@ implemintation of simple extractor of experimental PSF
 TODO:
 
 - deconvolution revision
+- RLTV method
+- TM method
