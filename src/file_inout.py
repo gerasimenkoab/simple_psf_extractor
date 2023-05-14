@@ -2,8 +2,10 @@ import numpy as np
 from PIL import Image
 
 
-def ReadTiffStackFile(fileName):
-    """Function ReadTiffStackFile() reads tiff stack from file and return np.array"""
+def ReadTiffStackFile(fileName: str):
+    """
+    Function ReadTiffStackFile() reads tiff stack from file and return np.array
+    """
     print("Loading Image from tiff stack file..... ", end=" ")
     try:
         image_tiff = Image.open(fileName)
@@ -20,8 +22,10 @@ def ReadTiffStackFile(fileName):
         return 0
 
 
-def ReadTiffMultFiles(fileNameList):
-    """Function ReadTiffStackFile() reads tiff stack from file and return np.array"""
+def ReadTiffMultFiles(fileNameList: list):
+    """
+    Function ReadTiffMultFile() reads tiff stack from file and return np.array
+    """
     print("Loading Images from files", end=" ")
     intensity_mult = 10
     try:
@@ -51,6 +55,7 @@ def ReadTiffMultFiles(fileNameList):
     except FileNotFoundError:
         print("ReadTiffStackFile: Error. File not found!")
         return 0
+
 
 def SaveTiffFiles(tiffDraw=np.zeros([3, 4, 6]), dirName="img", filePrefix=""):
     """Print files for any input arrray of intensity values
@@ -114,4 +119,3 @@ def SaveAsTiffStack_tag(tiffDraw=np.zeros([3, 4, 6]), filename="img", outtype="u
         filename, tiffinfo="testing tag system", save_all=True, append_images=imlist[1:]
     )
     print("File saved in one tiff", filename)
-

@@ -267,6 +267,11 @@ class BeadExtractionGUI(tk.Toplevel):
         # frameIdealBead.grid(row =7,column = 0,sticky='we')
 
         ttk.Separator(f0, orient="horizontal").pack(ipadx=200, pady=10)
+        Button(f0, text="Average Several Beads", command=self.AvrageManyBeads).pack(
+            side=TOP, padx=2, pady=2
+        )  # grid(row = 6, column = 3,padx=2,pady=2, sticky = 'we')
+
+        f0.grid(row=1, column=0, sticky="NSWE")
 
         Button(f0, text="Close", command=self.CloseWindow).pack(
             side=TOP, padx=2, pady=2
@@ -648,6 +653,48 @@ class BeadExtractionGUI(tk.Toplevel):
         self.cnv1.create_image((0, 0), image=self.imgCnv, state = 'normal', anchor=NW)
         # updating scrollers
         self.cnv1.configure(scrollregion=self.cnv1.bbox("all"))
+
+    def AvrageManyBeads(self):
+        """
+        Loading many same size bead files and calculate the arithmetic mean.
+        Output: file with averaged bead.
+        """
+        beadsArray = self.LoadManyBeads()
+        if beadsArray != None:
+            averagedArray = sum(beadsArray) / len(beadsArray)
+            fio.SaveAsTiffStack(averagedArray,asksaveasfilename())
+
+
+    def LoadManyBeads(self):
+        """Loading many raw bead photos from files"""
+        fileList = askopenfilenames(title="Load Bead Photos")
+        beadsList = []
+        dimensions = []
+        if len(fileList) < 1:
+            showerror("No bead files selected.")
+            return None
+        else:
+            fPath = fileList[0]
+            newArray = fio.ReadTiffStackFile(fPath)
+            dimensions = newArray.shape
+            beadsList.append( newArray )
+            for fPath in fileList[1:]:
+                try:
+                    newArray = fio.ReadTiffStackFile(fPath)
+                    print(dimensions,newArray.shape,fPath)
+                    if dimensions == newArray.shape:
+                        print(dimensions == newArray.shape)
+                        beadsList.append( newArray )
+                    else:
+                        showerror( "Error", "Beads must have the same dimensions. Wrong size at: " + fPath )
+                        return None
+                except Exception as exc:
+                    showerror("Error", "Beads load for averaging failed.")
+                    print(exc)
+                    return
+        return beadsList
+    
+    
 
     def BeadMarkClickOld(self, event):
         """Append mouse event coordinates to global list."""
