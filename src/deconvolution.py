@@ -3,6 +3,7 @@ from scipy import misc
 import numpy as np
 import itertools
 from scipy.special import jv
+from scipy.ndimage import laplace
 from tkinter.messagebox import showerror, showinfo
 
 from scipy.signal import convolve, fftconvolve
@@ -111,17 +112,6 @@ def MakeIdealSphereArray(imgSize=36, sphRadius=5):
     return tiffDraw
 
 
-# def MakeIdealSphereArray(imgSize = 36, sphRadius = 5):
-#     """create ideall sphere array"""
-#     imgMidCoord = 0.5 * (imgSize)
-#     imgCenter = np.array([imgMidCoord,imgMidCoord,imgMidCoord])
-#     tiffDraw = np.ndarray([imgSize,imgSize,imgSize])
-#     lightIntensity = 1000
-#     for i in range(imgSize):
-#       for j in range(imgSize):
-#         for k in range(imgSize):
-#           tiffDraw[i,j,k] = PointFunction(np.array([i,j,k]), imgCenter, sphRadius, lightIntensity)
-#     return tiffDraw
 
 
 def LoadIdealSphereArray(imgSize=36, sphRadius=5):
@@ -181,7 +171,6 @@ def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False)
     # end of iteration cycle
 
     xdim = f_old.shape[1]
-    #    print("shape: ",xdim)
     xstart = xdim // 4
     xend = xstart + xdim // 2
     hm = hm[xstart:xend, xstart:xend, xstart:xend]
@@ -255,19 +244,14 @@ def divergence(F):
     return reduce(np.add, np.gradient(F))
 
 
-def DeconvolutionRLTV(image, imgPSF, iterLimit=20, debug_flag=False):
-    """Function for  convolution Richardson Lucy Total Variation"""
+def DeconvolutionRLTMR(image:np.ndarray, imgPSF:np.ndarray, iterLimit = 20, debug_flag = False):
+    """Function for  convolution Richardson Lucy tikhonov Miller Regularisation"""
 
     hm = image
     # if there is NAN in image array(seems from source image) replace it with zeros
     hm[np.isnan(hm)] = 0.0
-    # do image padding
-    pad = imgPSF.shape
-    hm = np.pad(hm, ((pad[0], pad[0]), (pad[1], pad[1]), (pad[2], pad[2])), "edge")
     beadMaxInt = np.amax(image)
-
     p = imgPSF
-
     b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
 
     if debug_flag:
@@ -279,15 +263,11 @@ def DeconvolutionRLTV(image, imgPSF, iterLimit=20, debug_flag=False):
             hm.shape,
             imgPSF.shape,
         )
-    #    print( np.mean(hm[0,0,:]),np.mean(hm[0,:,0]),np.mean(hm[:,0,0]) )
-    #    print(np.amax(hm[0,0,:]),np.amax(hm[0,:,0]),np.amax(hm[:,0,0]))
-    #        input("debug end")
     #    b_noize = 0.1
     # preparing for start of iteration cycle
     f_old = hm
-    #    Hm = np.fft.fftn(hm)
-    #    P = np.fft.fftn(p)
     # starting iteration cycle
+    lambdaTM = 0.0001
     for k in range(0, iterLimit):
         print("\r", "iter:", k, end=" ")
         # first convolution
@@ -300,23 +280,85 @@ def DeconvolutionRLTV(image, imgPSF, iterLimit=20, debug_flag=False):
         rnew = signal.fftconvolve(r, p1, mode="same")
         rnew = np.real(rnew)
         #      rnew = rnew.clip(min=0)
-        lambdaTV = 0.001
         # https://stackoverflow.com/questions/11435809/compute-divergence-of-vector-field-using-python
-        regTV = 1.0 - lambdaTV * divergence(np.gradient(f_old))
-        regTV = 1.0
-        f_old = f_old * rnew
-        f_old = f_old  # / np.amax(f_old) * beadMaxInt
-    # end of iteration cycle
-    imSh = hm.shape
-    pad = imgPSF.shape
-    f_old = f_old[
-        pad[0] : imSh[0] - pad[0], pad[1] : imSh[1] - pad[1], pad[2] : imSh[2] - pad[2]
-    ]
+        regTM = 1.0 + 2.0 * lambdaTM * laplace(f_old)
+        f_old = f_old * rnew / regTM
+        f_old = f_old   / np.amax(f_old) * beadMaxInt
+    xdim = f_old.shape[1]
+    xstart = xdim // 4
+    xend = xstart + xdim // 2
+    f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
+
     if debug_flag:
         print("Debug output:")
+        print("Input image shape: ", image.shape)
         print("Deconvoluiton output shape :", f_old.shape)
 
     return f_old
+
+def DeconvolutionRLTVR(image:np.ndarray, imgPSF:np.ndarray, iterLimit = 20, debug_flag = False):
+    """Function for  convolution Richardson Lucy Total Variation"""
+
+    hm = image
+    # if there is NAN in image array(seems from source image) replace it with zeros
+    hm[np.isnan(hm)] = 0.0
+    beadMaxInt = np.amax(image)
+    p = imgPSF
+    b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
+
+    if debug_flag:
+        print("Debug output:")
+        print("Background intensity:", b_noize, "Max intensity:", np.amax(hm))
+        print(
+            "Deconvoluiton input shape (image, padded, psf):",
+            image.shape,
+            hm.shape,
+            imgPSF.shape,
+        )
+    #    b_noize = 0.1
+    # preparing for start of iteration cycle
+    f_old = hm
+    # starting iteration cycle
+    lambdaTV = 0.005
+    lambdaTM = 0.0001
+    for k in range(0, iterLimit):
+        print("\r", "iter:", k, end=" ")
+        # first convolution
+        e = signal.fftconvolve(f_old, p, mode="same")
+        # e = np.real(e)
+        e = e + b_noize
+        r = hm / e
+        # second convolution
+        p1 = np.flip(p)
+        rnew = signal.fftconvolve(r, p1, mode="same")
+        rnew = np.real(rnew)
+        #      rnew = rnew.clip(min=0)
+        # https://stackoverflow.com/questions/11435809/compute-divergence-of-vector-field-using-python
+        regTM = 1.0 + 2.0 * lambdaTM * laplace(f_old)
+        # regTV = 1.0 - lambdaTV * divergence(np.gradient(f_old))
+        # regTV = 1.0
+        f_old = f_old * rnew / regTM
+        f_old = f_old   / np.amax(f_old) * beadMaxInt
+    # end of iteration cycle
+    # imSh = hm.shape
+    # pad = imgPSF.shape
+    # f_old = f_old[
+    #     pad[0] : imSh[0] - pad[0], pad[1] : imSh[1] - pad[1], pad[2] : imSh[2] - pad[2]
+    # ]
+    xdim = f_old.shape[1]
+    xstart = xdim // 4
+    xend = xstart + xdim // 2
+    # hm = hm[xstart:xend, xstart:xend, xstart:xend]
+    # p = p[xstart:xend, xstart:xend, xstart:xend]
+    f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
+
+    if debug_flag:
+        print("Debug output:")
+        print("Input image shape: ", image.shape)
+        print("Deconvoluiton output shape :", f_old.shape)
+
+    return f_old
+
 
 
 def EM_MLE_3D(pImg, idSphImg, iterLimit=20, debug_flag=True):
@@ -541,4 +583,38 @@ def richardson_lucy_deconvolution_3d_tv(
         pad[1] // 2 : -pad[1] // 2,
         pad[2] // 2 : -pad[2] // 2,
     ]
+    return deconvolved
+
+def richardson_lucy_tv_deconvolve(image: np.ndarray, kernel: np.ndarray, iterations, regularization):
+
+#    pad = kernel.shape
+#    hm = np.pad(hm, ((pad[0], pad[0]), (pad[1], pad[1]), (pad[2], pad[2])), "edge")
+
+    # Pad the image with zeros to handle borders
+    padded_image = np.pad(image, 1, mode='constant')
+
+    # Initialize the deconvolved image
+    deconvolved = np.ones_like(padded_image)
+
+    # Iterate the RLTV algorithm
+    for i in range(iterations):
+        # Compute the blurred image
+        blurred = convolve(deconvolved, kernel, mode='same')
+
+        # Compute the relative difference between the input and blurred image
+        relative_difference = image / blurred
+
+        # Compute the total variation of the deconvolved image
+        gradient = np.gradient(deconvolved)
+        total_variation = np.sqrt(gradient[0]**2 + gradient[1]**2 + gradient[2]**2)
+
+        # Compute the update term
+        update = blurred * convolve(relative_difference, kernel[::-1, ::-1, ::-1], mode='same') - regularization * total_variation
+
+        # Update the deconvolved image
+        deconvolved *= convolve(update, kernel, mode='same')
+
+    # Remove the padding
+    deconvolved = deconvolved[1:-1, 1:-1, 1:-1]
+
     return deconvolved

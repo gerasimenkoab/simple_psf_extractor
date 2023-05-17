@@ -430,11 +430,24 @@ class DeconvolutionGUI(tk.Toplevel):
                     self.imArr1.shape[1],
                     self.imArr1.shape[2],
                 )
-                self.imgPSF = decon.MaxLikelhoodEstimationFFT_3D(
+                #Richardson Lucy
+                # self.imgPSF = decon.MaxLikelhoodEstimationFFT_3D(
+                #     self.imArr1,
+                #     decon.MakeIdealSphereArray(self.imArr1.shape[0], self.beadSizepx),
+                #     self.itNum,
+                # )
+                #Richardson Lucy with TM regularisation
+                self.imgPSF = decon.DeconvolutionRLTMR(
                     self.imArr1,
                     decon.MakeIdealSphereArray(self.imArr1.shape[0], self.beadSizepx),
-                    self.itNum,
+                    self.itNum, False
                 )
+                # self.imgPSF = decon.richardson_lucy_tv_deconvolve(
+                #     self.imArr1,
+                #     decon.MakeIdealSphereArray(self.imArr1.shape[0], self.beadSizepx),
+                #     self.itNum,
+                #     0.001
+                # )
             except:
                 showerror("Error. Can't finish convolution properly.")
                 return
