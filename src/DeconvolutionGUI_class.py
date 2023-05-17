@@ -437,7 +437,13 @@ class DeconvolutionGUI(tk.Toplevel):
                 #     self.itNum,
                 # )
                 #Richardson Lucy with TM regularisation
-                self.imgPSF = decon.DeconvolutionRLTMR(
+                # self.imgPSF = decon.DeconvolutionRLTMR(
+                #     self.imArr1,
+                #     decon.MakeIdealSphereArray(self.imArr1.shape[0], self.beadSizepx),
+                #     0.0001,
+                #     self.itNum, False
+                # )
+                self.imgPSF = decon.DeconvolutionRLTVR(
                     self.imArr1,
                     decon.MakeIdealSphereArray(self.imArr1.shape[0], self.beadSizepx),
                     0.0001,

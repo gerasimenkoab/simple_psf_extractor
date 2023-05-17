@@ -330,9 +330,10 @@ def DeconvolutionRLTVR(image:np.ndarray, imgPSF:np.ndarray, lambdaTV =0.0001, it
         rnew = np.real(rnew)
         #      rnew = rnew.clip(min=0)
         # https://stackoverflow.com/questions/11435809/compute-divergence-of-vector-field-using-python
-        regTV = 1.0 - lambdaTV * divergence(np.gradient(f_old))
-        regTV = 1.0
-        f_old = f_old * rnew / regTM
+        # regTV = 1.0 - lambdaTV * divergence(np.gradient(f_old))
+        gr = np.gradient(f_old)
+        regTV = 1.0 - lambdaTV * np.sqrt(gr[0]**2+gr[1]**2+gr[2]**2)
+        f_old = f_old * rnew / regTV
         f_old = f_old   / np.amax(f_old) * beadMaxInt
     # end of iteration cycle
     # imSh = hm.shape
