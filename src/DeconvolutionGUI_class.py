@@ -440,6 +440,7 @@ class DeconvolutionGUI(tk.Toplevel):
                 self.imgPSF = decon.DeconvolutionRLTMR(
                     self.imArr1,
                     decon.MakeIdealSphereArray(self.imArr1.shape[0], self.beadSizepx),
+                    0.0001,
                     self.itNum, False
                 )
                 # self.imgPSF = decon.richardson_lucy_tv_deconvolve(

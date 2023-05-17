@@ -244,7 +244,7 @@ def divergence(F):
     return reduce(np.add, np.gradient(F))
 
 
-def DeconvolutionRLTMR(image:np.ndarray, imgPSF:np.ndarray, iterLimit = 20, debug_flag = False):
+def DeconvolutionRLTMR(image:np.ndarray, imgPSF:np.ndarray, lambdaTV =0.0001, iterLimit = 20, debug_flag = False):
     """Function for  convolution Richardson Lucy tikhonov Miller Regularisation"""
 
     hm = image
@@ -267,7 +267,6 @@ def DeconvolutionRLTMR(image:np.ndarray, imgPSF:np.ndarray, iterLimit = 20, debu
     # preparing for start of iteration cycle
     f_old = hm
     # starting iteration cycle
-    lambdaTM = 0.0001
     for k in range(0, iterLimit):
         print("\r", "iter:", k, end=" ")
         # first convolution
@@ -279,8 +278,6 @@ def DeconvolutionRLTMR(image:np.ndarray, imgPSF:np.ndarray, iterLimit = 20, debu
         p1 = np.flip(p)
         rnew = signal.fftconvolve(r, p1, mode="same")
         rnew = np.real(rnew)
-        #      rnew = rnew.clip(min=0)
-        # https://stackoverflow.com/questions/11435809/compute-divergence-of-vector-field-using-python
         regTM = 1.0 + 2.0 * lambdaTM * laplace(f_old)
         f_old = f_old * rnew / regTM
         f_old = f_old   / np.amax(f_old) * beadMaxInt
@@ -296,7 +293,7 @@ def DeconvolutionRLTMR(image:np.ndarray, imgPSF:np.ndarray, iterLimit = 20, debu
 
     return f_old
 
-def DeconvolutionRLTVR(image:np.ndarray, imgPSF:np.ndarray, iterLimit = 20, debug_flag = False):
+def DeconvolutionRLTVR(image:np.ndarray, imgPSF:np.ndarray, lambdaTV =0.0001, iterLimit = 20, debug_flag = False):
     """Function for  convolution Richardson Lucy Total Variation"""
 
     hm = image
@@ -320,7 +317,6 @@ def DeconvolutionRLTVR(image:np.ndarray, imgPSF:np.ndarray, iterLimit = 20, debu
     f_old = hm
     # starting iteration cycle
     lambdaTV = 0.005
-    lambdaTM = 0.0001
     for k in range(0, iterLimit):
         print("\r", "iter:", k, end=" ")
         # first convolution
@@ -334,9 +330,8 @@ def DeconvolutionRLTVR(image:np.ndarray, imgPSF:np.ndarray, iterLimit = 20, debu
         rnew = np.real(rnew)
         #      rnew = rnew.clip(min=0)
         # https://stackoverflow.com/questions/11435809/compute-divergence-of-vector-field-using-python
-        regTM = 1.0 + 2.0 * lambdaTM * laplace(f_old)
-        # regTV = 1.0 - lambdaTV * divergence(np.gradient(f_old))
-        # regTV = 1.0
+        regTV = 1.0 - lambdaTV * divergence(np.gradient(f_old))
+        regTV = 1.0
         f_old = f_old * rnew / regTM
         f_old = f_old   / np.amax(f_old) * beadMaxInt
     # end of iteration cycle
