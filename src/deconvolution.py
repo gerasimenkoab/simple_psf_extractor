@@ -10,10 +10,100 @@ from scipy.signal import convolve, fftconvolve
 from scipy.ndimage import gaussian_filter
 
 
+def DeconPSF(
+    image: np.ndarray, beadSizePx: int, iterNum: int,
+    deconType: str, lambdaR: float
+):
+    """
+    General function for restoration of PSF
+    Input:
+        image: np.ndarray  - averaged single bead image
+        beadSizePx: int - actual bead size in pixels
+        iterNum: int - number of iteration steps
+        deconType: str  - deconvolution method name ( default - RL)
+        lambdaR: float - regularization coefficient
+    Returns:
+        imagePSF: np.ndarray
+    """
+    imagePSF: np.ndarray
+    if deconType == "RL":
+        # Richardson Lucy
+        imagePSF = MaxLikelhoodEstimationFFT_3D(
+            image,
+            MakeIdealSphereArray(image.shape[0], beadSizePx),
+            iterNum, False
+        )
+    elif deconType == "RLTMR":
+        # Richardson Lucy with Tikhonov-Miller regularisation
+        imagePSF = DeconvolutionRLTMR(
+            image,
+            MakeIdealSphereArray(image.shape[0], beadSizePx),
+            lambdaR,
+            iterNum, False
+        )
+    elif deconType == "RLTVR":
+        # Richardson Lucy with Total Variation regularisation
+        imagePSF = DeconvolutionRLTVR(
+            image,
+            MakeIdealSphereArray(image.shape[0], beadSizePx),
+            lambdaR,
+            iterNum, False
+        )
+    else:
+        imagePSF = None
+        print("DeconPSF: Invalid option. Please choose a valid option.")
+
+    return imagePSF
+
+
+def DeconImage(
+    image: np.ndarray, kernell: np.ndarray,
+    iterNum: int, deconType: str, lambdaR: float
+):
+    """
+    General function for restoration of image with known PSF(kernell)
+    Input:
+        image: np.ndarray  - averaged single bead image
+        kernell: np.ndarray - PSF or other kernell
+        iterNum: int - number of iteration steps
+        deconType: str  - deconvolution method name ( default - RL)
+        lambdaR: float - regularization coefficient
+    Returns:
+        imagePSF: np.ndarray
+    """
+    imageDeconvolved: np.ndarray
+
+    if deconType == "RL":
+        # Richardson Lucy
+        imageDeconvolved = MaxLikelhoodEstimationFFT_3D(
+            image, kernell,
+            iterNum, False
+        )
+    elif deconType == "RLTMR":
+        # Richardson Lucy with Tikhonov-Miller regularisation
+        imageDeconvolved = DeconvolutionRLTMR(
+            image, kernell,
+            lambdaR, iterNum, False
+        )
+    elif deconType == "RLTVR":
+        # Richardson Lucy with Total Variation regularisation
+        imageDeconvolved = DeconvolutionRLTVR(
+            image, kernell,
+            lambdaR, iterNum, False
+        )
+    else:
+        imagePSF = None
+        print("DeconImage: Invalid option. Please choose a valid option.")
+
+    return imageDeconvolved
+
+
 def PointFunction(pt, r0, r, maxIntensity):
-    """Function of sphere of radius r with center in r0.
+    """
+    Function of sphere of radius r with center in r0.
     Function return maxIntensity if pt in sphere and 0 if out of sphere.
-    pt and r0 are np.array vectors : np.array([x,y,z])"""
+    pt and r0 are np.array vectors : np.array([x,y,z])
+    """
     if (pt - r0).dot(pt - r0) <= r * r:
         result = maxIntensity
     else:
@@ -22,7 +112,8 @@ def PointFunction(pt, r0, r, maxIntensity):
 
 
 def PointFunctionAiryNotZoomed(pt, r0, maxIntensity=255, zoomfactor=2.6):
-    """Function of sphere of radius r with center in r0.
+    """
+    Function of sphere of radius r with center in r0.
     Function return Airy disk intesity within first circle if pt in sphere and 0 if out of sphere.
     pt and r0 are np.array vectors : np.array([x,y,z])
     All  dimension in pixels are equal to x-dimension
@@ -110,8 +201,6 @@ def MakeIdealSphereArray(imgSize=36, sphRadius=5):
         )
     print("Sphere created")
     return tiffDraw
-
-
 
 
 def LoadIdealSphereArray(imgSize=36, sphRadius=5):
@@ -244,7 +333,13 @@ def divergence(F):
     return reduce(np.add, np.gradient(F))
 
 
-def DeconvolutionRLTMR(image:np.ndarray, imgPSF:np.ndarray, lambdaTV =0.0001, iterLimit = 20, debug_flag = False):
+def DeconvolutionRLTMR(
+    image: np.ndarray,
+    imgPSF: np.ndarray,
+    lambdaTM=0.0001,
+    iterLimit=20,
+    debug_flag=False,
+):
     """Function for  convolution Richardson Lucy tikhonov Miller Regularisation"""
 
     hm = image
@@ -280,7 +375,7 @@ def DeconvolutionRLTMR(image:np.ndarray, imgPSF:np.ndarray, lambdaTV =0.0001, it
         rnew = np.real(rnew)
         regTM = 1.0 + 2.0 * lambdaTM * laplace(f_old)
         f_old = f_old * rnew / regTM
-        f_old = f_old   / np.amax(f_old) * beadMaxInt
+        f_old = f_old / np.amax(f_old) * beadMaxInt
     xdim = f_old.shape[1]
     xstart = xdim // 4
     xend = xstart + xdim // 2
@@ -293,7 +388,14 @@ def DeconvolutionRLTMR(image:np.ndarray, imgPSF:np.ndarray, lambdaTV =0.0001, it
 
     return f_old
 
-def DeconvolutionRLTVR(image:np.ndarray, imgPSF:np.ndarray, lambdaTV =0.0001, iterLimit = 20, debug_flag = False):
+
+def DeconvolutionRLTVR(
+    image: np.ndarray,
+    imgPSF: np.ndarray,
+    lambdaTV=0.0001,
+    iterLimit=20,
+    debug_flag=False,
+):
     """Function for  convolution Richardson Lucy Total Variation"""
 
     hm = image
@@ -332,9 +434,9 @@ def DeconvolutionRLTVR(image:np.ndarray, imgPSF:np.ndarray, lambdaTV =0.0001, it
         # https://stackoverflow.com/questions/11435809/compute-divergence-of-vector-field-using-python
         # regTV = 1.0 - lambdaTV * divergence(np.gradient(f_old))
         gr = np.gradient(f_old)
-        regTV = 1.0 - lambdaTV * np.sqrt(gr[0]**2+gr[1]**2+gr[2]**2)
+        regTV = 1.0 - lambdaTV * np.sqrt(gr[0] ** 2 + gr[1] ** 2 + gr[2] ** 2)
         f_old = f_old * rnew / regTV
-        f_old = f_old   / np.amax(f_old) * beadMaxInt
+        f_old = f_old / np.amax(f_old) * beadMaxInt
     # end of iteration cycle
     # imSh = hm.shape
     # pad = imgPSF.shape
@@ -354,7 +456,6 @@ def DeconvolutionRLTVR(image:np.ndarray, imgPSF:np.ndarray, lambdaTV =0.0001, it
         print("Deconvoluiton output shape :", f_old.shape)
 
     return f_old
-
 
 
 def EM_MLE_3D(pImg, idSphImg, iterLimit=20, debug_flag=True):
@@ -581,36 +682,3 @@ def richardson_lucy_deconvolution_3d_tv(
     ]
     return deconvolved
 
-def richardson_lucy_tv_deconvolve(image: np.ndarray, kernel: np.ndarray, iterations, regularization):
-
-#    pad = kernel.shape
-#    hm = np.pad(hm, ((pad[0], pad[0]), (pad[1], pad[1]), (pad[2], pad[2])), "edge")
-
-    # Pad the image with zeros to handle borders
-    padded_image = np.pad(image, 1, mode='constant')
-
-    # Initialize the deconvolved image
-    deconvolved = np.ones_like(padded_image)
-
-    # Iterate the RLTV algorithm
-    for i in range(iterations):
-        # Compute the blurred image
-        blurred = convolve(deconvolved, kernel, mode='same')
-
-        # Compute the relative difference between the input and blurred image
-        relative_difference = image / blurred
-
-        # Compute the total variation of the deconvolved image
-        gradient = np.gradient(deconvolved)
-        total_variation = np.sqrt(gradient[0]**2 + gradient[1]**2 + gradient[2]**2)
-
-        # Compute the update term
-        update = blurred * convolve(relative_difference, kernel[::-1, ::-1, ::-1], mode='same') - regularization * total_variation
-
-        # Update the deconvolved image
-        deconvolved *= convolve(update, kernel, mode='same')
-
-    # Remove the padding
-    deconvolved = deconvolved[1:-1, 1:-1, 1:-1]
-
-    return deconvolved
