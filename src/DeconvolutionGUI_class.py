@@ -430,33 +430,15 @@ class DeconvolutionGUI(tk.Toplevel):
                     self.imArr1.shape[1],
                     self.imArr1.shape[2],
                 )
-                #Richardson Lucy
-                # self.imgPSF = decon.MaxLikelhoodEstimationFFT_3D(
-                #     self.imArr1,
-                #     decon.MakeIdealSphereArray(self.imArr1.shape[0], self.beadSizepx),
-                #     self.itNum,
-                # )
-                #Richardson Lucy with TM regularisation
-                # self.imgPSF = decon.DeconvolutionRLTMR(
-                #     self.imArr1,
-                #     decon.MakeIdealSphereArray(self.imArr1.shape[0], self.beadSizepx),
-                #     0.0001,
-                #     self.itNum, False
-                # )
-                self.imgPSF = decon.DeconvolutionRLTVR(
-                    self.imArr1,
-                    decon.MakeIdealSphereArray(self.imArr1.shape[0], self.beadSizepx),
-                    0.0001,
-                    self.itNum, False
+                self.lambdaR_PSF = 0.0001
+                self.typeDeconPSF = "RLTMR"
+                print("call DeconPSF")
+                self.imgPSF = decon.DeconPSF(
+                    self.imArr1, self.beadSizepx,
+                    self.itNum, self.typeDeconPSF, self.lambdaR_PSF
                 )
-                # self.imgPSF = decon.richardson_lucy_tv_deconvolve(
-                #     self.imArr1,
-                #     decon.MakeIdealSphereArray(self.imArr1.shape[0], self.beadSizepx),
-                #     self.itNum,
-                #     0.001
-                # )
-            except:
-                showerror("Error. Can't finish convolution properly.")
+            except Exception as exc:
+                showerror("Error. Can't finish convolution properly. ",str(exc))
                 return
             self.figPSF_canvas_agg = FigureCanvasTkFrom3DArray(self.imgPSF, self.cnvPSF, plotName = "PSF")
             self.figPSF_canvas_agg.get_tk_widget().grid(
