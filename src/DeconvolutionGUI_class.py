@@ -1,5 +1,6 @@
 from tkinter import *
 import tkinter as tk
+from tkinter import ttk
 from tkinter.messagebox import showerror, showinfo, askokcancel
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.filedialog import askopenfilenames
@@ -131,6 +132,10 @@ class DeconvolutionGUI(tk.Toplevel):
         # Label(text="Resolution Z(nm/pixel)").grid(row = 5,column = 1)
         self.beadImZResWgt = Entry(f2, width=15, bg="white", fg="black")
         self.beadImZResWgt.grid(row=2, column=2, sticky="w")
+        # setting default values
+        self.beadSizeWgt.insert(0, str(200))
+        self.beadImXYResWgt.insert(0, str(22))
+        self.beadImZResWgt.insert(0, str(100))
 
         Label(
             f2,
@@ -139,17 +144,45 @@ class DeconvolutionGUI(tk.Toplevel):
         ).grid(
             row=3, column=0, columnspan=2, sticky="w"
         )  # blanc insert
-        Label(f2, text="Iteration number:").grid(row=4, column=0)
-        self.iterNumWgt = Entry(f2, width=15, bg="white", fg="black")
-        self.iterNumWgt.grid(row=4, column=1, sticky="w")
-        # setting default values
-        self.beadSizeWgt.insert(0, str(200))
-        self.beadImXYResWgt.insert(0, str(22))
-        self.beadImZResWgt.insert(0, str(100))
+
+        self.deconPSFMenuText = ["RL", "RLTMR", "RLTVR"]
+        self.deconPSFType = StringVar()
+        self.deconPSFType.set(self.deconPSFMenuText[0])
+
+        frameDeconPSFTypeSelect = Frame(f2)
+        Label(frameDeconPSFTypeSelect, width=25, text="Deconvolution method:").pack(
+            side=LEFT, padx=2, pady=2
+        )
+        #            OptionMenu(frameBlurTypeSelect, self.blurApplyType, *self.blurMenuTypeText).pack(side = LEFT, padx = 2,pady = 2)
+        deconPSFSelect = ttk.Combobox(
+            frameDeconPSFTypeSelect,
+            textvariable=self.deconPSFType,
+            values=self.deconPSFMenuText,
+            state="readonly",
+        )
+        deconPSFSelect.current(0)
+        deconPSFSelect.pack(side=LEFT, padx=2, pady=2)
+        frameDeconPSFTypeSelect.grid(row=4, column = 0, columnspan=2,sticky="w")
+
+        frameIterNumberInput = Frame(f2)
+        Label(frameIterNumberInput, text="Iteration number:").pack(
+            side=LEFT, padx=2, pady=2
+        )
+        self.iterNumWgt = Entry(frameIterNumberInput,width=10, bg="white", fg="black")
+        self.iterNumWgt.pack( side=LEFT, padx=2, pady=2 )
+        # setting default value
         self.iterNumWgt.insert(0, str(50))
 
+        Label(frameIterNumberInput,  text="Regularization:").pack(
+            side=LEFT, padx=2, pady=2
+        )
+        self.iterRegNumWgt = Entry(frameIterNumberInput, width=10, bg="white", fg="black")
+        self.iterRegNumWgt.pack( side=LEFT, padx=2, pady=2 )
+        # setting default value
+        self.iterRegNumWgt.insert(0, str(0.0001))
+        frameIterNumberInput.grid(row=5, column = 0,columnspan=2,sticky="w")
         Button(f2, text="Calculate PSF", command=self.CalculatePSF).grid(
-            row=4, column=2
+            row=4, column=2, padx=2, pady=2 
         )
 
         # Label(text="PSF folder").grid(row = 8,column = 1)
@@ -163,7 +196,7 @@ class DeconvolutionGUI(tk.Toplevel):
 
         #    Button(f2,text = 'Save PSF multi-file',command=self.SavePSFMulti).grid(row=5, column=0)
         Button(f2, text="Save PSF as tiff", command=self.SavePSFSingle).grid(
-            row=5, column=1
+            row=5, column=2, padx=2, pady=2 
         )
 
         Separator(f2, orient="horizontal").grid(
