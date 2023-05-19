@@ -85,6 +85,8 @@ class GetStringPopup(Frame):
 class DeconvolutionGUI(tk.Toplevel):
     def __init__(self, parent, wwidth=800, wheight=2000):
         super().__init__(parent)
+        gui_var_dict ={}
+        gui_widgets_dict = {}
         self.imgBeadRawLoad = FALSE
 
         self.beadVoxelSize = [
@@ -145,7 +147,7 @@ class DeconvolutionGUI(tk.Toplevel):
             row=3, column=0, columnspan=2, sticky="w"
         )  # blanc insert
 
-        self.deconPSFMenuText = ["RL", "RLTMR", "RLTVR"]
+        self.deconPSFMenuText = ["Richardson-Lucy", "Richardson-Lucy TM Reg", "Richardson-Lucy TV Reg"]
         self.deconPSFType = StringVar()
         self.deconPSFType.set(self.deconPSFMenuText[0])
 
@@ -168,7 +170,7 @@ class DeconvolutionGUI(tk.Toplevel):
         Label(frameIterNumberInput, text="Iteration number:").pack(
             side=LEFT, padx=2, pady=2
         )
-        self.iterNumWgt = Entry(frameIterNumberInput,width=10, bg="white", fg="black")
+        self.iterNumWgt = Entry(frameIterNumberInput,width=5, bg="white", fg="black")
         self.iterNumWgt.pack( side=LEFT, padx=2, pady=2 )
         # setting default value
         self.iterNumWgt.insert(0, str(50))
