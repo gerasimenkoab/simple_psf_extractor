@@ -12,7 +12,7 @@ from scipy.ndimage import gaussian_filter
 
 def DeconPSF(
     image: np.ndarray, beadSizePx: int, iterNum: int,
-    deconType: str, lambdaR: float
+    deconType: str, lambdaR: float, progBar, parentWin
 ):
     """
     General function for restoration of PSF
@@ -28,10 +28,11 @@ def DeconPSF(
     imagePSF: np.ndarray
     if deconType == "RL":
         # Richardson Lucy
+        print(deconType," selected")
         imagePSF = MaxLikelhoodEstimationFFT_3D(
             image,
             MakeIdealSphereArray(image.shape[0], beadSizePx),
-            iterNum, False
+            iterNum, False, progBar, parentWin
         )
     elif deconType == "RLTMR":
         # Richardson Lucy with Tikhonov-Miller regularisation
@@ -39,7 +40,7 @@ def DeconPSF(
             image,
             MakeIdealSphereArray(image.shape[0], beadSizePx),
             lambdaR,
-            iterNum, False
+            iterNum, False, progBar, parentWin
         )
     elif deconType == "RLTVR":
         # Richardson Lucy with Total Variation regularisation
@@ -47,7 +48,7 @@ def DeconPSF(
             image,
             MakeIdealSphereArray(image.shape[0], beadSizePx),
             lambdaR,
-            iterNum, False
+            iterNum, False, progBar, parentWin
         )
     else:
         imagePSF = None
@@ -218,8 +219,10 @@ def LoadIdealSphereArray(imgSize=36, sphRadius=5):
     return tiffDraw
 
 
-def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False):
-    """Function for  convolution"""
+def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False, pb = None , parentWin=None):
+    """
+    Function for  convolution with (Maximum likelihood estimaton)Richardson-Lucy method
+    """
     hm = pImg
     # if there is NAN in image array(seems from source image) replace it with zeros
     hm[np.isnan(hm)] = 0
@@ -241,6 +244,10 @@ def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False)
     f_old = hm
     Hm = np.fft.fftn(hm)
     P = np.fft.fftn(p)
+    if pb != None:
+        # initializing progressbar
+        pb['value'] = 0
+        pb_step = 100 / iterLimit
     # starting iteration cycle
     for k in range(0, iterLimit):
         print("\r", "iter:", k, end=" ")
@@ -257,6 +264,11 @@ def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False)
         f_old = f_old * rnew
 
         f_old = f_old / np.amax(f_old) * beadMaxInt
+        if pb != None:
+            # updaiting progressbar
+            pb.step(pb_step)
+            parentWin.update_idletasks()
+
     # end of iteration cycle
 
     xdim = f_old.shape[1]
@@ -338,7 +350,7 @@ def DeconvolutionRLTMR(
     imgPSF: np.ndarray,
     lambdaTM=0.0001,
     iterLimit=20,
-    debug_flag=False,
+    debug_flag=False, pb = None , parentWin=None
 ):
     """Function for  convolution Richardson Lucy tikhonov Miller Regularisation"""
 
@@ -359,6 +371,10 @@ def DeconvolutionRLTMR(
             imgPSF.shape,
         )
     #    b_noize = 0.1
+    if pb != None:
+        # initializing progressbar
+        pb['value'] = 0
+        pb_step = 100 / iterLimit
     # preparing for start of iteration cycle
     f_old = hm
     # starting iteration cycle
@@ -376,6 +392,11 @@ def DeconvolutionRLTMR(
         regTM = 1.0 + 2.0 * lambdaTM * laplace(f_old)
         f_old = f_old * rnew / regTM
         f_old = f_old / np.amax(f_old) * beadMaxInt
+        if pb != None:
+            # updating progressbar
+            pb.step(pb_step)
+            parentWin.update_idletasks()
+
     xdim = f_old.shape[1]
     xstart = xdim // 4
     xend = xstart + xdim // 2
@@ -394,9 +415,11 @@ def DeconvolutionRLTVR(
     imgPSF: np.ndarray,
     lambdaTV=0.0001,
     iterLimit=20,
-    debug_flag=False,
+    debug_flag=False, pb = None , parentWin=None
 ):
-    """Function for  convolution Richardson Lucy Total Variation"""
+    """
+    Function for  convolution Richardson Lucy Total Variation
+    """
 
     hm = image
     # if there is NAN in image array(seems from source image) replace it with zeros
@@ -415,6 +438,10 @@ def DeconvolutionRLTVR(
             imgPSF.shape,
         )
     #    b_noize = 0.1
+    if pb != None:
+        # initializing progressbar
+        pb['value'] = 0
+        pb_step = 100 / iterLimit
     # preparing for start of iteration cycle
     f_old = hm
     # starting iteration cycle
@@ -437,6 +464,11 @@ def DeconvolutionRLTVR(
         regTV = 1.0 - lambdaTV * np.sqrt(gr[0] ** 2 + gr[1] ** 2 + gr[2] ** 2)
         f_old = f_old * rnew / regTV
         f_old = f_old / np.amax(f_old) * beadMaxInt
+        if pb != None:
+            # updaiting progressbar
+            pb.step(pb_step)
+            parentWin.update_idletasks()
+
     # end of iteration cycle
     # imSh = hm.shape
     # pad = imgPSF.shape

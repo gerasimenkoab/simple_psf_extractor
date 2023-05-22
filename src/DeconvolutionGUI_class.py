@@ -85,8 +85,12 @@ class GetStringPopup(Frame):
 class DeconvolutionGUI(tk.Toplevel):
     def __init__(self, parent, wwidth=800, wheight=2000):
         super().__init__(parent)
-        gui_var_dict ={}
-        gui_widgets_dict = {}
+        #self.gui_var_dict ={}
+        self.deconMethodsDict = {
+            "Richardson-Lucy":"RL",
+            "Richardson-Lucy TM Reg":"RLTMR",
+            "Richardson-Lucy TV Reg":"RLTVR"
+            }
         self.imgBeadRawLoad = FALSE
 
         self.beadVoxelSize = [
@@ -147,41 +151,44 @@ class DeconvolutionGUI(tk.Toplevel):
             row=3, column=0, columnspan=2, sticky="w"
         )  # blanc insert
 
-        self.deconPSFMenuText = ["Richardson-Lucy", "Richardson-Lucy TM Reg", "Richardson-Lucy TV Reg"]
-        self.deconPSFType = StringVar()
-        self.deconPSFType.set(self.deconPSFMenuText[0])
-
         frameDeconPSFTypeSelect = Frame(f2)
-        Label(frameDeconPSFTypeSelect, width=25, text="Deconvolution method:").pack(
+        self.deconPSFType = StringVar()
+        Label(frameDeconPSFTypeSelect, width=21, text="Deconvolution method:").pack(
             side=LEFT, padx=2, pady=2
         )
-        #            OptionMenu(frameBlurTypeSelect, self.blurApplyType, *self.blurMenuTypeText).pack(side = LEFT, padx = 2,pady = 2)
         deconPSFSelect = ttk.Combobox(
             frameDeconPSFTypeSelect,
-            textvariable=self.deconPSFType,
-            values=self.deconPSFMenuText,
+            textvariable = self.deconPSFType,
+            values = list( self.deconMethodsDict.keys() ),
             state="readonly",
         )
         deconPSFSelect.current(0)
         deconPSFSelect.pack(side=LEFT, padx=2, pady=2)
+        self.deconProgBar = ttk.Progressbar(
+            frameDeconPSFTypeSelect,
+            orient = 'horizontal',
+            mode = 'determinate',
+            length = 100
+            )
+        self.deconProgBar.pack(side=LEFT, padx=2, pady=2)
         frameDeconPSFTypeSelect.grid(row=4, column = 0, columnspan=2,sticky="w")
 
         frameIterNumberInput = Frame(f2)
-        Label(frameIterNumberInput, text="Iteration number:").pack(
+        Label(frameIterNumberInput, width=21, text="Iteration number:").pack(
             side=LEFT, padx=2, pady=2
         )
-        self.iterNumWgt = Entry(frameIterNumberInput,width=5, bg="white", fg="black")
-        self.iterNumWgt.pack( side=LEFT, padx=2, pady=2 )
+        self.deconIterNumPSF = Entry(frameIterNumberInput,width=5, bg="white", fg="black")
+        self.deconIterNumPSF.pack( side=LEFT, padx=2, pady=2 )
         # setting default value
-        self.iterNumWgt.insert(0, str(50))
+        self.deconIterNumPSF.insert(0, str(5))
 
-        Label(frameIterNumberInput,  text="Regularization:").pack(
+        Label(frameIterNumberInput, width=15,  text="Regularization:").pack(
             side=LEFT, padx=2, pady=2
         )
-        self.iterRegNumWgt = Entry(frameIterNumberInput, width=10, bg="white", fg="black")
-        self.iterRegNumWgt.pack( side=LEFT, padx=2, pady=2 )
+        self.deconRegCoefPSF = Entry(frameIterNumberInput, width=10, bg="white", fg="black")
+        self.deconRegCoefPSF.pack( side=LEFT, padx=2, pady=2 )
         # setting default value
-        self.iterRegNumWgt.insert(0, str(0.0001))
+        self.deconRegCoefPSF.insert(0, str(0.0001))
         frameIterNumberInput.grid(row=5, column = 0,columnspan=2,sticky="w")
         Button(f2, text="Calculate PSF", command=self.CalculatePSF).grid(
             row=4, column=2, padx=2, pady=2 
@@ -224,18 +231,56 @@ class DeconvolutionGUI(tk.Toplevel):
         Label(f3, text="3. Run deconvolution ", font="Helvetica 10 bold").grid(
             row=6, column=0, sticky="w"
         )
+#====================================
         f3_1 = Frame(f3)
-        Label(f3_1, text="Iteration number:").pack(side=LEFT, padx=2, pady=2)
-        self.iterNumDecWgt = Entry(f3_1, width=5, bg="white", fg="black")
-        self.iterNumDecWgt.pack(side=LEFT, padx=2, pady=2)
-        f3_1.grid(row=7, column=0, sticky="w")
+        self.deconImageType = StringVar()
+        Label(f3_1, width=21, text="Deconvolution method:").pack(
+            side=LEFT, padx=2, pady=2
+        )
+        deconImageSelect = ttk.Combobox(
+            f3_1,
+            textvariable = self.deconImageType,
+            values = list( self.deconMethodsDict.keys() ),
+            state="readonly",
+        )
+        deconImageSelect.current(0)
+        deconImageSelect.pack(side=LEFT, padx=2, pady=2)
+        self.deconProgBarImage = ttk.Progressbar(
+            f3_1,
+            orient = 'horizontal',
+            mode = 'determinate',
+            length = 100
+            )
+        self.deconProgBarImage.pack(side=LEFT, padx=2, pady=2)
+        f3_1.grid(row=7, column = 0, columnspan=2,sticky="w")
 
-        Button(f3, text="Deconvolve", command=self.DeconvolveIt).grid(row=7, column=1)
+        f3_2 = Frame(f3)
+        Label(f3_2, width=21, text="Iteration number:").pack(
+            side=LEFT, padx=2, pady=2
+        )
+        self.deconIterNumImage = Entry(f3_2,width=5, bg="white", fg="black")
+        self.deconIterNumImage.pack( side=LEFT, padx=2, pady=2 )
+        # setting default value
+        self.deconIterNumImage.insert(0, str(5))
+
+        Label(f3_2, width=15,  text="Regularization:").pack(
+            side=LEFT, padx=2, pady=2
+        )
+        self.deconRegCoefImage = Entry(f3_2, width=10, bg="white", fg="black")
+        self.deconRegCoefImage.pack( side=LEFT, padx=2, pady=2 )
+        # setting default value
+        self.deconRegCoefImage.insert(0, str(0.0001))
+        f3_2.grid(row=8, column = 0,columnspan=2,sticky="w")
+
+#====================================
         Button(
-            f3, text="Save deconvolved image", command=self.SaveDeconvImgSingle
-        ).grid(row=8, column=1)
+            f3, text = "Deconvolve", command = self.DeconvolveIt
+        ).grid(row = 7, column = 2, padx=2, pady=2)
+        Button(
+            f3, text = "Save image", command = self.SaveDeconvImgSingle
+        ).grid(row = 8, column = 2, padx=2, pady=2)
         Separator(f3, orient="horizontal").grid(
-            row=9, column=0, ipadx=200, padx=30, pady=10, columnspan=2
+            row=9, column=0, ipadx=200, padx=30, pady=10, columnspan=3
         )
         Button(f3, text="Close", command=self.CloseWindow).grid(row=10, column=1)
         f3.grid(row=3, column=1, sticky="WENS")
@@ -441,7 +486,6 @@ class DeconvolutionGUI(tk.Toplevel):
         txt_beadSizenm = self.beadSizeWgt.get()
         txt_resolutionXY = self.beadImXYResWgt.get()
         txt_resolutionZ = self.beadImZResWgt.get()
-        txt_itNum = self.iterNumWgt.get()
         print(txt_beadSizenm, txt_resolutionXY, txt_resolutionZ)
         if not hasattr(self, "imgBeadRaw"):
             showerror("Error", "No bead image loaded.")
@@ -449,15 +493,12 @@ class DeconvolutionGUI(tk.Toplevel):
             showerror("Error", "Empty Bead size or resolution value.")
         elif txt_beadSizenm == "0" or txt_resolutionXY == "0" or txt_resolutionZ == "0":
             showerror("Error", "Zero Bead size or resolution value.")
-        elif txt_itNum == "0" or txt_itNum == "":
-            txt_itNum = "10"  # default iteration number
         else:
             try:
                 self.beadSizenm = float(txt_beadSizenm)
                 self.resolutionXY = float(txt_resolutionXY)
                 self.resolutionZ = float(txt_resolutionZ)
                 self.beadSizepx = int(self.beadSizenm / self.resolutionXY / 2)
-                self.itNum = int(txt_itNum)
                 self.imArr1 = imtrans.PaddingImg(self.imgBeadRaw)
                 print(
                     "shapes:",
@@ -465,12 +506,14 @@ class DeconvolutionGUI(tk.Toplevel):
                     self.imArr1.shape[1],
                     self.imArr1.shape[2],
                 )
-                self.lambdaR_PSF = 0.0001
-                self.typeDeconPSF = "RLTMR"
+                
                 print("call DeconPSF")
                 self.imgPSF = decon.DeconPSF(
                     self.imArr1, self.beadSizepx,
-                    self.itNum, self.typeDeconPSF, self.lambdaR_PSF
+                    int( self.deconIterNumPSF.get() ),
+                    self.deconMethodsDict[ self.deconPSFType.get() ],
+                    float(self.deconRegCoefPSF.get()),
+                    progBar=self.deconProgBar, parentWin=self
                 )
             except Exception as exc:
                 showerror("Error. Can't finish convolution properly. ",str(exc))
@@ -579,8 +622,8 @@ class DeconvolutionGUI(tk.Toplevel):
         """
         try:
 
-            try:  # get iternum from self.iterNumDecWgt
-                iterLim = int(self.iterNumDecWgt.get())
+            try:  # get iternum from self.self.deconIterNumImage
+                iterLim = int(self.self.deconIterNumImage.get())
             except:
                 iterLim = 10
             try:

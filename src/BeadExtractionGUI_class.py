@@ -219,7 +219,6 @@ class BeadExtractionGUI(tk.Toplevel):
         Label(frameBlurTypeSelect, width=10, text=" Blur type:").pack(
             side=LEFT, padx=2, pady=2
         )
-        #            OptionMenu(frameBlurTypeSelect, self.blurApplyType, *self.blurMenuTypeText).pack(side = LEFT, padx = 2,pady = 2)
         blurTypeSelect = ttk.Combobox(
             frameBlurTypeSelect,
             textvariable=self.blurApplyType,
