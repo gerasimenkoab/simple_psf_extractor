@@ -275,26 +275,26 @@ class DeconvolutionGUI(tk.Toplevel):
 #====================================
         Button(
             f3, text = "Deconvolve", command = self.DeconvolveIt
-        ).grid(row = 7, column = 2, padx=2, pady=2)
+        ).grid(row = 7, column = 2, padx = 2, pady = 2)
         Button(
             f3, text = "Save image", command = self.SaveDeconvImgSingle
-        ).grid(row = 8, column = 2, padx=2, pady=2)
+        ).grid(row = 8, column = 2, padx = 2, pady = 2)
         Separator(f3, orient="horizontal").grid(
-            row=9, column=0, ipadx=200, padx=30, pady=10, columnspan=3
+            row = 9, column = 0, ipadx = 200, padx = 30, pady = 10, columnspan = 3 
         )
-        Button(f3, text="Close", command=self.CloseWindow).grid(row=10, column=1)
-        f3.grid(row=3, column=1, sticky="WENS")
+        Button(f3, text="Close", command=self.CloseWindow).grid(row = 10, column = 1)
+        f3.grid(row = 3, column = 1, sticky="WENS")
 
-        Label(self, text="").grid(row=1, column=4)  # blanc insert
+        Label(self, text="").grid(row = 1, column = 4)  # blanc insert
 
-        self.cnvImg = Canvas(self, width=180, height=450, bg="white")
-        self.cnvImg.grid(row=1, column=5, rowspan=10, sticky=(N, E, S, W))
-        self.cnvPSF = Canvas(self, width=180, height=450, bg="white")
-        self.cnvPSF.grid(row=1, column=6, rowspan=10, sticky=(N, E, S, W))
-        self.cnvDecon = Canvas(self, width=180, height=450, bg="white")
-        self.cnvDecon.grid(row=1, column=7, rowspan=10, sticky=(N, E, S, W))
+        self.cnvImg = Canvas(self, width = 180, height = 450, bg = "white")
+        self.cnvImg.grid(row = 1, column = 5, rowspan = 10, sticky = (N, E, S, W))
+        self.cnvPSF = Canvas(self, width = 180, height = 450, bg = "white")
+        self.cnvPSF.grid(row = 1, column = 6, rowspan = 10, sticky = (N, E, S, W))
+        self.cnvDecon = Canvas(self, width = 180, height = 450, bg = "white")
+        self.cnvDecon.grid(row = 1, column = 7, rowspan = 10, sticky = (N, E, S, W))
 
-        Label(self, text="").grid(row=13, column=6)  # blanc insert
+        Label(self, text = "").grid(row = 13, column = 6)  # blanc insert
 
     def CloseWindow(self):
         """Closing window and clear tmp files"""
