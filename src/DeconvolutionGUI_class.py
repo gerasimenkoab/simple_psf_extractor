@@ -113,12 +113,11 @@ class DeconvolutionGUI(tk.Toplevel):
             text="1. Load avaraged bead image created with bead extractor application.",
             font="Helvetica 10 bold",
         ).grid(row=1, column=0, columnspan=3, sticky="w")
-
-        self.beadImgPathW = Entry(f1, width=50, bg="white", fg="black")
-        self.beadImgPathW.grid(row=2, column=0, columnspan=2, sticky="w")
-        Button(f1, text="Load image file", command=self.LoadBeadImageFile).grid(
-            row=2, column=2
-        )
+        f1ButtonEntryFrame = Frame(f1)
+        Button(f1ButtonEntryFrame, text="Load image file", command=self.LoadBeadImageFile).pack(side = LEFT, padx=10)
+        self.beadImgPathW = Entry(f1ButtonEntryFrame, width=50, bg="white", fg="black")
+        self.beadImgPathW.pack( side = LEFT )
+        f1ButtonEntryFrame.grid(row=2, column=0, columnspan=2, sticky="w")
         Separator(f1, orient="horizontal").grid(
             row=3, column=0, ipadx=200, pady=10, columnspan=3
         )

@@ -32,10 +32,10 @@ class ImageRaw:
         """
             Prints class attributes. 
         """
-        print( "ImageClassInfo:" )
-        print( "path:", self.path )
-        print( "voxel(micrometres):", self.voxelSize )
-        print( "image shape:", self.imArray.shape )
+        print( " ImageClassInfo: " )
+        print( " path: ", self.path )
+        print( " voxel(micrometres): ", self.voxelSize )
+        print( " image shape: ", self.imArray.shape )
         if plotPreview == True:  # draw 3 projections of bead
             figUpsc, figUpscAxs = plt.subplots( 3, 1, sharex=False, figsize=(2, 6) )
             figUpsc.suptitle( "Image preview" )
