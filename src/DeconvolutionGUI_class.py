@@ -190,7 +190,7 @@ class DeconvolutionGUI(tk.Toplevel):
         # setting default value
         self.deconRegCoefPSF.insert(0, str(0.0001))
         frameIterNumberInput.grid(row=5, column = 0,columnspan=2,sticky="w")
-        Button(f2, text="Calculate PSF", command=self.CalculatePSF).grid(
+        Button(f2, text="Calculate PSF", width=12, command=self.CalculatePSF).grid(
             row=4, column=2, padx=2, pady=2 
         )
 
@@ -204,7 +204,7 @@ class DeconvolutionGUI(tk.Toplevel):
         # self.filePrfxPSFWgt.grid(row = 9, column = 2, sticky = 'w')
 
         #    Button(f2,text = 'Save PSF multi-file',command=self.SavePSFMulti).grid(row=5, column=0)
-        Button(f2, text="Save PSF as tiff", command=self.SavePSFSingle).grid(
+        Button(f2, text="Save PSF as tiff", width=12, command=self.SavePSFSingle).grid(
             row=5, column=2, padx=2, pady=2 
         )
 
@@ -220,24 +220,25 @@ class DeconvolutionGUI(tk.Toplevel):
         )
         Label(
             f3, text="1. Load Image tiff stack from file ", font="Helvetica 10 bold"
-        ).grid(row=2, column=0, sticky="w")
-        Button(f3, text="Load  Image", command=self.LoadPhotoImageFile).grid(
-            row=3, column=0
-        )
-
-        self.EntryImageParam = Entry( f3, width = 50 )
+        ).grid(row=2, column=0, columnspan = 2, sticky="w")
+        f3ButtonEntryFrame1 = Frame(f3) 
+        Button(f3ButtonEntryFrame1, text="Load  Image", width=10, command=self.LoadPhotoImageFile).pack(side=LEFT, padx=10)
+        self.EntryImageParam = Entry( f3ButtonEntryFrame1, width = 60 )
         self.EntryImageParam.insert( 0,"No Image Loaded" )
         self.EntryImageParam.configure( state="readonly" )
-        self.EntryImageParam.grid( row = 3, column = 1, columnspan = 2 )
-        
+        self.EntryImageParam.pack(side=LEFT)
+        f3ButtonEntryFrame1.grid(row=3, column=0,columnspan=3)
         Label(
             f3, text="2. Load PSF tiff stack from file ", font="Helvetica 10 bold"
         ).grid( row = 4, column = 0, sticky = "w" )
-        Button(f3, text="Load PSF", command=self.LoadPSFImageFile).grid(row=5, column=0)
-        self.EntryPSFParam = Entry(f3, width = 50)
+        f3ButtonEntryFrame2 = Frame(f3) 
+        Button(f3ButtonEntryFrame2, text="Load PSF", width=10, command=self.LoadPSFImageFile).pack(side=LEFT, padx=10)
+        self.EntryPSFParam = Entry(f3ButtonEntryFrame2, width = 60)
         self.EntryPSFParam.insert(0,"No PSF Loaded")
         self.EntryPSFParam.configure(state = "readonly")
-        self.EntryPSFParam.grid( row = 5, column = 1, columnspan = 2 )
+        self.EntryPSFParam.pack(side=LEFT)
+        f3ButtonEntryFrame2.grid(row=5, column=0,columnspan=3)
+
         Label(f3, text="3. Run deconvolution ", font="Helvetica 10 bold").grid(
             row=6, column=0, sticky="w"
         )
@@ -283,10 +284,10 @@ class DeconvolutionGUI(tk.Toplevel):
         f3_2.grid(row=8, column = 0,columnspan=2,sticky="w")
 
         Button(
-            f3, text = "Deconvolve", command = self.DeconvolveIt
+            f3, text = "Deconvolve", width=10, command = self.DeconvolveIt
         ).grid(row = 7, column = 2, padx = 2, pady = 2)
         Button(
-            f3, text = "Save image", command = self.SaveDeconvImgSingle
+            f3, text = "Save image", width=10, command = self.SaveDeconvImgSingle
         ).grid(row = 8, column = 2, padx = 2, pady = 2)
         Separator(f3, orient="horizontal").grid(
             row = 9, column = 0, ipadx = 200, padx = 30, pady = 10, columnspan = 3 
@@ -422,8 +423,7 @@ class DeconvolutionGUI(tk.Toplevel):
         )
         self.EntryImageParam.configure( state="normal" )
         self.EntryImageParam.delete(0,END)
-        self.EntryImageParam.insert( 0,"Image size(z,y,x): "+str(self.img.imArray.shape)+
-                                    "  Voxel: "+str(self.img.voxelSize) )
+        self.EntryImageParam.insert( 0,self.img.GetImageParam(output = "full") )
         self.EntryImageParam.configure( state="readonly" )
         
     #        self.imArr1 = self.UpscaleImage_Zaxis(self.imArr1,False)
@@ -573,26 +573,49 @@ class DeconvolutionGUI(tk.Toplevel):
         """
         Loading raw bead photo from file located at self.beadImgPath
         """
-        fileList = askopenfilenames(title="Load Beads Photo")
-        try:
-            imgPSFPath = fileList[0]
-            print("Open path: ", imgPSFPath)
-            self.imgPSF = fio.ReadTiffStackFile(imgPSFPath)
-            self.beadVoxelSize = self.GetVoxelDialog( "Enter voxel size as z,x,y in micrometers" )
-            print( "print voxel:", self.beadVoxelSize )
-            self.figPSF_canvas_agg = FigureCanvasTkFrom3DArray( self.imgPSF, self.cnvPSF, plotName="PSF" )
-            self.figPSF_canvas_agg.get_tk_widget().grid(
-                row=1, column=6, rowspan=10, sticky=(N, E, S, W)
+# =========================
+        fileList = askopenfilenames(title="Select PSF file")
+        print(fileList, type(fileList), len(fileList))
+        if len(fileList) > 1:
+            print("ImageRawClass")
+            self.imagePSF = ImageRaw(
+                fileList, self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm"), fio.ReadTiffMultFiles(fileList)
             )
+            self.imagePSF.ShowClassInfo()
+        else:
+            imgPSFPath = fileList[0]
+            print("ImageRawClass")
+            print("Read one file", imgPSFPath)
+            self.imagePSF = ImageRaw(
+                imgPSFPath, self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm"), fio.ReadTiffStackFile(imgPSFPath)
+            )
+            self.imagePSF.ShowClassInfo()
+        
+        self.imagePSF.imArray = self.BlurImage(self.imagePSF.imArray)
+        self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imagePSF.imArray, self.cnvPSF, plotName = "PSF")
+        self.figIMG_canvas_agg.get_tk_widget().grid(
+            row=1, column=5, rowspan=10, sticky=(N, E, S, W)
+        )
+# =========================
+        # fileList = askopenfilenames(title="Load Beads Photo")
+        # try:
+        #     imgPSFPath = fileList[0]
+        #     print("Open path: ", imgPSFPath)
+        #     self.imgPSF = fio.ReadTiffStackFile(imgPSFPath)
+        #     self.beadVoxelSize = self.GetVoxelDialog( "Enter voxel size as z,x,y in micrometers" )
+        #     print( "print voxel:", self.beadVoxelSize )
+        #     self.figPSF_canvas_agg = FigureCanvasTkFrom3DArray( self.imgPSF, self.cnvPSF, plotName="PSF" )
+        #     self.figPSF_canvas_agg.get_tk_widget().grid(
+        #         row=1, column=6, rowspan=10, sticky=(N, E, S, W)
+        #     )
 
-        except Exception as e:
-           # print("LoadPSFImageFile:", e)
-            showerror("LoadPSFImageFile: Error", "Can't read file."+str(e))
-            return
+        # except Exception as e:
+        #    # print("LoadPSFImageFile:", e)
+        #     showerror("LoadPSFImageFile: Error", "Can't read file."+str(e))
+        #     return
         self.EntryPSFParam.configure( state="normal" )
         self.EntryPSFParam.delete(0,END)
-        self.EntryPSFParam.insert( 0,"Image size(z,y,x): "+str(self.img.imArray.shape)+
-                                    "  Voxel: "+str(self.img.voxelSize) )
+        self.EntryPSFParam.insert( 0,self.imagePSF.GetImageParam(output = "full") )
         self.EntryPSFParam.configure( state="readonly" )
 
 
@@ -605,12 +628,12 @@ class DeconvolutionGUI(tk.Toplevel):
         """
         try:
             try:
-                self.img.RescaleZ(self.img.voxelSize[1])
+                self.imagePSF.RescaleZ(self.img.voxelSize[1])
             except Exception as e:
                 print("rescale failed"+str(e))
                 return
             try:
-                self.img.ShowClassInfo()
+                self.imagePSF.ShowClassInfo()
             except Exception as e:
                 print("imageRaw show class fail"+str(e))
                 return
@@ -620,7 +643,7 @@ class DeconvolutionGUI(tk.Toplevel):
                 # TODO replace with the correct deconvolution function as is done in the first part
                 
                 self.imgDecon = decon.DeconImage(
-                    self.img.imArray, self.imgPSF,
+                    self.img.imArray, self.imagePSF.imArray,
                     int( self.deconIterNumImage.get() ),
                     self.deconMethodsDict[ self.deconImageType.get() ],
                     float(self.deconRegCoefImage.get()),

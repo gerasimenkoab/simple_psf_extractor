@@ -304,10 +304,6 @@ def DeconvolutionRL(image, imgPSF, iterLimit=20, debug_flag=False):
             hm.shape,
             imgPSF.shape,
         )
-    #    print( np.mean(hm[0,0,:]),np.mean(hm[0,:,0]),np.mean(hm[:,0,0]) )
-    #    print(np.amax(hm[0,0,:]),np.amax(hm[0,:,0]),np.amax(hm[:,0,0]))
-    #        input("debug end")
-    #    b_noize = 0.1
     # preparing for start of iteration cycle
     f_old = hm
     #    Hm = np.fft.fftn(hm)

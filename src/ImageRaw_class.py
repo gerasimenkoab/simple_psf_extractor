@@ -12,30 +12,33 @@ class ImageRaw:
     """Class for image storage."""
 
     def __init__(
-        self, fpath, voxelSize=[0.1, 0.022, 0.022], imArray=np.zeros((30, 30, 30))
+        self, fpath, voxelSizeIn=[0.1, 0.022, 0.022], imArrayIn=np.zeros((30, 30, 30))
     ):
         self.path = fpath
 
-        if self.CheckVoxel(voxelSize):
+        if self.CheckVoxel(voxelSizeIn):
             # microscope voxel size(z,x,y) in micrometres (resolution=micrometre/pixel)
-            self.beadVoxelSize = voxelSize
+            self.voxelSize = voxelSizeIn
         self.voxelFields = "Z", "X", "Y"
         self.voxelSizeEntries = {}
 
-        self.imArray = imArray
+        self.imArray = imArrayIn
         # fixing possible array value issues
         self.imArray[np.isnan(self.imArray)] = 0  # replace NaN with 0
-        self.imArray.clip(0)  # replace negative with 0
+        self.imArray.clip(0)                      # replace negative with 0
 
     # methods
-    def ShowClassInfo(self, plotPreview=False):
-        print("ImageClassInfo:")
-        print("path:", self.path)
-        print("voxel(micrometres):", self.beadVoxelSize)
-        print("image shape:", self.imArray.shape)
+    def ShowClassInfo( self, plotPreview = False ):
+        """
+            Prints class attributes. 
+        """
+        print( "ImageClassInfo:" )
+        print( "path:", self.path )
+        print( "voxel(micrometres):", self.voxelSize )
+        print( "image shape:", self.imArray.shape )
         if plotPreview == True:  # draw 3 projections of bead
-            figUpsc, figUpscAxs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-            figUpsc.suptitle("Image preview")
+            figUpsc, figUpscAxs = plt.subplots( 3, 1, sharex=False, figsize=(2, 6) )
+            figUpsc.suptitle( "Image preview" )
             figUpscAxs[0].pcolormesh(
                 self.imArray[self.imArray.shape[0] // 2, :, :], cmap=cm.jet
             )
@@ -46,25 +49,29 @@ class ImageRaw:
                 self.imArray[:, :, self.imArray.shape[2] // 2], cmap=cm.jet
             )
             newWin = Toplevel(self)
-            newWin.geometry("200x600")
-            newWin.title("Image ")
-            cnvFigUpsc = Canvas(newWin, width=200, height=600, bg="white")
-            cnvFigUpsc.pack(side=TOP, fill=BOTH, expand=True)
-            FigureCanvasTkAgg(figUpsc, cnvFigUpsc).get_tk_widget().pack(
-                side=TOP, fill=BOTH, expand=True
+            newWin.geometry( "200x600" )
+            newWin.title( "Image " )
+            cnvFigUpsc = Canvas( newWin, width = 200, height = 600, bg = "white" )
+            cnvFigUpsc.pack( side = TOP, fill = BOTH, expand = True )
+            FigureCanvasTkAgg( figUpsc, cnvFigUpsc ).get_tk_widget().pack(
+                side = TOP, fill = BOTH, expand = True
             )
 
     def CheckVoxel(self, voxel):
-        """Checking if voxel empty,wrong length or wrong values. All good return True"""
+        """
+            Checking if voxel empty,wrong length or wrong values. All good return True
+        """
         if len(voxel) != 3 or np.amin(voxel) <= 0:
             return False
         return True
 
     def SetVoxel(self, newVoxel):
-        """Setting objects voxel"""
+        """
+            Setting objects voxel
+        """
         if self.CheckVoxel(newVoxel):
             try:
-                self.beadVoxelSize = newVoxel
+                self.voxelSize = newVoxel
             except:
                 print("Can't assign new voxel.")
                 return False
@@ -74,7 +81,9 @@ class ImageRaw:
         return True
 
     def RescaleZ(self, newZVoxelSize):
-        "Rescale over z. newZVoxelSize in micrometers"
+        """
+            Rescale over z. newZVoxelSize in micrometers
+        """
         # теперь разбрасываем бид по отдельным массивам .
         oldShape = self.imArray.shape
         #        print("old shape:",oldShape)
@@ -87,13 +96,13 @@ class ImageRaw:
         #        maxcoords = np.unravel_index(np.argmax(bead, axis=None), bead.shape)
         #            print("maxcoords:",maxcoords)
 
-        zcoord = np.arange(oldShape[0]) * self.beadVoxelSize[0]
-        xcoord = np.arange(oldShape[1]) * self.beadVoxelSize[1]
-        ycoord = np.arange(oldShape[2]) * self.beadVoxelSize[2]
+        zcoord = np.arange(oldShape[0]) * self.voxelSize[0]
+        xcoord = np.arange(oldShape[1]) * self.voxelSize[1]
+        ycoord = np.arange(oldShape[2]) * self.voxelSize[2]
         shapeZ = int(zcoord[oldShape[0] - 1] / newZVoxelSize)
         print(
             "voxel size, oldshape, shapeZ :",
-            self.beadVoxelSize[0],
+            self.voxelSize[0],
             oldShape[0],
             (shapeZ),
         )
@@ -113,7 +122,18 @@ class ImageRaw:
         for pID, p_ijk in enumerate(pts_ID):
             beadInterp[p_ijk[0], p_ijk[1], p_ijk[2]] = ptsInterp[pID]
         self.imArray = beadInterp
-        self.beadVoxelSize[0] = newZVoxelSize
+        self.voxelSize[0] = newZVoxelSize
+
+    def GetImageParam(self, output = "full"):
+        """
+            Return string with array and voxel parameters.
+        """
+        if output == "full":
+            return "Image size(z,y,x)px: " + str(self.imArray.shape) + "  Voxel(\u03BCm): " + str(self.imArray.shape)
+        elif output == "dimensions":
+            return str( self.imArray.shape ) + str( self.imArray.shape )
+        else:
+            return None
 
 
 if __name__ == "__main__":
