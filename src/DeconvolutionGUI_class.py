@@ -221,13 +221,23 @@ class DeconvolutionGUI(tk.Toplevel):
         Label(
             f3, text="1. Load Image tiff stack from file ", font="Helvetica 10 bold"
         ).grid(row=2, column=0, sticky="w")
-        Button(f3, text="Load  Image", command=self.LoadDeconvPhoto).grid(
-            row=3, column=1
+        Button(f3, text="Load  Image", command=self.LoadPhotoImageFile).grid(
+            row=3, column=0
         )
+
+        self.EntryImageParam = Entry( f3, width = 50 )
+        self.EntryImageParam.insert( 0,"No Image Loaded" )
+        self.EntryImageParam.configure( state="readonly" )
+        self.EntryImageParam.grid( row = 3, column = 1, columnspan = 2 )
+        
         Label(
             f3, text="2. Load PSF tiff stack from file ", font="Helvetica 10 bold"
-        ).grid(row=4, column=0, sticky="w")
-        Button(f3, text="Load PSF", command=self.LoadPSFImageFile).grid(row=5, column=1)
+        ).grid( row = 4, column = 0, sticky = "w" )
+        Button(f3, text="Load PSF", command=self.LoadPSFImageFile).grid(row=5, column=0)
+        self.EntryPSFParam = Entry(f3, width = 50)
+        self.EntryPSFParam.insert(0,"No PSF Loaded")
+        self.EntryPSFParam.configure(state = "readonly")
+        self.EntryPSFParam.grid( row = 5, column = 1, columnspan = 2 )
         Label(f3, text="3. Run deconvolution ", font="Helvetica 10 bold").grid(
             row=6, column=0, sticky="w"
         )
@@ -373,40 +383,27 @@ class DeconvolutionGUI(tk.Toplevel):
 
         return beadInterp
 
-    def LoadDeconvPhotoOld(self):
-        """Loading raw photo for deconvolution with created PSF"""
-        #            self.beadImPath = askopenfilenames(title = 'Load Beads Photo')
-        fileList = askopenfilenames(title="Load Beads Photo")
-        print(fileList, type(fileList), len(fileList))
-        if len(fileList) > 1:
-            print("read list of files")
-            self.imArr1 = fio.ReadTiffMultFiles(fileList)
-        else:
-            beadImPath = fileList[0]
-            print("read one file", beadImPath)
-            self.imArr1 = fio.ReadTiffStackFile(beadImPath)
-        self.imArr1 = self.BlurImage(self.imArr1)
-        self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imArr1, self.cnvImg, plotName="Bead")
-        self.figIMG_canvas_agg.get_tk_widget().grid(
-            row=1, column=5, rowspan=10, sticky=(N, E, S, W)
-        )
 
-    #        self.imArr1 = self.UpscaleImage_Zaxis(self.imArr1,False)
-
-    def GetVoxelDialog(self):
-        """Create diealog and return list of values"""
-        dWin = GetStringPopup(self, "Enter voxel size as z,x,y")
+    def GetVoxelDialog(self, text = ""):
+        """
+        Create diealog and return list of values
+        """
+        dWin = GetStringPopup(self, text)
         self.wait_window(dWin.dialogWindow)
         return [float(a) for a in dWin.val.split(",")]
 
-    def LoadDeconvPhoto(self):
-        """Loading raw photo for deconvolution with created PSF"""
-        fileList = askopenfilenames(title="Load Beads Photo")
+    def LoadPhotoImageFile(self):
+        """
+        Loading raw photo from the microscope for deconvolution.
+        Photo may be one multiframe TIFF of set of single frame TIFF files
+        """
+
+        fileList = askopenfilenames(title="Load Photo")
         print(fileList, type(fileList), len(fileList))
         if len(fileList) > 1:
             print("ImageRawClass")
             self.img = ImageRaw(
-                fileList, self.GetVoxelDialog(), fio.ReadTiffMultFiles(fileList)
+                fileList, self.GetVoxelDialog("Enter voxel size as z,x,y in micrometers"), fio.ReadTiffMultFiles(fileList)
             )
             self.img.ShowClassInfo()
         else:
@@ -414,22 +411,23 @@ class DeconvolutionGUI(tk.Toplevel):
             print("ImageRawClass")
             print("read one file", beadImPath)
             self.img = ImageRaw(
-                beadImPath, self.GetVoxelDialog(), fio.ReadTiffStackFile(beadImPath)
+                beadImPath, self.GetVoxelDialog("Enter voxel size as z,x,y in micrometers"), fio.ReadTiffStackFile(beadImPath)
             )
             self.img.ShowClassInfo()
         
         self.img.imArray = self.BlurImage(self.img.imArray)
-        self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.img.imArray, self.cnvImg, plotName = "Bead")
+        self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.img.imArray, self.cnvImg, plotName = "Image")
         self.figIMG_canvas_agg.get_tk_widget().grid(
             row=1, column=5, rowspan=10, sticky=(N, E, S, W)
         )
-
+        self.EntryImageParam.configure( state="normal" )
+        self.EntryImageParam.delete(0,END)
+        self.EntryImageParam.insert( 0,"Image size(z,y,x): "+str(self.img.imArray.shape)+
+                                    "  Voxel: "+str(self.img.voxelSize) )
+        self.EntryImageParam.configure( state="readonly" )
+        
     #        self.imArr1 = self.UpscaleImage_Zaxis(self.imArr1,False)
 
-    def SelectBeadImage(self):
-        """Selecting bead file"""
-        self.beadImgPath = askopenfilename(title="Load Beads Photo")
-        self.beadImgPathW.insert(0, self.beadImgPath)
 
     def LoadBeadImageFile(self):
         """Loading raw bead photo from file at self.beadImgPath"""
@@ -572,47 +570,32 @@ class DeconvolutionGUI(tk.Toplevel):
                 showinfo("Can't save file as ", fname)
 
     def LoadPSFImageFile(self):
-        """Loading raw bead photo from file at self.beadImgPath"""
+        """
+        Loading raw bead photo from file located at self.beadImgPath
+        """
         fileList = askopenfilenames(title="Load Beads Photo")
         try:
             imgPSFPath = fileList[0]
             print("Open path: ", imgPSFPath)
             self.imgPSF = fio.ReadTiffStackFile(imgPSFPath)
-            self.beadVoxelSize = self.GetVoxelDialog()
-            print("print voxel:", self.beadVoxelSize)
-            self.figPSF_canvas_agg = FigureCanvasTkFrom3DArray(self.imgPSF, self.cnvPSF, plotName="PSF")
+            self.beadVoxelSize = self.GetVoxelDialog( "Enter voxel size as z,x,y in micrometers" )
+            print( "print voxel:", self.beadVoxelSize )
+            self.figPSF_canvas_agg = FigureCanvasTkFrom3DArray( self.imgPSF, self.cnvPSF, plotName="PSF" )
             self.figPSF_canvas_agg.get_tk_widget().grid(
                 row=1, column=6, rowspan=10, sticky=(N, E, S, W)
             )
 
         except Exception as e:
            # print("LoadPSFImageFile:", e)
-            showerror("LoadBeadImageFile: Error", "Can't read file."+str(e))
+            showerror("LoadPSFImageFile: Error", "Can't read file."+str(e))
             return
+        self.EntryPSFParam.configure( state="normal" )
+        self.EntryPSFParam.delete(0,END)
+        self.EntryPSFParam.insert( 0,"Image size(z,y,x): "+str(self.img.imArray.shape)+
+                                    "  Voxel: "+str(self.img.voxelSize) )
+        self.EntryPSFParam.configure( state="readonly" )
 
-    def LoadPSFImage(self):
-        """Loading PSF from file"""
-        if not hasattr(self, "beadImgPath"):
-            showerror("Error", "Select bead image first!")
-            return
-        elif self.beadImgPath == "":
-            showerror("Error", "Bead image path is empty!")
-            return
 
-        try:
-            self.imgBeadRaw = Image.open(self.beadImgPath)
-            print("Number of frames: ", self.imgBeadRaw.n_frames)
-            frameNumber = int(self.imgBeadRaw.n_frames / 2)
-            print("Frame number for output: ", frameNumber)
-            # setting imgTmp to desired number
-            self.imgBeadRaw.seek(frameNumber)
-            # preparing image for canvas from desired frame
-            self.cnvBeadImg = ImageTk.PhotoImage(self.imgBeadRaw)
-        except Exception as e:
-            showerror("LoadPSFImage Error: ", "Can't read file."+str(e))
-            return
-        # replacing image on the canvas
-        self.cnvImg.create_image(0, 0, image=self.cnvBeadImg, anchor=NW)
 
     def DeconvolveIt(self):
         """Deconvolution of image with calculated PSF
@@ -622,7 +605,7 @@ class DeconvolutionGUI(tk.Toplevel):
         """
         try:
             try:
-                self.img.RescaleZ(self.img.beadVoxelSize[1])
+                self.img.RescaleZ(self.img.voxelSize[1])
             except Exception as e:
                 print("rescale failed"+str(e))
                 return
