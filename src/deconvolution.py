@@ -59,7 +59,7 @@ def DeconPSF(
 
 def DeconImage(
     image: np.ndarray, kernell: np.ndarray,
-    iterNum: int, deconType: str, lambdaR: float
+    iterNum: int, deconType: str, lambdaR: float, progBar, parentWin
 ):
     """
     General function for restoration of image with known PSF(kernell)
@@ -78,19 +78,19 @@ def DeconImage(
         # Richardson Lucy
         imageDeconvolved = MaxLikelhoodEstimationFFT_3D(
             image, kernell,
-            iterNum, False
+            iterNum, False, progBar, parentWin
         )
     elif deconType == "RLTMR":
         # Richardson Lucy with Tikhonov-Miller regularisation
         imageDeconvolved = DeconvolutionRLTMR(
             image, kernell,
-            lambdaR, iterNum, False
+            lambdaR, iterNum, False, progBar, parentWin
         )
     elif deconType == "RLTVR":
         # Richardson Lucy with Total Variation regularisation
         imageDeconvolved = DeconvolutionRLTVR(
             image, kernell,
-            lambdaR, iterNum, False
+            lambdaR, iterNum, False, progBar, parentWin
         )
     else:
         imagePSF = None

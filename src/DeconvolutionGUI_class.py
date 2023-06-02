@@ -231,7 +231,7 @@ class DeconvolutionGUI(tk.Toplevel):
         Label(f3, text="3. Run deconvolution ", font="Helvetica 10 bold").grid(
             row=6, column=0, sticky="w"
         )
-#====================================
+
         f3_1 = Frame(f3)
         self.deconImageType = StringVar()
         Label(f3_1, width=21, text="Deconvolution method:").pack(
@@ -272,7 +272,6 @@ class DeconvolutionGUI(tk.Toplevel):
         self.deconRegCoefImage.insert(0, str(0.0001))
         f3_2.grid(row=8, column = 0,columnspan=2,sticky="w")
 
-#====================================
         Button(
             f3, text = "Deconvolve", command = self.DeconvolveIt
         ).grid(row = 7, column = 2, padx = 2, pady = 2)
@@ -581,13 +580,14 @@ class DeconvolutionGUI(tk.Toplevel):
             self.imgPSF = fio.ReadTiffStackFile(imgPSFPath)
             self.beadVoxelSize = self.GetVoxelDialog()
             print("print voxel:", self.beadVoxelSize)
-            self.figPSF_canvas_agg = FigureCanvasTkFrom3DArray(self.figPSF, self.cnvPSF, plotName="PSF")
+            self.figPSF_canvas_agg = FigureCanvasTkFrom3DArray(self.imgPSF, self.cnvPSF, plotName="PSF")
             self.figPSF_canvas_agg.get_tk_widget().grid(
                 row=1, column=6, rowspan=10, sticky=(N, E, S, W)
             )
 
-        except:
-            showerror("LoadBeadImageFile: Error", "Can't read file.")
+        except Exception as e:
+           # print("LoadPSFImageFile:", e)
+            showerror("LoadBeadImageFile: Error", "Can't read file."+str(e))
             return
 
     def LoadPSFImage(self):
@@ -608,8 +608,8 @@ class DeconvolutionGUI(tk.Toplevel):
             self.imgBeadRaw.seek(frameNumber)
             # preparing image for canvas from desired frame
             self.cnvBeadImg = ImageTk.PhotoImage(self.imgBeadRaw)
-        except:
-            showerror("Error", "Can't read file.")
+        except Exception as e:
+            showerror("LoadPSFImage Error: ", "Can't read file."+str(e))
             return
         # replacing image on the canvas
         self.cnvImg.create_image(0, 0, image=self.cnvBeadImg, anchor=NW)
@@ -621,35 +621,39 @@ class DeconvolutionGUI(tk.Toplevel):
         test_strings - 200х200  - 216.9s
         """
         try:
-
-            try:  # get iternum from self.self.deconIterNumImage
-                iterLim = int(self.self.deconIterNumImage.get())
-            except:
-                iterLim = 10
             try:
                 self.img.RescaleZ(self.img.beadVoxelSize[1])
-            except:
-                print("rescale failed")
+            except Exception as e:
+                print("rescale failed"+str(e))
                 return
             try:
                 self.img.ShowClassInfo()
-            except:
-                print("imageRaw show class fail")
+            except Exception as e:
+                print("imageRaw show class fail"+str(e))
                 return
             start_time = time.time()
             try:
                 # self.imgDecon = decon.DeconvolutionRL(self.img.imArray, self.imgPSF, iterLim,True)
-                self.imgDecon = decon.richardson_lucy_deconvolution_3d_tv(
-                    self.img.imArray, self.imgPSF, iterLim, beta=0.5, tv_weight=0.1
+                # TODO replace with the correct deconvolution function as is done in the first part
+                
+                self.imgDecon = decon.DeconImage(
+                    self.img.imArray, self.imgPSF,
+                    int( self.deconIterNumImage.get() ),
+                    self.deconMethodsDict[ self.deconImageType.get() ],
+                    float(self.deconRegCoefImage.get()),
+                    progBar=self.deconProgBarImage, parentWin=self
                 )
-            except:
-                print("deconvolution failed")
+                # self.imgDecon = decon.richardson_lucy_deconvolution_3d_tv(
+                #     self.img.imArray, self.imgPSF, iterLim, beta=0.5, tv_weight=0.1
+                # )
+            except Exception as e:
+                print("deconvolution failed "+str(e))
                 return
             print("decon output shape:", self.imgDecon.shape)
             print("Deconvolution time: %s seconds " % (time.time() - start_time))
-        except Exception as exc:
-            showerror("Error. Can't finish convolution properly.")
-            print(exc)
+        except Exception as e:
+            showerror("Error", "Can't finish convolution properly. "+str(e))
+            print(e)
             return
         self.figDec_canvas_agg = FigureCanvasTkFrom3DArray(self.imgDecon, self.cnvDecon, "Deconvolved")
         self.figDec_canvas_agg.get_tk_widget().grid(
