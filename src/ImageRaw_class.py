@@ -16,9 +16,9 @@ class ImageRaw:
     ):
         self.path = fpath
 
-        if self.CheckVoxel(voxelSizeIn):
-            # microscope voxel size(z,x,y) in micrometres (resolution=micrometre/pixel)
-            self.voxelSize = voxelSizeIn
+        self.SetVoxel(voxelSizeIn)  # microscope voxel size(z,x,y) in micrometres (resolution=micrometre/pixel)
+        # if self.CheckVoxel(voxelSizeIn):
+        #     self.voxelSize = voxelSizeIn
         self.voxelFields = "Z", "X", "Y"
         self.voxelSizeEntries = {}
 
@@ -129,9 +129,9 @@ class ImageRaw:
             Return string with array and voxel parameters.
         """
         if output == "full":
-            return "Image size(z,y,x)px: " + str(self.imArray.shape) + "  Voxel(\u03BCm): " + str(self.imArray.shape)
+            return "Image size(z,y,x)px: " + str(self.imArray.shape) + "  Voxel(\u03BCm): " + str(self.voxelSize)
         elif output == "dimensions":
-            return str( self.imArray.shape ) + str( self.imArray.shape )
+            return str( self.imArray.shape ) + str( self.voxelSize )
         else:
             return None
 
