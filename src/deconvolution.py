@@ -280,18 +280,18 @@ def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False,
     return f_old
 
 
-def DeconvolutionRL(image, imgPSF, iterLimit=20, debug_flag=False):
+def DeconvolutionRL(image, psf, iterLimit=20, debug_flag=False):
     """Function for  convolution"""
 
     hm = image
     # if there is NAN in image array(seems from source image) replace it with zeros
     hm[np.isnan(hm)] = 0.0
     # do image padding
-    pad = imgPSF.shape
+    pad = psf.shape
     hm = np.pad(hm, ((pad[0], pad[0]), (pad[1], pad[1]), (pad[2], pad[2])), "edge")
     beadMaxInt = np.amax(image)
 
-    p = imgPSF
+    p = psf
 
     b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
 
@@ -302,7 +302,7 @@ def DeconvolutionRL(image, imgPSF, iterLimit=20, debug_flag=False):
             "Deconvoluiton input shape (image, padded, psf):",
             image.shape,
             hm.shape,
-            imgPSF.shape,
+            psf.shape,
         )
     # preparing for start of iteration cycle
     f_old = hm
@@ -325,7 +325,7 @@ def DeconvolutionRL(image, imgPSF, iterLimit=20, debug_flag=False):
         f_old = f_old  # / np.amax(f_old) * beadMaxInt
     # end of iteration cycle
     imSh = hm.shape
-    pad = imgPSF.shape
+    pad = psf.shape
     f_old = f_old[
         pad[0] : imSh[0] - pad[0], pad[1] : imSh[1] - pad[1], pad[2] : imSh[2] - pad[2]
     ]
@@ -343,7 +343,7 @@ def divergence(F):
 
 def DeconvolutionRLTMR(
     image: np.ndarray,
-    imgPSF: np.ndarray,
+    psf: np.ndarray,
     lambdaTM=0.0001,
     iterLimit=20,
     debug_flag=False, pb = None , parentWin=None
@@ -354,7 +354,7 @@ def DeconvolutionRLTMR(
     # if there is NAN in image array(seems from source image) replace it with zeros
     hm[np.isnan(hm)] = 0.0
     beadMaxInt = np.amax(image)
-    p = imgPSF
+    p = psf
     b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
 
     if debug_flag:
@@ -364,7 +364,7 @@ def DeconvolutionRLTMR(
             "Deconvoluiton input shape (image, padded, psf):",
             image.shape,
             hm.shape,
-            imgPSF.shape,
+            psf.shape,
         )
     #    b_noize = 0.1
     if pb != None:
@@ -408,20 +408,32 @@ def DeconvolutionRLTMR(
 
 def DeconvolutionRLTVR(
     image: np.ndarray,
-    imgPSF: np.ndarray,
+    psf: np.ndarray,
     lambdaTV=0.0001,
-    iterLimit=20,
+    iterLimit=10,
     debug_flag=False, pb = None , parentWin=None
 ):
     """
-    Function for  convolution Richardson Lucy Total Variation
+    Perform Richardson-Lucy deconvolution on a 3D image using a given point spread function (psf)
+    with total variation regularization.
+
+    Parameters:
+    image (ndarray): The 3D image to be deconvolved.
+    psf (ndarray): The point spread function (PSF) of the imaging system.
+    iterLimit (int): The number of iterations to perform. Defaults to 10.
+    beta (float): The step size parameter. Defaults to 0.5.
+    lambdaTV (float): The weight of the total variation regularization term. Defaults to 0.0001.
+    mode (str): The mode parameter passed to the convolution function. Defaults to 'nearest'.
+ 
+    Returns:
+    ndarray: The deconvolved image.    
     """
 
     hm = image
     # if there is NAN in image array(seems from source image) replace it with zeros
     hm[np.isnan(hm)] = 0.0
     beadMaxInt = np.amax(image)
-    p = imgPSF
+    p = psf
     b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
 
     if debug_flag:
@@ -431,7 +443,7 @@ def DeconvolutionRLTVR(
             "Deconvoluiton input shape (image, padded, psf):",
             image.shape,
             hm.shape,
-            imgPSF.shape,
+            psf.shape,
         )
     #    b_noize = 0.1
     if pb != None:
@@ -467,7 +479,7 @@ def DeconvolutionRLTVR(
 
     # end of iteration cycle
     # imSh = hm.shape
-    # pad = imgPSF.shape
+    # pad = psf.shape
     # f_old = f_old[
     #     pad[0] : imSh[0] - pad[0], pad[1] : imSh[1] - pad[1], pad[2] : imSh[2] - pad[2]
     # ]
@@ -617,7 +629,7 @@ def richardson_lucy_deconvolution_3d_tv(
 
     Parameters:
     image (ndarray): The 3D image to be deconvolved.
-    psf (ndarray): The point spread function (PSF) of the imaging system.
+    psf (ndarray): The point spread function (psf) of the imaging system.
     iterations (int): The number of iterations to perform. Defaults to 10.
     beta (float): The step size parameter. Defaults to 0.5.
     tv_weight (float): The weight of the total variation regularization term. Defaults to 0.1.

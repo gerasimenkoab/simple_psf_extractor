@@ -8,6 +8,7 @@ TODO:
 + add method selection for PSF deconvolution app
 + add progress bar to GUI
 + add method selection for Image deconvolution app
+
 - strange padding number along Z axis
 - implement temporary file using tempfile.SpooledTemporaryFile
 - logging with logger.(from logging.handlers import RotatingFileHandler)
