@@ -1,5 +1,6 @@
 import numpy as np
 from PIL import Image
+from PIL.TiffTags import TAGS
 
 
 def ReadTiffStackFile(fileName: str):
@@ -9,6 +10,8 @@ def ReadTiffStackFile(fileName: str):
     print("Loading Image from tiff stack file..... ", end=" ")
     try:
         image_tiff = Image.open(fileName)
+        meta_dict = {TAGS[key]:image_tiff.tag[key] for key in image_tiff.tag}
+        print(meta_dict)
         ncols, nrows = image_tiff.size
         nlayers = image_tiff.n_frames
         imgArray = np.ndarray([nlayers, nrows, ncols])
@@ -30,6 +33,8 @@ def ReadTiffMultFiles(fileNameList: list):
     intensity_mult = 10
     try:
         image_preread = Image.open(fileNameList[0])
+        meta_dict = {TAGS[key]:image_preread.tag[key] for key in image_preread.tag}
+        print(meta_dict)
         print("color_mode:", image_preread.mode, ".......", end=" ")
         nlayers = len(fileNameList)
         ncols, nrows = image_preread.size
@@ -111,11 +116,14 @@ def SaveAsTiffStack_tag(tiffDraw=np.zeros([3, 4, 6]), filename="img", outtype="u
     """Print files for any input arrray of intensity values
     tiffDraw - numpy ndarray of intensity values"""
     print("Trying to save file", outtype)
+    # test voxel
+    voxelSizeIn = [0.1, 0.022, 0.022]
+    strVoxel = ';'.join(str(s) for s in voxelSizeIn)
     imlist = []
     for tmp in tiffDraw:
         imlist.append(Image.fromarray(tmp.astype(outtype)))
-    # imlist[0].tag[270] = "testing tag system"
+    #imlist[0].tag[270] = strVoxel
     imlist[0].save(
-        filename, tiffinfo="testing tag system", save_all=True, append_images=imlist[1:]
+        filename, tiffinfo={270:strVoxel}, save_all=True, append_images=imlist[1:]
     )
     print("File saved in one tiff", filename)
