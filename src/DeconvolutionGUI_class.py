@@ -6,6 +6,7 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.filedialog import askopenfilenames
 from tkinter.ttk import Combobox, Separator
 from PIL import ImageTk, Image
+from PIL.TiffTags import TAGS
 
 import os.path
 from os import path
@@ -401,15 +402,16 @@ class DeconvolutionGUI(tk.Toplevel):
         fileList = askopenfilenames(title="Load Photo")
         print(fileList, type(fileList), len(fileList))
         if len(fileList) > 1:
-            print("ImageRawClass")
-            self.img = ImageRaw(
-                fileList, self.GetVoxelDialog("Enter voxel size as z,x,y in micrometers"), fio.ReadTiffMultFiles(fileList)
-            )
-            self.img.ShowClassInfo()
+            try:
+                self.img = ImageRaw(
+                    fileList, self.GetVoxelDialog("Enter voxel size as z,x,y in micrometers"), fio.ReadTiffMultFiles(fileList)
+                )
+                self.img.ShowClassInfo()
+            except Exception as e:
+                print(e)
+                return
         else:
             beadImPath = fileList[0]
-            print("ImageRawClass")
-            print("read one file", beadImPath)
             self.img = ImageRaw(
                 beadImPath, self.GetVoxelDialog("Enter voxel size as z,x,y in micrometers"), fio.ReadTiffStackFile(beadImPath)
             )
@@ -539,34 +541,32 @@ class DeconvolutionGUI(tk.Toplevel):
             fio.SaveTiffFiles(self.imgPSF, txt_folder, txt_prefix)
             showinfo("PSF Files saved at:", txt_folder)
 
+
     def SavePSFSingle(self):
-        """Save PSF array as multi-page tiff"""
+        """Save PSF array as single tiff"""
         if hasattr(self, "imgPSF"):
-            # txt_folder = self.folderPSFWgt.get()
-            # txt_prefix = self.filePrfxPSFWgt.get()
-            # if txt_prefix == '':
-            txt_prefix = "EML_psf"
-            # if txt_folder == '':
-            dirId = -1
-            while True:
-                dirId += 1
-                print(dirId)
-                txt_folder = str(os.getcwd()) + "\\" + "PSF_folder_" + str(dirId)
-                if not path.isdir(txt_folder):
-                    print("creating dir")
-                    os.mkdir(txt_folder)
-                    break
-            fio.SaveTiffStack(self.imgPSF, txt_folder, txt_prefix)
-            showinfo("PSF File saved at:", txt_folder)
+            self.SaveImage(self.imgPSF)
+
 
     def SaveDeconvImgSingle(self):
         """Save deconvolved image as multi-page tiff"""
         if hasattr(self, "imgDecon"):
+            self.SaveImage(self.imgDecon)
+
+    def SaveImage(self, imageArray:np.zeros(1)):
+        """
+        Save imageArray as multi-page tiff
+        """
+        if not((imageArray == np.zeros(1)).all()):
             fname = asksaveasfilename(title="Save image as")
             try:
-                fio.SaveAsTiffStack(self.imgDecon, fname)
-            except:
-                showinfo("Can't save file as ", fname)
+                fio.SaveAsTiffStack(imageArray, fname)
+            except Exception as e:
+                showerror("Can't save image as ", fname + "\n Exception: " + str(e))
+                return
+            showinfo("Image saved at:", fname)
+        else:
+            showerror("No array recieved.")
 
     def LoadPSFImageFile(self):
         """
