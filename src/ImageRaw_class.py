@@ -134,7 +134,24 @@ class ImageRaw:
             return str( self.imArray.shape ) + str( self.voxelSize )
         else:
             return None
-
+        
+    def SaveAsTiffSingle(self, filename="img", outtype="uint8"):
+        """
+        Save Image as TIFF file
+        Input: filename - path to file, including file name
+               outtype - bit type for output
+        """
+        print("Trying to save TIFF file", outtype)
+        tagID = 270
+        strVoxel = ';'.join(str(s) for s in self.voxelSize)
+        imlist = []
+        for tmp in self.imArray:
+            imlist.append(Image.fromarray(tmp.astype(outtype)))
+        #imlist[0].tag[270] = strVoxel
+        imlist[0].save(
+            filename, tiffinfo={tagID:strVoxel}, save_all=True, append_images=imlist[1:]
+        )
+        print("File saved in ", filename)
 
 if __name__ == "__main__":
     pass

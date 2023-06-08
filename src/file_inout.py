@@ -112,18 +112,17 @@ def SaveAsTiffStack(tiffDraw=np.zeros([3, 4, 6]), filename="img", outtype="uint8
     #     print("Exception message: ", e)
 
 
-def SaveAsTiffStack_tag(tiffDraw=np.zeros([3, 4, 6]), filename="img", outtype="uint8"):
+def SaveAsTiffStack_tag(imgInArray=np.zeros([3, 4, 6]), filename="img", outtype="uint8", tagID = 270, tagString = "Image info"):
     """Print files for any input arrray of intensity values
     tiffDraw - numpy ndarray of intensity values"""
     print("Trying to save file", outtype)
     # test voxel
-    voxelSizeIn = [0.1, 0.022, 0.022]
-    strVoxel = ';'.join(str(s) for s in voxelSizeIn)
+    # voxelSizeIn = [0.1, 0.022, 0.022]
+    # strVoxel = ';'.join(str(s) for s in voxelSizeIn)
     imlist = []
-    for tmp in tiffDraw:
-        imlist.append(Image.fromarray(tmp.astype(outtype)))
-    #imlist[0].tag[270] = strVoxel
+    for tmpArray in imgInArray:
+        imlist.append(Image.fromarray(tmpArray.astype(outtype)))
     imlist[0].save(
-        filename, tiffinfo={270:strVoxel}, save_all=True, append_images=imlist[1:]
+        filename, tiffinfo={tagID:tagString}, save_all=True, append_images=imlist[1:]
     )
     print("File saved in one tiff", filename)

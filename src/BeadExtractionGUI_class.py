@@ -887,16 +887,17 @@ class BeadExtractionGUI(tk.Toplevel):
             dirId = -1
             while True:
                 dirId += 1
-                txt_folder = txt_folder_enquiry + "\\" + "bead_folder_" + str(dirId)
+                txt_folder = txt_folder_enquiry + "/" + "bead_folder_" + str(dirId)
                 if not os.path.isdir(txt_folder):
                     print("creating dir", txt_folder)
                     os.mkdir(txt_folder)
                     break
             tiffBit = self.tiffMenuBitDict[self.tiffSaveBitType.get()]
+            
+            strVoxel = "Voxel(\u03BCm) :" + ';'.join(str(s) for s in self.beadVoxelSize)
             for idx, bead in enumerate(self.selectedBeads):
-                fio.SaveTiffStack(
-                    bead, txt_folder, txt_prefix + str(idx).zfill(2), tiffBit
-                )
+                fname = txt_folder + "/" + str(idx).zfill(2) + ".tif"
+                fio.SaveAsTiffStack_tag(bead, fname, outtype = tiffBit, tagID = 270, tagString = strVoxel)
             showinfo("Selected beads tiffs saved at saved at:", txt_folder)
 
     def PlotBeadPreview2D(self):
@@ -1019,43 +1020,58 @@ class BeadExtractionGUI(tk.Toplevel):
     def SaveAverageBead(self):
         """Save averaged bead to file"""
         #      print("upscaled bead shape:", type(self.__avrageBead))
-        txt_folder_enquiry = askdirectory()
+        # txt_folder_enquiry = askdirectory()
 
-        txt_folder = ""
-        txt_prefix = ""
-        if txt_prefix == "":
-            txt_prefix = "AvrBead_r_"
-        fname_default = txt_prefix + str(self.beadDiameter * 1000) + "nm".zfill(2)
-        fname = askstring(
-            title="File name.", prompt="Enter file name:", initialvalue=fname_default
-        )
-        if txt_folder_enquiry == "":
-            txt_folder = str(os.getcwd()) + "/" + "average_bead_folder"
-        else:
-            txt_folder = txt_folder_enquiry
-        if not os.path.isdir(txt_folder):
-            try:
-                print("creating dir:", txt_folder)
-                os.mkdir(txt_folder)
-            except Exception as err:
-                showerror("Can't create folder to save avaraged bead", err)
-        else:
-            # TODO: resolve duplicate fname. Duplicate file not detecting correctly somehow
-            print(
-                txt_folder + "/" + fname + ".tiff",
-                "   ",
-                os.path.exists(txt_folder + "/" + fname + ".tiff"),
-            )
-            if os.path.exists(txt_folder + "/" + fname + ".tiff"):
-                fname = askstring(
-                    title="File exist",
-                    prompt="Enter new file name:",
-                    initialvalue=fname,
-                )
-                if fname is None or fname == "":
-                    fname = fname_default
+        # txt_folder = ""
+        # txt_prefix = ""
+        # if txt_prefix == "":
+        #     txt_prefix = "AvrBead_r_"
+        # fname_default = txt_prefix + str(self.beadDiameter * 1000) + "nm".zfill(2)
+        # fname = askstring(
+        #     title="File name.", prompt="Enter file name:", initialvalue=fname_default
+        # )
+        # if txt_folder_enquiry == "":
+        #     txt_folder = str(os.getcwd()) + "/" + "average_bead_folder"
+        # else:
+        #     txt_folder = txt_folder_enquiry
+        # if not os.path.isdir(txt_folder):
+        #     try:
+        #         print("creating dir:", txt_folder)
+        #         os.mkdir(txt_folder)
+        #     except Exception as err:
+        #         showerror("Can't create folder to save avaraged bead", err)
+        # else:
+        #     # TODO: resolve duplicate fname. Duplicate file not detecting correctly somehow
+        #     print(
+        #         txt_folder + "/" + fname + ".tiff",
+        #         "   ",
+        #         os.path.exists(txt_folder + "/" + fname + ".tiff"),
+        #     )
+        #     if os.path.exists(txt_folder + "/" + fname + ".tiff"):
+        #         fname = askstring(
+        #             title="File exist",
+        #             prompt="Enter new file name:",
+        #             initialvalue=fname,
+        #         )
+        #         if fname is None or fname == "":
+        #             fname = fname_default
         tiffBit = self.tiffMenuBitDict[self.tiffSaveBitType.get()]
-        fio.SaveTiffStack(self.__avrageBead, txt_folder, fname, tiffBit)
+        strVoxel = "Voxel(\u03BCm) :" + ';'.join(str(s) for s in self.beadVoxelSize)
+        filesMask = [('All Files', '*.*'), 
+             ('TIFF file', '*.tif')]
+        try:
+            fname = asksaveasfilename(
+                filetypes = filesMask,
+                defaultextension = filesMask,
+                initialfile = "averagebead.tif")
+        except Exception as e:
+            print(e)
+            return
+        try:
+            fio.SaveAsTiffStack_tag(self.__avrageBead, fname, outtype = tiffBit, tagID = 270, tagString = strVoxel)
+        except Exception as e:
+            print(e)
+            return
 
     def PointFunctionAiry(self, pt, r0, maxIntensity=255, zoomfactor=2.6):
         """Function of sphere of radius r with center in r0.
