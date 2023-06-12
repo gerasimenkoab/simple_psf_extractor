@@ -20,6 +20,7 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.cm as cm
 import os
+import json
 
 # from os import path
 from logging import raiseExceptions
@@ -57,7 +58,6 @@ class BeadExtractionGUI(tk.Toplevel):
         self.beadDiameter = (
             0.2  # initial bead diameter in micrometers = diameter(nm)/1000
         )
-
         self.beadVoxelSize = [
             0.2,
             0.089,
@@ -894,7 +894,8 @@ class BeadExtractionGUI(tk.Toplevel):
                     break
             tiffBit = self.tiffMenuBitDict[self.tiffSaveBitType.get()]
             
-            strVoxel = "Voxel(\u03BCm) :" + ';'.join(str(s) for s in self.beadVoxelSize)
+            #strVoxel = "Voxel(\u03BCm) :" + ';'.join(str(s) for s in self.beadVoxelSize)
+            strVoxel = json.dumps({"Z":self.beadVoxelSize[0],"X":self.beadVoxelSize[1],"Y":self.beadVoxelSize[2]})
             for idx, bead in enumerate(self.selectedBeads):
                 fname = txt_folder + "/" + str(idx).zfill(2) + ".tif"
                 fio.SaveAsTiffStack_tag(bead, fname, outtype = tiffBit, tagID = 270, tagString = strVoxel)
@@ -1056,7 +1057,8 @@ class BeadExtractionGUI(tk.Toplevel):
         #         if fname is None or fname == "":
         #             fname = fname_default
         tiffBit = self.tiffMenuBitDict[self.tiffSaveBitType.get()]
-        strVoxel = "Voxel(\u03BCm) :" + ';'.join(str(s) for s in self.beadVoxelSize)
+        #strVoxel = "Voxel(\u03BCm) :" + ';'.join(str(s) for s in self.beadVoxelSize)
+        strVoxel = json.dumps({"Z":self.beadVoxelSize[0],"X":self.beadVoxelSize[1],"Y":self.beadVoxelSize[2]})
         filesMask = [('All Files', '*.*'), 
              ('TIFF file', '*.tif')]
         try:

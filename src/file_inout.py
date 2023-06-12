@@ -3,15 +3,22 @@ from PIL import Image
 from PIL.TiffTags import TAGS
 
 
-def ReadTiffStackFile(fileName: str):
+def ReadTiffStackFile(fileName: str, fileInfo = False ,tagID = 270):
     """
     Function ReadTiffStackFile() reads tiff stack from file and return np.array
+    Input:
+        fileName - path to file
+        fileInfo - if true then read tag string and return it
+        tagID - tag index
+    Returns:
+        imgArray : ndarray
+        image_tiff.tag[tagID][0] : str
     """
     print("Loading Image from tiff stack file..... ", end=" ")
     try:
         image_tiff = Image.open(fileName)
-        meta_dict = {TAGS[key]:image_tiff.tag[key] for key in image_tiff.tag}
-        print(meta_dict)
+        # meta_dict = {TAGS[key]:image_tiff.tag[key] for key in image_tiff.tag}
+        # print(meta_dict)
         ncols, nrows = image_tiff.size
         nlayers = image_tiff.n_frames
         imgArray = np.ndarray([nlayers, nrows, ncols])
@@ -19,10 +26,18 @@ def ReadTiffStackFile(fileName: str):
             image_tiff.seek(i)
             imgArray[i, :, :] = np.array(image_tiff)
         print("Done!")
-        return imgArray
+        if fileInfo :
+            try:
+                return imgArray, image_tiff.tag[tagID][0]
+            except:
+                return imgArray, ""
+        else:
+            return imgArray 
     except FileNotFoundError:
         print("ReadTiffStackFile: Error. File not found!")
         return 0
+
+
 
 
 def ReadTiffMultFiles(fileNameList: list):

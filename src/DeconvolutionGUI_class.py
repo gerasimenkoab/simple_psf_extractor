@@ -2,6 +2,7 @@ from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showerror, showinfo, askokcancel
+from tkinter.simpledialog import askstring
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.filedialog import askopenfilenames
 from tkinter.ttk import Combobox, Separator
@@ -10,6 +11,7 @@ from PIL.TiffTags import TAGS
 
 import os.path
 from os import path
+import json
 import time
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -30,58 +32,9 @@ from scipy.interpolate import RegularGridInterpolator
 
 """
 TODO: 
-    -add voxel size dialog when load image
-
+    
 
 """
-# def SetVoxel():
-#     f1 = Frame(self)
-#     Label(f1, text = 'Voxel size (\u03BCm): ', anchor='w').pack(side  = LEFT,padx=2,pady=2)
-#     for idField,voxelField in enumerate(self.voxelFields):
-#             Label(f1, text = voxelField + "=").pack(side  = LEFT,padx=2,pady=2)
-#             ent = Entry(f1, width = 5, bg = 'green', fg = 'white')
-#             ent.pack(side = LEFT,padx=2,pady=2)
-#             Label(f1, text = " ").pack(side  = LEFT,padx=2,pady=2)
-#             ent.insert(0,self.beadVoxelSize[idField])
-#             ent.bind('<Return>', self.ReturnVoxelSizeEntryContent)
-#             self.voxelSizeEntries[voxelField] = ent
-#     f1.grid(row=3,column=0,sticky='we')
-
-
-class GetStringPopup(Frame):
-    """Class for popup window with string value input"""
-
-    dialogWindow = None
-    val = None
-
-    def __init__(self, master=None, dialogMsg="Enter some text below"):
-        self.dialogWindow = Toplevel(master)
-        # self.dialogWindow.geometry("150x100")
-        self.label = Label(self.dialogWindow, text=dialogMsg)
-        self.label.pack(side=TOP)
-        self.entry = Entry(self.dialogWindow)
-        self.entry.pack(side=TOP)
-        self.entry.insert(0, "Enter values here")
-        self.button = Button(
-            self.dialogWindow, text="Ok", command=lambda: self.close_window()
-        )
-        self.button.pack(side=TOP)
-
-    def close_window(self):
-        """Close dialog and get string value from the entry"""
-        if self.dialogWindow:
-            try:
-                # TODO : - add entry content check
-                self.val = self.entry.get()
-            #                self.master.beadVoxelSize[0] = float(val[0])
-            #                self.master.beadVoxelSize[1] = float(val[1])
-            #                self.master.beadVoxelSize[2] = float(val[2])
-            #                print("self.value = ", float(self.val[0]), float(self.val[1]), float(self.val[2]))
-            except:
-                print("Failed to get entry value")
-            self.dialogWindow.destroy()
-            self.dialogWindow = None
-
 
 class DeconvolutionGUI(tk.Toplevel):
     def __init__(self, parent, wwidth=800, wheight=2000):
@@ -92,8 +45,7 @@ class DeconvolutionGUI(tk.Toplevel):
             "Richardson-Lucy TM Reg":"RLTMR",
             "Richardson-Lucy TV Reg":"RLTVR"
             }
-        self.imgBeadRawLoad = FALSE
-
+     
         self.beadVoxelSize = [
             0.2,
             0.089,
@@ -389,9 +341,8 @@ class DeconvolutionGUI(tk.Toplevel):
         """
         Create diealog and return list of values
         """
-        dWin = GetStringPopup(self, text)
-        self.wait_window(dWin.dialogWindow)
-        return [float(a) for a in dWin.val.split(",")]
+        voxelStr = askstring("Voxel Dialog", text)
+        return [float(a) for a in voxelStr.split(",")]
 
     def LoadPhotoImageFile(self):
         """
@@ -404,7 +355,7 @@ class DeconvolutionGUI(tk.Toplevel):
         if len(fileList) > 1:
             try:
                 self.img = ImageRaw(
-                    fileList, self.GetVoxelDialog("Enter voxel size as z,x,y in micrometers"), fio.ReadTiffMultFiles(fileList)
+                    fileList, self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm"), fio.ReadTiffMultFiles(fileList)
                 )
                 self.img.ShowClassInfo()
             except Exception as e:
@@ -412,9 +363,10 @@ class DeconvolutionGUI(tk.Toplevel):
                 return
         else:
             beadImPath = fileList[0]
-            self.img = ImageRaw(
-                beadImPath, self.GetVoxelDialog("Enter voxel size as z,x,y in micrometers"), fio.ReadTiffStackFile(beadImPath)
-            )
+            # self.img = ImageRaw(
+            #     beadImPath, self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm"), fio.ReadTiffStackFile(beadImPath, fileInfo = False)
+            # )
+            self.img = ImageRaw( beadImPath )
             self.img.ShowClassInfo()
         
         self.img.imArray = self.BlurImage(self.img.imArray)
@@ -431,15 +383,33 @@ class DeconvolutionGUI(tk.Toplevel):
 
 
     def LoadBeadImageFile(self):
-        """Loading raw bead photo from file at self.beadImgPath"""
+        """
+        Loading raw bead photo from file at self.beadImgPath
+        """
         self.beadImgPath = askopenfilename(title="Select tiff image")
+        self.beadImgPathW.configure( state="normal")
+        self.beadImgPathW.delete(0,END)
         self.beadImgPathW.insert(0, self.beadImgPath)
+        self.beadImgPathW.configure( state="readonly")
+
         if self.beadImgPath == "":
             showerror("Error", "Bead image path empty!")
             return
         try:
             print("Open path: ", self.beadImgPath)
-            self.imgBeadRaw = fio.ReadTiffStackFile(self.beadImgPath)
+            #self.imgBeadRaw = fio.ReadTiffStackFile(self.beadImgPath)
+            self.imgBeadRaw,tagString = fio.ReadTiffStackFile(self.beadImgPath, fileInfo = True)
+            if tagString == "":
+                print("Need voxel parameters.")
+                self.voxel = {"Z":0, "X":0,"Y":0}
+                self.voxel["Z"],self.voxel["X"],self.voxel["Y"] = self.GetVoxelDialog("Enter voxel values  Z,X,Y (\u03BCm)")
+            else:
+                self.voxel = json.loads(tagString)
+            self.beadImXYResWgt.delete(0,END)
+            self.beadImXYResWgt.insert(0, str(self.voxel["X"] * 1000) )
+            self.beadImZResWgt.delete(0,END)
+            self.beadImZResWgt.insert(0, str(self.voxel["Z"] * 1000) )
+
         except Exception as exc:
             showerror("LoadBeadImageFile: Error", "Can't read file.")
             print(exc)
@@ -483,7 +453,9 @@ class DeconvolutionGUI(tk.Toplevel):
     def CalculatePSF(self):
         txt_beadSizenm = self.beadSizeWgt.get()
         txt_resolutionXY = self.beadImXYResWgt.get()
+        #txt_resolutionXY = self.voxel["X"]
         txt_resolutionZ = self.beadImZResWgt.get()
+        #txt_resolutionZ = self.voxel["Z"]
         print(txt_beadSizenm, txt_resolutionXY, txt_resolutionZ)
         if not hasattr(self, "imgBeadRaw"):
             showerror("Error", "No bead image loaded.")
@@ -585,9 +557,9 @@ class DeconvolutionGUI(tk.Toplevel):
             imgPSFPath = fileList[0]
             print("ImageRawClass")
             print("Read one file", imgPSFPath)
-            self.imagePSF = ImageRaw(
-                imgPSFPath, self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm"), fio.ReadTiffStackFile(imgPSFPath)
-            )
+            # self.imagePSF = ImageRaw(
+            #     imgPSFPath, self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm"), fio.ReadTiffStackFile(imgPSFPath)
+            self.imagePSF = ImageRaw( imgPSFPath )
             self.imagePSF.ShowClassInfo()
         
         self.imagePSF.imArray = self.BlurImage(self.imagePSF.imArray)
@@ -652,9 +624,9 @@ class DeconvolutionGUI(tk.Toplevel):
                 #     self.img.imArray, self.imgPSF, iterLim, beta=0.5, tv_weight=0.1
                 # )
             except Exception as e:
-                print("deconvolution failed "+str(e))
+                print("Deconvolution failed. "+str(e))
                 return
-            print("decon output shape:", self.imgDecon.shape)
+            print("Decon output shape:", self.imgDecon.shape)
             print("Deconvolution time: %s seconds " % (time.time() - start_time))
         except Exception as e:
             showerror("Error", "Can't finish convolution properly. "+str(e))
