@@ -9,7 +9,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showerror, showinfo, askokcancel
 from tkinter.filedialog import (
-    askopenfilename,
     askopenfilenames,
     askdirectory,
     asksaveasfilename,
