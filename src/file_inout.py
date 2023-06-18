@@ -48,33 +48,40 @@ def ReadTiffMultFiles(fileNameList: list):
     intensity_mult = 10
     try:
         image_preread = Image.open(fileNameList[0])
-        meta_dict = {TAGS[key]:image_preread.tag[key] for key in image_preread.tag}
-        print(meta_dict)
-        print("color_mode:", image_preread.mode, ".......", end=" ")
-        nlayers = len(fileNameList)
-        ncols, nrows = image_preread.size
-        imgArray = np.ndarray([nlayers, nrows, ncols])
-        # checking file color mode and convert to grayscale
-        if image_preread.mode == "RGB":
-            # convert to Grayscale
-            for i, fileName in enumerate(fileNameList):
-                image_tiff = Image.open(fileName)
-                image_tiff.getdata()
-                r, g, b = image_tiff.split()
-                ra = np.array(r)
-                ga = np.array(g)
-                ba = np.array(b)
-                grayImgArr = 0.299 * ra + 0.587 * ga + 0.114 * ba
-                imgArray[i, :, :] = grayImgArr
-                # print("maxint:", i, np.max(grayImgArr))
-        elif image_preread.mode == "I" or image_preread.mode == "L":
-            for i, fileName in enumerate(fileNameList):
-                imgArray[i, :, :] = np.array(Image.open(fileName))
-        print("Done.")
-        return imgArray
     except FileNotFoundError:
         print("ReadTiffStackFile: Error. File not found!")
         return 0
+    # meta_dict = {TAGS[key]:image_preread.tag[key] for key in image_preread.tag}
+    # print(meta_dict)
+    print("color_mode:", image_preread.mode, ".......", end=" ")
+    nlayers = len(fileNameList)
+    ncols, nrows = image_preread.size
+    imgArray = np.ndarray([nlayers, nrows, ncols])
+    # checking file color mode and convert to grayscale
+    if image_preread.mode == "RGB":
+        # convert to Grayscale
+        for i, fileName in enumerate(fileNameList):
+            try: 
+                image_tiff = Image.open(fileName)
+            except Exception as e:
+                print(str(e))
+                raise FileNotFoundError
+            image_tiff.getdata()
+            r, g, b = image_tiff.split()
+            ra = np.array(r)
+            ga = np.array(g)
+            ba = np.array(b)
+            grayImgArr = 0.299 * ra + 0.587 * ga + 0.114 * ba
+            imgArray[i, :, :] = grayImgArr
+            # print("maxint:", i, np.max(grayImgArr))
+    elif image_preread.mode == "I" or image_preread.mode == "L":
+        for i, fileName in enumerate(fileNameList):
+            imgArray[i, :, :] = np.array(Image.open(fileName))
+    else:
+        print("ReadTiffStackFile: Unsupported file format")
+        return
+    print("Done.")
+    return imgArray
 
 
 def SaveTiffFiles(tiffDraw=np.zeros([3, 4, 6]), dirName="img", filePrefix=""):

@@ -1,3 +1,8 @@
+import file_inout as fio
+import deconvolution as decon
+import img_transform as imtrans
+from ImageRaw_class import ImageRaw
+
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
@@ -20,15 +25,13 @@ import matplotlib.cm as cm
 from scipy.ndimage import gaussian_filter
 
 from plot_for_gui import FigureCanvasTkFrom3DArray
-import file_inout as fio
-import deconvolution as decon
-import img_transform as imtrans
-from ImageRaw_class import ImageRaw
 
 import numpy as np
 import itertools
 from scipy.interpolate import interpn
 from scipy.interpolate import RegularGridInterpolator
+
+import traceback
 
 """
 TODO: 
@@ -352,23 +355,25 @@ class DeconvolutionGUI(tk.Toplevel):
 
         fileList = askopenfilenames(title="Load Photo")
         print(fileList, type(fileList), len(fileList))
-        if len(fileList) > 1:
-            try:
-                self.img = ImageRaw(
-                    fileList, self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm"), fio.ReadTiffMultFiles(fileList)
-                )
-                self.img.ShowClassInfo()
-            except Exception as e:
-                print(e)
+# new file load 
+        try:
+            self.img = ImageRaw(fileList)
+        except ValueError as vE:
+            if vE.args[1] == "voxel_problem":
+                try:
+                    tmpVoxel = self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm")
+                    self.img = ImageRaw(fileList, tmpVoxel)
+                except ValueError as vE1:
+                    print(vE1.args[0])
+                    return
+            elif vE.args[1] == "data_problem":
+                print(vE.args[0])
                 return
-        else:
-            beadImPath = fileList[0]
-            # self.img = ImageRaw(
-            #     beadImPath, self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm"), fio.ReadTiffStackFile(beadImPath, fileInfo = False)
-            # )
-            self.img = ImageRaw( beadImPath )
-            self.img.ShowClassInfo()
-        
+            else:
+                print("Unknown problem while loading file.")
+                return
+        self.img.ShowClassInfo()
+
         self.img.imArray = self.BlurImage(self.img.imArray)
         self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.img.imArray, self.cnvImg, plotName = "Image")
         self.figIMG_canvas_agg.get_tk_widget().grid(
@@ -547,43 +552,30 @@ class DeconvolutionGUI(tk.Toplevel):
 # =========================
         fileList = askopenfilenames(title="Select PSF file")
         print(fileList, type(fileList), len(fileList))
-        if len(fileList) > 1:
-            print("ImageRawClass")
-            self.imagePSF = ImageRaw(
-                fileList, self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm"), fio.ReadTiffMultFiles(fileList)
-            )
-            self.imagePSF.ShowClassInfo()
-        else:
-            imgPSFPath = fileList[0]
-            print("ImageRawClass")
-            print("Read one file", imgPSFPath)
-            # self.imagePSF = ImageRaw(
-            #     imgPSFPath, self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm"), fio.ReadTiffStackFile(imgPSFPath)
-            self.imagePSF = ImageRaw( imgPSFPath )
-            self.imagePSF.ShowClassInfo()
-        
+        try:
+            self.imagePSF = ImageRaw(fileList)
+        except ValueError as vE:
+            if vE.args[1] == "voxel_problem":
+                try:
+                    tmpVoxel = self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm")
+                    self.imagePSF = ImageRaw(fileList, tmpVoxel)
+                except ValueError as vE1:
+                    print(vE1.args[0])
+                    return
+            elif vE.args[1] == "data_problem":
+                print(vE.args[0])
+                return
+            else:
+                print("Unknown problem while loading file.")
+                return
+        self.imagePSF.ShowClassInfo()
+
         self.imagePSF.imArray = self.BlurImage(self.imagePSF.imArray)
         self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imagePSF.imArray, self.cnvPSF, plotName = "PSF")
         self.figIMG_canvas_agg.get_tk_widget().grid(
             row=1, column=5, rowspan=10, sticky=(N, E, S, W)
         )
-# =========================
-        # fileList = askopenfilenames(title="Load Beads Photo")
-        # try:
-        #     imgPSFPath = fileList[0]
-        #     print("Open path: ", imgPSFPath)
-        #     self.imgPSF = fio.ReadTiffStackFile(imgPSFPath)
-        #     self.beadVoxelSize = self.GetVoxelDialog( "Enter voxel size as z,x,y in micrometers" )
-        #     print( "print voxel:", self.beadVoxelSize )
-        #     self.figPSF_canvas_agg = FigureCanvasTkFrom3DArray( self.imgPSF, self.cnvPSF, plotName="PSF" )
-        #     self.figPSF_canvas_agg.get_tk_widget().grid(
-        #         row=1, column=6, rowspan=10, sticky=(N, E, S, W)
-        #     )
 
-        # except Exception as e:
-        #    # print("LoadPSFImageFile:", e)
-        #     showerror("LoadPSFImageFile: Error", "Can't read file."+str(e))
-        #     return
         self.EntryPSFParam.configure( state="normal" )
         self.EntryPSFParam.delete(0,END)
         self.EntryPSFParam.insert( 0,self.imagePSF.GetImageParam(output = "full") )
