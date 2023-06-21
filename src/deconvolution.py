@@ -227,6 +227,9 @@ def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False,
     # if there is NAN in image array(seems from source image) replace it with zeros
     hm[np.isnan(hm)] = 0
     beadMaxInt = np.amax(pImg)
+#    pImg = pImg / beadMaxInt * np.amax(idSphImg)
+    padSh = idSphImg.shape
+    hm = np.pad(hm, list(zip(padSh, padSh)), "edge")
     print("starting convolution:", pImg.shape, idSphImg.shape, hm.shape)
     b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
 
@@ -264,8 +267,8 @@ def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False,
         f_old = f_old * rnew
 
         f_old = f_old / np.amax(f_old) * beadMaxInt
-        if pb != None:
-            # updaiting progressbar
+
+        if pb != None:             # updaiting progressbar
             pb.step(pb_step)
             parentWin.update_idletasks()
 
@@ -276,7 +279,9 @@ def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False,
     xend = xstart + xdim // 2
     hm = hm[xstart:xend, xstart:xend, xstart:xend]
     p = p[xstart:xend, xstart:xend, xstart:xend]
-    f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
+    # f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
+    f_old = f_old[padSh[0]:-padSh[0], padSh[1]:-padSh[1], padSh[2]:-padSh[2]]
+    print("finish convolution: "+ str(f_old.shape))
     return f_old
 
 
@@ -348,11 +353,13 @@ def DeconvolutionRLTMR(
     iterLimit=20,
     debug_flag=False, pb = None , parentWin=None
 ):
-    """Function for  convolution Richardson Lucy tikhonov Miller Regularisation"""
+    """Function for  convolution Richardson Lucy Tikhonov Miller Regularization"""
 
     hm = image
     # if there is NAN in image array(seems from source image) replace it with zeros
     hm[np.isnan(hm)] = 0.0
+    padSh = psf.shape
+    hm = np.pad(hm, list(zip(padSh, padSh)), "edge")
     beadMaxInt = np.amax(image)
     p = psf
     b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
@@ -393,10 +400,11 @@ def DeconvolutionRLTMR(
             pb.step(pb_step)
             parentWin.update_idletasks()
 
-    xdim = f_old.shape[1]
-    xstart = xdim // 4
-    xend = xstart + xdim // 2
-    f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
+    # xdim = f_old.shape[1]
+    # xstart = xdim // 4
+    # xend = xstart + xdim // 2
+    # f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
+    f_old = f_old[padSh[0]:-padSh[0], padSh[1]:-padSh[1], padSh[2]:-padSh[2]]
 
     if debug_flag:
         print("Debug output:")
@@ -432,6 +440,8 @@ def DeconvolutionRLTVR(
     hm = image
     # if there is NAN in image array(seems from source image) replace it with zeros
     hm[np.isnan(hm)] = 0.0
+    padSh = psf.shape
+    hm = np.pad(hm, list(zip(padSh, padSh)), "edge")
     beadMaxInt = np.amax(image)
     p = psf
     b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
@@ -478,18 +488,14 @@ def DeconvolutionRLTVR(
             parentWin.update_idletasks()
 
     # end of iteration cycle
-    # imSh = hm.shape
-    # pad = psf.shape
-    # f_old = f_old[
-    #     pad[0] : imSh[0] - pad[0], pad[1] : imSh[1] - pad[1], pad[2] : imSh[2] - pad[2]
-    # ]
-    xdim = f_old.shape[1]
-    xstart = xdim // 4
-    xend = xstart + xdim // 2
-    # hm = hm[xstart:xend, xstart:xend, xstart:xend]
-    # p = p[xstart:xend, xstart:xend, xstart:xend]
-    f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
+    # xdim = f_old.shape[1]
+    # xstart = xdim // 4
+    # xend = xstart + xdim // 2
+    # f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
+    padSh = psf.shape
+    f_old = f_old[padSh[0]:-padSh[0], padSh[1]:-padSh[1], padSh[2]:-padSh[2]]
 
+ 
     if debug_flag:
         print("Debug output:")
         print("Input image shape: ", image.shape)

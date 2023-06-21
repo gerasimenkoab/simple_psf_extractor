@@ -30,6 +30,7 @@ import numpy as np
 import itertools
 from scipy.interpolate import interpn
 from scipy.interpolate import RegularGridInterpolator
+from scipy.ndimage import zoom
 
 import traceback
 
@@ -76,13 +77,11 @@ class DeconvolutionGUI(tk.Toplevel):
         self.beadImgPathW.configure(state = "readonly")
         self.beadImgPathW.pack( side = LEFT )
         f1ButtonEntryFrame.grid(row = 2, column = 0, columnspan = 2, sticky = "w")
-        Separator(f1, orient="horizontal").grid(
-            row = 3, column = 0, ipadx = 200, pady = 10, columnspan = 3
-        )
-        f1.grid(column=1, row=1, sticky="WE")
+        Separator( f1, orient="horizontal" ).grid( row = 3, column = 0, ipadx = 200, pady = 10, columnspan = 3 )
+        f1.grid(column = 1, row = 1, sticky = "WE")
 
         f2 = Frame(self)
-        Label(f2, text="2. Fill Bead Image Parameters", font="Helvetica 10 bold").grid(
+        Label(f2, text = "2. Fill Bead Image Parameters", font = "Helvetica 10 bold").grid(
             row=0, column=0, columnspan=2, sticky="w"
         )  # blanc insert
         Label(f2, text="Bead size(nm):").grid(row=1, column=0)
@@ -151,16 +150,6 @@ class DeconvolutionGUI(tk.Toplevel):
             row=4, column=2, padx=2, pady=2 
         )
 
-        # Label(text="PSF folder").grid(row = 8,column = 1)
-        # self.folderPSFWgt = Entry(self, width = 15, bg = 'white', fg = 'black')
-        # self.folderPSFWgt.grid(row = 8, column = 2, sticky = 'w')
-        # Button(text = 'Browse').grid(row=9,column=3)
-
-        # Label(text="PSF file prefix").grid(row = 9,column = 1)
-        # self.filePrfxPSFWgt = Entry(self, width = 15, bg = 'white', fg = 'black')
-        # self.filePrfxPSFWgt.grid(row = 9, column = 2, sticky = 'w')
-
-        #    Button(f2,text = 'Save PSF multi-file',command=self.SavePSFMulti).grid(row=5, column=0)
         Button(f2, text="Save PSF as tiff", width=12, command=self.SavePSFSingle).grid(
             row=5, column=2, padx=2, pady=2 
         )
@@ -383,7 +372,7 @@ class DeconvolutionGUI(tk.Toplevel):
         )
         self.EntryImageParam.configure( state="normal" )
         self.EntryImageParam.delete(0,END)
-        self.EntryImageParam.insert( 0,self.img.GetImageParam(output = "full") )
+        self.EntryImageParam.insert( 0,self.img.GetImageInfoStr(output = "full") )
         self.EntryImageParam.configure( state="readonly" )
         
     #        self.imArr1 = self.UpscaleImage_Zaxis(self.imArr1,False)
@@ -427,7 +416,7 @@ class DeconvolutionGUI(tk.Toplevel):
         # setting info about loaded file
         self.beadImgPathW.configure( state="normal" )
         self.beadImgPathW.delete(0,END)
-        self.beadImgPathW.insert( 0, self.imgBeadAvr.GetImageParam(output = "full") )
+        self.beadImgPathW.insert( 0, self.imgBeadAvr.GetImageInfoStr(output = "full") )
         self.beadImgPathW.configure( state="readonly" )
 
         self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imgBeadRaw, self.cnvImg, "Bead")
@@ -484,7 +473,8 @@ class DeconvolutionGUI(tk.Toplevel):
                 self.resolutionXY = float(txt_resolutionXY)
                 self.resolutionZ = float(txt_resolutionZ)
                 self.beadSizepx = int(self.beadSizenm / self.resolutionXY / 2)
-                self.imArr1 = imtrans.PaddingImg(self.imgBeadRaw)
+# sss               self.imArr1 = imtrans.PaddingImg(self.imgBeadRaw)
+                self.imArr1 = self.imgBeadRaw
                 print(
                     "shapes:",
                     self.imArr1.shape[0],
@@ -589,7 +579,7 @@ class DeconvolutionGUI(tk.Toplevel):
 
         self.EntryPSFParam.configure( state="normal" )
         self.EntryPSFParam.delete(0,END)
-        self.EntryPSFParam.insert( 0,self.imagePSF.GetImageParam(output = "full") )
+        self.EntryPSFParam.insert( 0,self.imagePSF.GetImageInfoStr(output = "full") )
         self.EntryPSFParam.configure( state="readonly" )
 
 
@@ -600,17 +590,22 @@ class DeconvolutionGUI(tk.Toplevel):
         3test_spheres - 100х100 - 38.9s / Phenom II 142s
         test_strings - 200х200  - 216.9s
         """
-        doRescaleZ = False
+        doRescaleZ = True
         if doRescaleZ:
+            rescaleCoef = self.imagePSF.voxel["Z"] / self.img.voxel["Z"] 
             try:
-                self.imagePSF.RescaleZ(self.img.voxelSize[1])
+                kernell = zoom(self.imagePSF.imArray,[rescaleCoef, 1.0, 1.0])
+                # self.imagePSF.RescaleZ(self.img.voxelSize[1])
             except Exception as e:
                 print("rescale failed"+str(e))
                 return
         start_time = time.time()
+        # print("padding:",list(zip(kernell.shape,kernell.shape)))
+        # imPadded = np.pad(self.img.imArray, list(zip(kernell.shape, kernell.shape)), "edge")
         try:
             self.imgDecon = decon.DeconImage(
-                self.img.imArray, self.imagePSF.imArray,
+                # self.img.imArray, self.imagePSF.imArray,
+                self.img.imArray, kernell, # self.imagePSF.imArray,
                 int( self.deconIterNumImage.get() ),
                 self.deconMethodsDict[ self.deconImageType.get() ],
                 float(self.deconRegCoefImage.get()),
@@ -624,6 +619,19 @@ class DeconvolutionGUI(tk.Toplevel):
         self.figDec_canvas_agg = FigureCanvasTkFrom3DArray(self.imgDecon, self.cnvDecon, "Deconvolved")
         self.figDec_canvas_agg.get_tk_widget().grid(
             row=1, column=6, rowspan=10, sticky=(N, E, S, W)
+        )
+
+        # plotting XY on separate canvas
+        figComp, ax = plt.subplots(1, 1, sharex=False, figsize=(1, 1))
+        dN = self.imgDecon.shape[0]
+        ax.pcolormesh(self.img.imArray[dN // 2, :, :], cmap=cm.jet)
+        top = Toplevel(self)
+        top.geometry("600x600")
+        top.title("Initial image XY plane")
+        cnvCompare = Canvas(top, width=590, height=590, bg="white")
+        cnvCompare.pack(side=TOP, fill=BOTH, expand=True)
+        FigureCanvasTkAgg(figComp, cnvCompare).get_tk_widget().pack(
+            side=TOP, fill=BOTH, expand=True
         )
 
         # plotting XY on separate canvas

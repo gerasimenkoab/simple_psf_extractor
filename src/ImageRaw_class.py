@@ -2,6 +2,7 @@ import numpy as np
 import itertools
 from scipy.interpolate import interpn
 from scipy.interpolate import RegularGridInterpolator
+from scipy.ndimage import zoom
 from tkinter import *
 from tkinter.simpledialog import askstring
 from PIL import Image
@@ -244,7 +245,7 @@ class ImageRaw:
         self.imArray = beadInterp
         self.voxelSize[0] = newZVoxelSize
 
-    def GetImageParam(self, output = "full"):
+    def GetImageInfoStr(self, output = "full"):
         """
             Return string with array and voxel parameters.
         """
@@ -288,5 +289,8 @@ if __name__ == "__main__":
         else:
             print("Not voxel problem")
             quit()
+    testExemplar.ShowClassInfo()
+    arnew = zoom(testExemplar.imArray,[0.5,1,1])
+    testExemplar.imArray = arnew
     testExemplar.ShowClassInfo()
         
