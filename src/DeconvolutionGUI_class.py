@@ -57,25 +57,27 @@ class DeconvolutionGUI(tk.Toplevel):
         self.voxelFields = "Z", "X", "Y"
         self.voxelSizeEntries = {}
 
+        #interface description
+
         self.title("Simple experimental PSF extractor")
         self.resizable(False, False)
-        Label(self, text="PSF  calculation:", font="Helvetica 14 bold").grid(
-            row=0, column=1
-        )  # blanc insert
+        Label(self, text = "PSF  calculation:", font = "Helvetica 14 bold").grid(row = 0, column = 1)  # blanc insert
         f1 = Frame(self)
-        Label(f1, text="").grid(row=0, column=0)  # blanc insert
+        Label(f1, text = "").grid(row = 0, column = 0)  # blanc insert
         Label(
             f1,
-            text="1. Load avaraged bead image created with bead extractor application.",
-            font="Helvetica 10 bold",
-        ).grid(row=1, column=0, columnspan=3, sticky="w")
+            text = "1. Load avaraged bead image created with bead extractor application.",
+            font = "Helvetica 10 bold",
+        ).grid(row = 1, column = 0, columnspan = 3, sticky = "w")
         f1ButtonEntryFrame = Frame(f1)
-        Button(f1ButtonEntryFrame, text="Load image file", command=self.LoadBeadImageFile).pack(side = LEFT, padx=10)
-        self.beadImgPathW = Entry(f1ButtonEntryFrame, width=50, bg="white", fg="black")
+        Button(f1ButtonEntryFrame, width = 10 , text = "Load image", command = self.LoadBeadImageFile).pack(side = LEFT, padx=10)
+        self.beadImgPathW = Entry(f1ButtonEntryFrame, width = 60, bg = "white", fg = "black")
+        self.beadImgPathW.insert(0, "No Image Loaded" )
+        self.beadImgPathW.configure(state = "readonly")
         self.beadImgPathW.pack( side = LEFT )
-        f1ButtonEntryFrame.grid(row=2, column=0, columnspan=2, sticky="w")
+        f1ButtonEntryFrame.grid(row = 2, column = 0, columnspan = 2, sticky = "w")
         Separator(f1, orient="horizontal").grid(
-            row=3, column=0, ipadx=200, pady=10, columnspan=3
+            row = 3, column = 0, ipadx = 200, pady = 10, columnspan = 3
         )
         f1.grid(column=1, row=1, sticky="WE")
 
@@ -374,7 +376,7 @@ class DeconvolutionGUI(tk.Toplevel):
                 return
         self.img.ShowClassInfo()
 
-        self.img.imArray = self.BlurImage(self.img.imArray)
+        # self.img.imArray = self.BlurImage(self.img.imArray)
         self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.img.imArray, self.cnvImg, plotName = "Image")
         self.figIMG_canvas_agg.get_tk_widget().grid(
             row=1, column=5, rowspan=10, sticky=(N, E, S, W)
@@ -389,36 +391,44 @@ class DeconvolutionGUI(tk.Toplevel):
 
     def LoadBeadImageFile(self):
         """
-        Loading raw bead photo from file at self.beadImgPath
+        Loading raw bead photo from file 
         """
-        self.beadImgPath = askopenfilename(title="Select tiff image")
-        self.beadImgPathW.configure( state="normal")
-        self.beadImgPathW.delete(0,END)
-        self.beadImgPathW.insert(0, self.beadImgPath)
-        self.beadImgPathW.configure( state="readonly")
+        fnames = askopenfilenames(title="Select tiff image")
 
-        if self.beadImgPath == "":
-            showerror("Error", "Bead image path empty!")
-            return
         try:
-            print("Open path: ", self.beadImgPath)
-            #self.imgBeadRaw = fio.ReadTiffStackFile(self.beadImgPath)
-            self.imgBeadRaw,tagString = fio.ReadTiffStackFile(self.beadImgPath, fileInfo = True)
-            if tagString == "":
-                print("Need voxel parameters.")
-                self.voxel = {"Z":0, "X":0,"Y":0}
-                self.voxel["Z"],self.voxel["X"],self.voxel["Y"] = self.GetVoxelDialog("Enter voxel values  Z,X,Y (\u03BCm)")
+            self.imgBeadAvr = ImageRaw(fnames)
+        except ValueError as vE:
+            if vE.args[1] == "voxel_problem":
+                try:
+                    tmpVoxel = self.GetVoxelDialog("Enter voxel size as z,x,y in \u03BCm")
+                    self.imgBeadAvr = ImageRaw(fnames, tmpVoxel)
+                except ValueError as vE1:
+                    print(vE1.args[0])
+                    return
+            elif vE.args[1] == "data_problem":
+                print(vE.args[0])
+                return
             else:
-                self.voxel = json.loads(tagString)
-            self.beadImXYResWgt.delete(0,END)
-            self.beadImXYResWgt.insert(0, str(self.voxel["X"] * 1000) )
-            self.beadImZResWgt.delete(0,END)
-            self.beadImZResWgt.insert(0, str(self.voxel["Z"] * 1000) )
+                print("Unknown problem while loading file.")
+                return
+        self.imgBeadAvr.ShowClassInfo()
 
-        except Exception as exc:
-            showerror("LoadBeadImageFile: Error", "Can't read file.")
-            print(exc)
-            return
+        self.imgBeadRaw = self.imgBeadAvr.imArray
+
+        # setting voxel values in GUI
+        self.beadImXYResWgt.delete(0,END)
+        self.beadImXYResWgt.insert(0, str(self.imgBeadAvr.voxel["X"] * 1000) )
+        self.beadImZResWgt.delete(0,END)
+        self.beadImZResWgt.insert(0, str(self.imgBeadAvr.voxel["Z"] * 1000) )
+        self.beadVoxelSize[0] = self.imgBeadAvr.voxel["Z"]       
+        self.beadVoxelSize[1] = self.imgBeadAvr.voxel["Y"]       
+        self.beadVoxelSize[2] = self.imgBeadAvr.voxel["X"]
+        
+        # setting info about loaded file
+        self.beadImgPathW.configure( state="normal" )
+        self.beadImgPathW.delete(0,END)
+        self.beadImgPathW.insert( 0, self.imgBeadAvr.GetImageParam(output = "full") )
+        self.beadImgPathW.configure( state="readonly" )
 
         self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imgBeadRaw, self.cnvImg, "Bead")
         self.figIMG_canvas_agg.get_tk_widget().grid(
@@ -495,7 +505,7 @@ class DeconvolutionGUI(tk.Toplevel):
                 return
             self.figPSF_canvas_agg = FigureCanvasTkFrom3DArray(self.imgPSF, self.cnvPSF, plotName = "PSF")
             self.figPSF_canvas_agg.get_tk_widget().grid(
-                row=1, column=6, rowspan=10, sticky=(N, E, S, W)
+                row=1, column=5, rowspan=10, sticky=(N, E, S, W)
             )
 
     def SavePSFMulti(self):
@@ -530,26 +540,27 @@ class DeconvolutionGUI(tk.Toplevel):
         if hasattr(self, "imgDecon"):
             self.SaveImage(self.imgDecon)
 
-    def SaveImage(self, imageArray:np.zeros(1)):
+    def SaveImage(self, imageArray:np.ndarray):
         """
         Save imageArray as multi-page tiff
         """
-        if not((imageArray == np.zeros(1)).all()):
-            fname = asksaveasfilename(title="Save image as")
-            try:
-                fio.SaveAsTiffStack(imageArray, fname)
-            except Exception as e:
-                showerror("Can't save image as ", fname + "\n Exception: " + str(e))
-                return
-            showinfo("Image saved at:", fname)
-        else:
-            showerror("No array recieved.")
+        filesMask = [('All Files', '*.*'), ('TIFF file', '*.tif')]
+        fname = asksaveasfilename(title="Save PSF as",
+            filetypes = filesMask,
+            defaultextension = filesMask,
+            initialfile = "new_psf.tif")
+        try:
+            tmpDict = dict(zip(self.voxelFields,self.beadVoxelSize))
+            fio.SaveAsTiffStack_tag(imageArray, fname, outtype = "uint8", tagID = 270, tagString = json.dumps(tmpDict))
+        except Exception as e:
+            showerror("Can't save image as ", fname + "\n Exception: " + str(e))
+            return
+        showinfo("Image saved at:", fname)
 
     def LoadPSFImageFile(self):
         """
         Loading raw bead photo from file located at self.beadImgPath
         """
-# =========================
         fileList = askopenfilenames(title="Select PSF file")
         print(fileList, type(fileList), len(fileList))
         try:
@@ -570,7 +581,7 @@ class DeconvolutionGUI(tk.Toplevel):
                 return
         self.imagePSF.ShowClassInfo()
 
-        self.imagePSF.imArray = self.BlurImage(self.imagePSF.imArray)
+        #self.imagePSF.imArray = self.BlurImage(self.imagePSF.imArray)
         self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imagePSF.imArray, self.cnvPSF, plotName = "PSF")
         self.figIMG_canvas_agg.get_tk_widget().grid(
             row=1, column=5, rowspan=10, sticky=(N, E, S, W)
@@ -589,41 +600,27 @@ class DeconvolutionGUI(tk.Toplevel):
         3test_spheres - 100х100 - 38.9s / Phenom II 142s
         test_strings - 200х200  - 216.9s
         """
-        try:
+        doRescaleZ = False
+        if doRescaleZ:
             try:
                 self.imagePSF.RescaleZ(self.img.voxelSize[1])
             except Exception as e:
                 print("rescale failed"+str(e))
                 return
-            try:
-                self.imagePSF.ShowClassInfo()
-            except Exception as e:
-                print("imageRaw show class fail"+str(e))
-                return
-            start_time = time.time()
-            try:
-                # self.imgDecon = decon.DeconvolutionRL(self.img.imArray, self.imgPSF, iterLim,True)
-                # TODO replace with the correct deconvolution function as is done in the first part
-                
-                self.imgDecon = decon.DeconImage(
-                    self.img.imArray, self.imagePSF.imArray,
-                    int( self.deconIterNumImage.get() ),
-                    self.deconMethodsDict[ self.deconImageType.get() ],
-                    float(self.deconRegCoefImage.get()),
-                    progBar=self.deconProgBarImage, parentWin=self
-                )
-                # self.imgDecon = decon.richardson_lucy_deconvolution_3d_tv(
-                #     self.img.imArray, self.imgPSF, iterLim, beta=0.5, tv_weight=0.1
-                # )
-            except Exception as e:
-                print("Deconvolution failed. "+str(e))
-                return
-            print("Decon output shape:", self.imgDecon.shape)
-            print("Deconvolution time: %s seconds " % (time.time() - start_time))
+        start_time = time.time()
+        try:
+            self.imgDecon = decon.DeconImage(
+                self.img.imArray, self.imagePSF.imArray,
+                int( self.deconIterNumImage.get() ),
+                self.deconMethodsDict[ self.deconImageType.get() ],
+                float(self.deconRegCoefImage.get()),
+                progBar=self.deconProgBarImage, parentWin=self
+            )
         except Exception as e:
-            showerror("Error", "Can't finish convolution properly. "+str(e))
-            print(e)
+            print("Deconvolution failed. "+str(e))
             return
+        print("Decon output shape:", self.imgDecon.shape)
+        print("Deconvolution time: %s seconds " % (time.time() - start_time))
         self.figDec_canvas_agg = FigureCanvasTkFrom3DArray(self.imgDecon, self.cnvDecon, "Deconvolved")
         self.figDec_canvas_agg.get_tk_widget().grid(
             row=1, column=6, rowspan=10, sticky=(N, E, S, W)

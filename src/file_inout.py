@@ -147,4 +147,4 @@ def SaveAsTiffStack_tag(imgInArray=np.zeros([3, 4, 6]), filename="img", outtype=
     imlist[0].save(
         filename, tiffinfo={tagID:tagString}, save_all=True, append_images=imlist[1:]
     )
-    print("File saved in one tiff", filename)
+    print("File saved in ", filename)

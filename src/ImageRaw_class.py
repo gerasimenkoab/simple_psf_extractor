@@ -14,15 +14,20 @@ import traceback
 
 class ImageRaw:
     """
-    Class for image storage.
+    Class for image:
+        attributes:
+        self.imArray: np.ndarray - array of pixel intensities
+        self.voxel: dict - voxel sizes in each dimension
     """
 
     def __init__(
         self, fpath = None, voxelSizeIn = None, imArrayIn = None
     ):
         self.imArray = None
-        self.voxel = None
-        #new argument separation
+        self.voxel = None #{"Z":0, "Y":0, "X":0}
+        self.voxelSize = None # obsolete
+        self.voxelFields = ("Z", "Y", "X") # obsolete
+
         if fpath is None:
             if imArrayIn is None:
                 raise ValueError("No data recieved.","data_problem")
@@ -33,47 +38,45 @@ class ImageRaw:
                     try:
                         self.SetArray(imArrayIn)
                     except:
-                        raise ValueError("Can not set array.","data_problem")
+                        raise ValueError("Can not set array from the argument.","data_problem")
                     try:
                         self.SetVoxel(voxelSizeIn)
                     except:
-                        raise ValueError("Can not set voxel.","voxel_problem")
+                        raise ValueError("Can not set voxel from the argument.","voxel_problem")
         else:
             if imArrayIn is None:
                 imArrayIn,tagString = self.LoadImageFile(fpath, 270)
                 if tagString == "" :
                     if voxelSizeIn is None:
-                        raise ValueError("No voxel recieved","voxel_problem")
+                        raise ValueError("No voxel recieved from file or as argument","voxel_problem")
                     else:
                         try:
                             self.SetArray(imArrayIn)
                         except:
-                            raise ValueError("Can not set array.","data_problem")
+                            raise ValueError("Can not set array from file.","data_problem")
                         try:
                             self.SetVoxel(voxelSizeIn)
                         except:
-                            raise ValueError("Can not set voxel.","voxel_problem")
+                            raise ValueError("Can not set voxel from argument.","voxel_problem")
                 else:
                     try:
                         self.SetArray(imArrayIn)
                     except:
                         raise ValueError("Can not set array.","data_problem")
                     try:
-                        voxelSizeIn = json.loads(tagString)
+                        try:
+                            voxelSizeIn = json.loads(tagString)
+                        except Exception as e:
+                            print(str(e))
+                            raise ValueError("Can not convert tag. Check tag format.","voxel_problem")
                         self.SetVoxel( [voxelSizeIn["Z"], voxelSizeIn["X"], voxelSizeIn["Y"]] ) 
                     except:
-                        raise ValueError("Can not set voxel.","voxel_problem")
+                        raise ValueError("Can not set voxel from tag. Check tag format.","voxel_problem")
             else:
                 raise ValueError("Only one source of data for pixel values allowed","data_problem")
 
-        #end new argument separation
         self.path =  fpath[0] 
-        self.voxelFields = "Z", "X", "Y"
-        self.voxelSizeEntries = {}
 
-        # fixing possible array value issues
-        self.imArray[np.isnan(self.imArray)] = 0  # replace NaN with 0
-        self.imArray.clip(0)                      # replace negative with 0
 
     # methods
 
@@ -96,7 +99,7 @@ class ImageRaw:
             try:
                 image_tiff = Image.open(fileNameList[0])
             except :
-                raise FileNotFoundError("Can't load file: {} ".format(fileName) )
+                raise FileNotFoundError("Can't load file: {} ".format(fileNameList[0]) )
             print("Color_mode:", image_tiff.mode, ".......", end=" ")
 
             ncols, nrows = image_tiff.size
@@ -117,7 +120,7 @@ class ImageRaw:
                     grayImgArr = 0.299 * ra + 0.587 * ga + 0.114 * ba
                     imgArray[i, :, :] = grayImgArr
             else:
-                raise ValueError( "Unsupported tiff file mode: {}".formatstr( str(image_tiff.mode) ) )          
+                raise ValueError( "Unsupported tiff file mode: {}".format( str(image_tiff.mode) ) )          
 
         else:
             # multi file load
@@ -150,7 +153,7 @@ class ImageRaw:
                 for i, fileName in enumerate(fileNameList):
                     imgArray[i, :, :] = np.array(Image.open(fileName))
             else:
-                raise ValueError( "Unsupported tiff file mode: {}".formatstr( str(image_tiff.mode) ) )
+                raise ValueError( "Unsupported tiff file mode: {}".format( str(image_tiff.mode) ) )
         print("Done.")
         try:
             return imgArray, image_tiff.tag[tagID][0]
@@ -191,10 +194,10 @@ class ImageRaw:
         """
         if newArray is None or len(newArray.shape) > 3 :
             raise ValueError("Wrong array Value.")
-        else:
-            newArray[np.isnan(newArray)] = 0  # replace NaN with 0
-            newArray.clip(0)                  # replace negative with 0
-            self.imArray = newArray
+        # fixing possible array elements values issues
+        newArray[np.isnan(newArray)] = 0  # replace NaN with 0
+        newArray.clip(0)                  # replace negative with 0
+        self.imArray = newArray
 
     def SetVoxel(self, newVoxel):
         """
@@ -204,6 +207,7 @@ class ImageRaw:
             raise ValueError("Wrong Voxel Value.")
         else:
             self.voxelSize = newVoxel
+            self.voxel = dict(zip(self.voxelFields, newVoxel))
 
     def RescaleZ(self, newZVoxelSize):
         """
@@ -211,15 +215,6 @@ class ImageRaw:
         """
         # теперь разбрасываем бид по отдельным массивам .
         oldShape = self.imArray.shape
-        #        print("old shape:",oldShape)
-        #        print("newshape:",newShape)
-        # zcoord = np.zeros(oldShape[0])
-        # xcoord = np.zeros(oldShape[1])
-        # ycoord = np.zeros(oldShape[2])
-        # zcoordR = np.zeros(shapeZ) # shape of rescaled bead in Z dimension  - same as x shape
-        #            bead = bead/np.amax(bead)*255.0 # normalize bead intensity
-        #        maxcoords = np.unravel_index(np.argmax(bead, axis=None), bead.shape)
-        #            print("maxcoords:",maxcoords)
 
         zcoord = np.arange(oldShape[0]) * self.voxelSize[0]
         xcoord = np.arange(oldShape[1]) * self.voxelSize[1]
@@ -260,7 +255,7 @@ class ImageRaw:
         else:
             return None
         
-    def SaveAsTiffSingle(self, filename="img", outtype="uint8"):
+    def SaveAsTiff(self, filename="img", outtype="uint8"):
         """
         Save Image as TIFF file
         Input: filename - path to file, including file name
@@ -268,7 +263,8 @@ class ImageRaw:
         """
         print("Trying to save TIFF file", outtype)
         tagID = 270
-        strVoxel = ';'.join(str(s) for s in self.voxelSize)
+        # strVoxel = ';'.join(str(s) for s in self.voxelSize)
+        strVoxel = json.dumps(self.voxel)
         imlist = []
         for tmp in self.imArray:
             imlist.append(Image.fromarray(tmp.astype(outtype)))
@@ -286,7 +282,7 @@ if __name__ == "__main__":
         testExemplar = ImageRaw(fileList)
     except ValueError as vE:
         traceback.print_exc()
-        if vE.args[0] == "No voxel recieved":
+        if vE.args[1] == "voxel_problem":
             testVoxel = [0.1,0.02,0.05]
             testExemplar = ImageRaw(fileList,testVoxel)
         else:
