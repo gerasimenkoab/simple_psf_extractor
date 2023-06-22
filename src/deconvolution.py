@@ -28,33 +28,64 @@ def DeconPSF(
         imagePSF: np.ndarray
     """
     imagePSF: np.ndarray
-    if deconType == "RL":
-        # Richardson Lucy
-        print(deconType," selected")
-        imagePSF = MaxLikelhoodEstimationFFT_3D(
-            image,
-            MakeIdealSphereArray(image.shape[0], beadSizePx),
-            iterNum, False, progBar, parentWin
-        )
-    elif deconType == "RLTMR":
-        # Richardson Lucy with Tikhonov-Miller regularisation
-        imagePSF = DeconvolutionRLTMR(
-            image,
-            MakeIdealSphereArray(image.shape[0], beadSizePx),
-            lambdaR,
-            iterNum, False, progBar, parentWin
-        )
-    elif deconType == "RLTVR":
-        # Richardson Lucy with Total Variation regularisation
-        imagePSF = DeconvolutionRLTVR(
-            image,
-            MakeIdealSphereArray(image.shape[0], beadSizePx),
-            lambdaR,
-            iterNum, False, progBar, parentWin
-        )
-    else:
-        imagePSF = None
-        print("DeconPSF: Invalid option. Please choose a valid option.")
+    # if deconType == "RL":
+    #     # Richardson Lucy
+    #     print(deconType," selected")
+    #     imagePSF = MaxLikelhoodEstimationFFT_3D(
+    #         image,
+    #         MakeIdealSphereArray(image.shape[0], beadSizePx),
+    #         iterNum, False, progBar, parentWin
+    #     )
+    # elif deconType == "RLTMR":
+    #     # Richardson Lucy with Tikhonov-Miller regularisation
+    #     imagePSF = DeconvolutionRLTMR(
+    #         image,
+    #         MakeIdealSphereArray(image.shape[0], beadSizePx),
+    #         lambdaR,
+    #         iterNum, False, progBar, parentWin
+    #     )
+    # elif deconType == "RLTVR":
+    #     # Richardson Lucy with Total Variation regularisation
+    #     imagePSF = DeconvolutionRLTVR(
+    #         image,
+    #         MakeIdealSphereArray(image.shape[0], beadSizePx),
+    #         lambdaR,
+    #         iterNum, False, progBar, parentWin
+    #     )
+    # else:
+    #     imagePSF = None
+    #     print("DeconPSF: Invalid option. Please choose a valid option.")
+
+
+    match deconType:
+        case "RL":
+            # Richardson Lucy
+            print(deconType," selected")
+            imagePSF = MaxLikelhoodEstimationFFT_3D(
+                image,
+                MakeIdealSphereArray(image.shape[0], beadSizePx),
+                iterNum, False, progBar, parentWin
+            )
+        case "RLTMR":
+            # Richardson Lucy with Tikhonov-Miller regularisation
+            imagePSF = DeconvolutionRLTMR(
+                image,
+                MakeIdealSphereArray(image.shape[0], beadSizePx),
+                lambdaR,
+                iterNum, False, progBar, parentWin
+            )
+        case "RLTVR":
+            # Richardson Lucy with Total Variation regularisation
+            imagePSF = DeconvolutionRLTVR(
+                image,
+                MakeIdealSphereArray(image.shape[0], beadSizePx),
+                lambdaR,
+                iterNum, False, progBar, parentWin
+            )
+        case _:
+            imagePSF = None
+            print("DeconPSF: Invalid option. Please choose a valid option.")
+
 
     return imagePSF
 
