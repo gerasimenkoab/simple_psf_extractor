@@ -600,12 +600,9 @@ class DeconvolutionGUI(tk.Toplevel):
                 print("rescale failed"+str(e))
                 return
         start_time = time.time()
-        # print("padding:",list(zip(kernell.shape,kernell.shape)))
-        # imPadded = np.pad(self.img.imArray, list(zip(kernell.shape, kernell.shape)), "edge")
         try:
             self.imgDecon = decon.DeconImage(
-                # self.img.imArray, self.imagePSF.imArray,
-                self.img.imArray, kernell, # self.imagePSF.imArray,
+                self.img.imArray, kernell,
                 int( self.deconIterNumImage.get() ),
                 self.deconMethodsDict[ self.deconImageType.get() ],
                 float(self.deconRegCoefImage.get()),

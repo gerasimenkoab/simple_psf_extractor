@@ -22,6 +22,8 @@ def DeconPSF(
         iterNum: int - number of iteration steps
         deconType: str  - deconvolution method name ( default - RL)
         lambdaR: float - regularization coefficient
+        progBar : ttk.progressbar - progressbar to update
+        parentWin : tkinter window widget
     Returns:
         imagePSF: np.ndarray
     """
@@ -69,6 +71,9 @@ def DeconImage(
         iterNum: int - number of iteration steps
         deconType: str  - deconvolution method name ( default - RL)
         lambdaR: float - regularization coefficient
+        progBar : ttk.progressbar - progressbar to update
+        parentWin : tkinter window widget
+
     Returns:
         imagePSF: np.ndarray
     """
@@ -159,18 +164,9 @@ def PointFunctionAiry(pt, r0, maxIntensity=255, zoomfactor=2.6):
 
         distSq = (ptd[1] - r0d[1]) ** 2 + (ptd[2] - r0d[2]) ** 2
         dist = np.sqrt(distSq)
-        # if distSq <= R**2:
-        #     x = dist / R * 4.0
-        #     # NOTE: If 'x' is equal zero - result == nan!. To prevent it - make result equal 'maxIntensity'
-        #     if abs(x) >= 0.00001:          # Zero-criterion
-        #             result = (2. * jv(1, x) / x)**2 * maxIntensity
-        #     else:
-        #             result = maxIntensity
-        # else:
-        #     result = 0
         x = dist / R * 4.0
-        # NOTE: If 'x' is equal zero - result == nan!. To prevent it - make result equal 'maxIntensity'
         if abs(x) >= 0.00001:  # Zero-criterion
+        #     # NOTE: If 'x' is equal zero - result == nan!. To prevent it - make result equal 'maxIntensity'
             result = (2.0 * jv(1, x) / x) ** 2 * maxIntensity
         else:
             result = maxIntensity
@@ -182,7 +178,9 @@ def PointFunctionAiry(pt, r0, maxIntensity=255, zoomfactor=2.6):
 
 
 def MakeIdealSphereArray(imgSize=36, sphRadius=5):
-    """create ideal  sphere array corresponding to sphere_type"""
+    """
+    Create ideal  sphere array corresponding to sphere_type
+    """
     imgMidCoord = int(imgSize / 2)
     # imgSize = self.sideHalf *2
     imgCenter = np.array([imgMidCoord, imgMidCoord, imgMidCoord])
@@ -230,7 +228,6 @@ def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False,
 #    pImg = pImg / beadMaxInt * np.amax(idSphImg)
     padSh = idSphImg.shape
     hm = np.pad(hm, list(zip(padSh, padSh)), "edge")
-    print("starting convolution:", pImg.shape, idSphImg.shape, hm.shape)
     b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
 
     if debug_flag:
@@ -245,7 +242,6 @@ def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False,
     p = idSphImg
     # preparing for start of iteration cycle
     f_old = hm
-    Hm = np.fft.fftn(hm)
     P = np.fft.fftn(p)
     if pb != None:
         # initializing progressbar
@@ -274,14 +270,7 @@ def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False,
 
     # end of iteration cycle
 
-    xdim = f_old.shape[1]
-    xstart = xdim // 4
-    xend = xstart + xdim // 2
-    hm = hm[xstart:xend, xstart:xend, xstart:xend]
-    p = p[xstart:xend, xstart:xend, xstart:xend]
-    # f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
     f_old = f_old[padSh[0]:-padSh[0], padSh[1]:-padSh[1], padSh[2]:-padSh[2]]
-    print("finish convolution: "+ str(f_old.shape))
     return f_old
 
 
@@ -341,11 +330,6 @@ def DeconvolutionRL(image, psf, iterLimit=20, debug_flag=False):
     return f_old
 
 
-def divergence(F):
-    """compute the divergence of n-D scalar field `F`"""
-    return reduce(np.add, np.gradient(F))
-
-
 def DeconvolutionRLTMR(
     image: np.ndarray,
     psf: np.ndarray,
@@ -353,7 +337,21 @@ def DeconvolutionRLTMR(
     iterLimit=20,
     debug_flag=False, pb = None , parentWin=None
 ):
-    """Function for  convolution Richardson Lucy Tikhonov Miller Regularization"""
+    """
+    Function for  convolution Richardson Lucy Tikhonov Miller Regularization
+
+    Parameters:
+        image (ndarray): The 3D image to be deconvolved.
+        psf (ndarray): The point spread function (PSF) of the imaging system.
+        lambdaTM (float): The weight of the tikhonov miller regularization term. Defaults to 0.0001.
+        iterLimit (int): The number of iterations to perform. Defaults to 10.
+        debug_flag (bool) : debug output
+        pb : tkinter.ttk.progressbar progressbar widget
+        parentWin : tkinter window widget instance
+ 
+    Returns:
+        ndarray: The deconvolved image.    
+    """
 
     hm = image
     # if there is NAN in image array(seems from source image) replace it with zeros
@@ -426,15 +424,16 @@ def DeconvolutionRLTVR(
     with total variation regularization.
 
     Parameters:
-    image (ndarray): The 3D image to be deconvolved.
-    psf (ndarray): The point spread function (PSF) of the imaging system.
-    iterLimit (int): The number of iterations to perform. Defaults to 10.
-    beta (float): The step size parameter. Defaults to 0.5.
-    lambdaTV (float): The weight of the total variation regularization term. Defaults to 0.0001.
-    mode (str): The mode parameter passed to the convolution function. Defaults to 'nearest'.
+        image (ndarray): The 3D image to be deconvolved.
+        psf (ndarray): The point spread function (PSF) of the imaging system.
+        lambdaTV (float): The weight of the total variation regularization term. Defaults to 0.0001.
+        iterLimit (int): The number of iterations to perform. Defaults to 10.
+        debug_flag (bool) : debug output
+        pb : tkinter.ttk.progressbar progressbar widget
+        parentWin : tkinter window widget instance
  
     Returns:
-    ndarray: The deconvolved image.    
+        ndarray: The deconvolved image.    
     """
 
     hm = image
@@ -504,227 +503,230 @@ def DeconvolutionRLTVR(
     return f_old
 
 
-def EM_MLE_3D(pImg, idSphImg, iterLimit=20, debug_flag=True):
-    """Function for  convolution"""
-    hm = pImg
-    beadMaxInt = np.amax(pImg)
+# def EM_MLE_3D(pImg, idSphImg, iterLimit=20, debug_flag=True):
+#     """Function for  convolution"""
+#     hm = pImg
+#     beadMaxInt = np.amax(pImg)
 
-    # if there is NAN in image array(seems from source image) replace it with zeros
-    hm[np.isnan(hm)] = 0
-    print("starting convolution:", pImg.shape, idSphImg.shape, hm.shape)
-    b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
+#     # if there is NAN in image array(seems from source image) replace it with zeros
+#     hm[np.isnan(hm)] = 0
+#     print("starting convolution:", pImg.shape, idSphImg.shape, hm.shape)
+#     b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
 
-    if debug_flag:
-        print("Debug output:")
-        print(np.mean(hm[0, 0, :]), np.mean(hm[0, :, 0]), np.mean(hm[:, 0, 0]))
-        print(np.amax(hm[0, 0, :]), np.amax(hm[0, :, 0]), np.amax(hm[:, 0, 0]))
-        print(hm[0, 0, 56], hm[0, 56, 0], hm[56, 0, 0])
-    #    print("Background intensity:", b_noize)
-    #    print('max intensity value:', np.amax(hm))
-    p = idSphImg
-    # preparing for start of iteration cycle
-    f_old = hm
-    #    f_old = p
-    Hm = np.fft.fftn(hm)
-    P = np.fft.fftn(p)
-    # P_hat = np.fft.fftn(np.flip(p)) # spatially inverted p
-    # starting iteration cycle
-    for k in range(0, iterLimit):
-        print("\r", "iter:", k, end=" ")
-        # first convolution
-        e = signal.fftconvolve(f_old, p, mode="same")
-        # e = np.real(e)
-        e = e + b_noize
-        r = hm / e
-        # second convolution
-        p1 = np.flip(p)
-        rnew = signal.fftconvolve(r, p1, mode="same")
-        rnew = np.real(rnew)
-        #      rnew = rnew.clip(min=0)
-        f_old = f_old * rnew
-        # applying intensity regulatization according to Conchello(1996)
-        #      constr = np.amax(f_old)/np.amax(hm)
-        #      f_old = (-1.0+np.sqrt(1.0 + 2.0*constr*f_old))/(constr)
-        #      print("result:",hm[36,36,36],f_old[36,36,36],r[36,36,36],p[36,36,36],e[36,36,36],rnew[36,36,36])
+#     if debug_flag:
+#         print("Debug output:")
+#         print(np.mean(hm[0, 0, :]), np.mean(hm[0, :, 0]), np.mean(hm[:, 0, 0]))
+#         print(np.amax(hm[0, 0, :]), np.amax(hm[0, :, 0]), np.amax(hm[:, 0, 0]))
+#         print(hm[0, 0, 56], hm[0, 56, 0], hm[56, 0, 0])
+#     #    print("Background intensity:", b_noize)
+#     #    print('max intensity value:', np.amax(hm))
+#     p = idSphImg
+#     # preparing for start of iteration cycle
+#     f_old = hm
+#     #    f_old = p
+#     Hm = np.fft.fftn(hm)
+#     P = np.fft.fftn(p)
+#     # P_hat = np.fft.fftn(np.flip(p)) # spatially inverted p
+#     # starting iteration cycle
+#     for k in range(0, iterLimit):
+#         print("\r", "iter:", k, end=" ")
+#         # first convolution
+#         e = signal.fftconvolve(f_old, p, mode="same")
+#         # e = np.real(e)
+#         e = e + b_noize
+#         r = hm / e
+#         # second convolution
+#         p1 = np.flip(p)
+#         rnew = signal.fftconvolve(r, p1, mode="same")
+#         rnew = np.real(rnew)
+#         #      rnew = rnew.clip(min=0)
+#         f_old = f_old * rnew
+#         # applying intensity regulatization according to Conchello(1996)
+#         #      constr = np.amax(f_old)/np.amax(hm)
+#         #      f_old = (-1.0+np.sqrt(1.0 + 2.0*constr*f_old))/(constr)
+#         #      print("result:",hm[36,36,36],f_old[36,36,36],r[36,36,36],p[36,36,36],e[36,36,36],rnew[36,36,36])
 
-        f_old = f_old / np.amax(f_old) * beadMaxInt
-    #  maximum  entropy regularisation - seems to work bad
-    #      f_old = f_old * rnew - 0.00001*rnew *np.log(rnew)
-    # end of iteration cycle
+#         f_old = f_old / np.amax(f_old) * beadMaxInt
+#     #  maximum  entropy regularisation - seems to work bad
+#     #      f_old = f_old * rnew - 0.00001*rnew *np.log(rnew)
+#     # end of iteration cycle
 
-    xdim = f_old.shape[1]
-    print("shape: ", xdim)
-    xstart = xdim // 4
-    xend = xstart + xdim // 2
-    hm = hm[xstart:xend, xstart:xend, xstart:xend]
-    p = p[xstart:xend, xstart:xend, xstart:xend]
-    f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
-    print("End of MaxLikelhoodEstimation fft")
-    return f_old
-
-
-def Tikhonov_Miller_3D(pImg, idSphImg, alpha=0.1, debug_flag=True):
-    """Function for Tikhonov_Miller convolution
-    A*x = b
-    pImp -> b
-    idSphImg -> A
-    """
-    hm = pImg
-    # if there is NAN in image array(seems from source image) replace it with zeros
-    hm[np.isnan(hm)] = 0
-    beadMaxInt = np.amax(pImg)
-    print("starting Tikhonov:", pImg.shape, idSphImg.shape, hm.shape)
-
-    if debug_flag:
-        print("Debug output:")
-        print(np.mean(hm[0, 0, :]), np.mean(hm[0, :, 0]), np.mean(hm[:, 0, 0]))
-        print(np.amax(hm[0, 0, :]), np.amax(hm[0, :, 0]), np.amax(hm[:, 0, 0]))
-        print(hm[0, 0, 56], hm[0, 56, 0], hm[56, 0, 0])
-    G = alpha * np.identity
-    # x = (At*A + Gt*G)^{-1} *At*b
-    x = np.transpose(A) * A
-
-    p = idSphImg
-    # preparing for start of iteration cycle
-    f_old = hm
-    #    f_old = p
-    Hm = np.fft.fftn(hm)
-    P = np.fft.fftn(p)
-    # P_hat = np.fft.fftn(np.flip(p)) # spatially inverted p
-    # starting iteration cycle
-    for k in range(0, iterLimit):
-        print("\r", "iter:", k, end=" ")
-        # first convolution
-        e = signal.fftconvolve(f_old, p, mode="same")
-        # e = np.real(e)
-        e = e + b_noize
-        r = hm / e
-        # second convolution
-        p1 = np.flip(p)
-        rnew = signal.fftconvolve(r, p1, mode="same")
-        rnew = np.real(rnew)
-        #      rnew = rnew.clip(min=0)
-        f_old = f_old * rnew
-        # applying intensity regulatization according to Conchello(1996)
-        #      constr = np.amax(f_old)/np.amax(hm)
-        #      f_old = (-1.0+np.sqrt(1.0 + 2.0*constr*f_old))/(constr)
-        #      print("result:",hm[36,36,36],f_old[36,36,36],r[36,36,36],p[36,36,36],e[36,36,36],rnew[36,36,36])
-
-        f_old = f_old / np.amax(f_old) * beadMaxInt
-    #  maximum  entropy regularisation - seems to work bad
-    #      f_old = f_old * rnew - 0.00001*rnew *np.log(rnew)
-    # end of iteration cycle
-
-    xdim = f_old.shape[1]
-    print("shape: ", xdim)
-    xstart = xdim // 4
-    xend = xstart + xdim // 2
-    hm = hm[xstart:xend, xstart:xend, xstart:xend]
-    p = p[xstart:xend, xstart:xend, xstart:xend]
-    f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
-    print("End of TikhonovMillerEstimation fft")
-    return f_old
+#     xdim = f_old.shape[1]
+#     print("shape: ", xdim)
+#     xstart = xdim // 4
+#     xend = xstart + xdim // 2
+#     hm = hm[xstart:xend, xstart:xend, xstart:xend]
+#     p = p[xstart:xend, xstart:xend, xstart:xend]
+#     f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
+#     print("End of MaxLikelhoodEstimation fft")
+#     return f_old
 
 
-def richardson_lucy_deconvolution_3d_tv(
-    image, psf, iterations=10, beta=0.5, tv_weight=0.1
-):
-    """
-    Perform Richardson-Lucy deconvolution on a 3D image using a given point spread function (PSF)
-    with total variation regularization.
+# def Tikhonov_Miller_3D(pImg, idSphImg, alpha=0.1, debug_flag=True):
+#     """Function for Tikhonov_Miller convolution
+#     A*x = b
+#     pImp -> b
+#     idSphImg -> A
+#     """
+#     hm = pImg
+#     # if there is NAN in image array(seems from source image) replace it with zeros
+#     hm[np.isnan(hm)] = 0
+#     beadMaxInt = np.amax(pImg)
+#     print("starting Tikhonov:", pImg.shape, idSphImg.shape, hm.shape)
 
-    Parameters:
-    image (ndarray): The 3D image to be deconvolved.
-    psf (ndarray): The point spread function (psf) of the imaging system.
-    iterations (int): The number of iterations to perform. Defaults to 10.
-    beta (float): The step size parameter. Defaults to 0.5.
-    tv_weight (float): The weight of the total variation regularization term. Defaults to 0.1.
-    mode (str): The mode parameter passed to the convolution function. Defaults to 'nearest'.
+#     if debug_flag:
+#         print("Debug output:")
+#         print(np.mean(hm[0, 0, :]), np.mean(hm[0, :, 0]), np.mean(hm[:, 0, 0]))
+#         print(np.amax(hm[0, 0, :]), np.amax(hm[0, :, 0]), np.amax(hm[:, 0, 0]))
+#         print(hm[0, 0, 56], hm[0, 56, 0], hm[56, 0, 0])
+#     G = alpha * np.identity
+#     # x = (At*A + Gt*G)^{-1} *At*b
+#     x = np.transpose(A) * A
 
-    Returns:
-    ndarray: The deconvolved image.
-    """
-    print("deconvolution start")
-    # Normalize the image and the PSF
-    image = image / np.max(image)
-    psf = psf / np.max(psf)
+#     p = idSphImg
+#     # preparing for start of iteration cycle
+#     f_old = hm
+#     #    f_old = p
+#     Hm = np.fft.fftn(hm)
+#     P = np.fft.fftn(p)
+#     # P_hat = np.fft.fftn(np.flip(p)) # spatially inverted p
+#     # starting iteration cycle
+#     for k in range(0, iterLimit):
+#         print("\r", "iter:", k, end=" ")
+#         # first convolution
+#         e = signal.fftconvolve(f_old, p, mode="same")
+#         # e = np.real(e)
+#         e = e + b_noize
+#         r = hm / e
+#         # second convolution
+#         p1 = np.flip(p)
+#         rnew = signal.fftconvolve(r, p1, mode="same")
+#         rnew = np.real(rnew)
+#         #      rnew = rnew.clip(min=0)
+#         f_old = f_old * rnew
+#         # applying intensity regulatization according to Conchello(1996)
+#         #      constr = np.amax(f_old)/np.amax(hm)
+#         #      f_old = (-1.0+np.sqrt(1.0 + 2.0*constr*f_old))/(constr)
+#         #      print("result:",hm[36,36,36],f_old[36,36,36],r[36,36,36],p[36,36,36],e[36,36,36],rnew[36,36,36])
 
-    # Pad the PSF to match the size of the image
-    # psf = np.pad(psf, ((image.shape[0]-psf.shape[0])//2, (image.shape[1]-psf.shape[1])//2, (image.shape[2]-psf.shape[2])//2), mode='constant')
+#         f_old = f_old / np.amax(f_old) * beadMaxInt
+#     #  maximum  entropy regularisation - seems to work bad
+#     #      f_old = f_old * rnew - 0.00001*rnew *np.log(rnew)
+#     # end of iteration cycle
 
-    print("deconvolution start")
-    # Initialize the deconvolved image to the input image
-    deconvolved = np.copy(image)
-    # Pad the image to match the size of the PSF
-    pad = psf.shape
-    imagepadded = np.pad(
-        image,
-        (
-            (pad[0] // 2, pad[0] // 2),
-            (pad[1] // 2, pad[1] // 2),
-            (pad[2] // 2, pad[2] // 2),
-        ),
-        "edge",
-    )
-    deconvolved = np.pad(
-        deconvolved,
-        (
-            (pad[0] // 2, pad[0] // 2),
-            (pad[1] // 2, pad[1] // 2),
-            (pad[2] // 2, pad[2] // 2),
-        ),
-        "edge",
-    )
-    # Compute the gradient operators
-    dx = np.array([-1, 0, 1]).reshape((1, 1, 3))
-    dy = np.array([-1, 0, 1]).reshape((1, 3, 1))
-    dz = np.array([-1, 0, 1]).reshape((3, 1, 1))
+#     xdim = f_old.shape[1]
+#     print("shape: ", xdim)
+#     xstart = xdim // 4
+#     xend = xstart + xdim // 2
+#     hm = hm[xstart:xend, xstart:xend, xstart:xend]
+#     p = p[xstart:xend, xstart:xend, xstart:xend]
+#     f_old = f_old[xstart:xend, xstart:xend, xstart:xend]
+#     print("End of TikhonovMillerEstimation fft")
+#     return f_old
 
-    # Iterate the Richardson-Lucy algorithm with TV regularization
-    for i in range(iterations):
-        print("iteration number:", i)
-        try:
-            # Compute the convolution of the current deconvolved image with the PSF
-            convolved = fftconvolve(deconvolved, psf, mode="same")
-            print("deconvolution start")
 
-            # Compute the ratio of the input image to the convolution
-            ratio = imagepadded / convolved
-            print("deconvolution start")
+# def richardson_lucy_deconvolution_3d_tv(
+#     image, psf, iterations=10, beta=0.5, tv_weight=0.1
+# ):
+#     """
+#     Perform Richardson-Lucy deconvolution on a 3D image using a given point spread function (PSF)
+#     with total variation regularization.
 
-            # Compute the convolution of the ratio with the PSF
-            deconvolved *= fftconvolve(ratio, psf, mode="same")
-            print("deconvolution start")
+#     Parameters:
+#     image (ndarray): The 3D image to be deconvolved.
+#     psf (ndarray): The point spread function (psf) of the imaging system.
+#     iterations (int): The number of iterations to perform. Defaults to 10.
+#     beta (float): The step size parameter. Defaults to 0.5.
+#     tv_weight (float): The weight of the total variation regularization term. Defaults to 0.1.
+#     mode (str): The mode parameter passed to the convolution function. Defaults to 'nearest'.
 
-            # Compute the TV gradient of the deconvolved image
-            grad_x = convolve(deconvolved, dx, mode="same")
-            grad_y = convolve(deconvolved, dy, mode="same")
-            grad_z = convolve(deconvolved, dz, mode="same")
-            print("deconvolution start")
+#     Returns:
+#     ndarray: The deconvolved image.
+#     """
+#     print("deconvolution start")
+#     # Normalize the image and the PSF
+#     image = image / np.max(image)
+#     psf = psf / np.max(psf)
 
-            # Compute the total variation gradient of the deconvolved image
-            tv_grad = np.sqrt(grad_x**2 + grad_y**2 + grad_z**2)
-            print("deconvolution start")
+#     # Pad the PSF to match the size of the image
+#     # psf = np.pad(psf, ((image.shape[0]-psf.shape[0])//2, (image.shape[1]-psf.shape[1])//2, (image.shape[2]-psf.shape[2])//2), mode='constant')
 
-            # Compute the Laplacian operator of the TV gradient
-            laplacian = convolve(tv_grad, np.array([[-1, 2, -1]]), mode="same")
-            print("deconvolution start")
+#     print("deconvolution start")
+#     # Initialize the deconvolved image to the input image
+#     deconvolved = np.copy(image)
+#     # Pad the image to match the size of the PSF
+#     pad = psf.shape
+#     imagepadded = np.pad(
+#         image,
+#         (
+#             (pad[0] // 2, pad[0] // 2),
+#             (pad[1] // 2, pad[1] // 2),
+#             (pad[2] // 2, pad[2] // 2),
+#         ),
+#         "edge",
+#     )
+#     deconvolved = np.pad(
+#         deconvolved,
+#         (
+#             (pad[0] // 2, pad[0] // 2),
+#             (pad[1] // 2, pad[1] // 2),
+#             (pad[2] // 2, pad[2] // 2),
+#         ),
+#         "edge",
+#     )
+#     # Compute the gradient operators
+#     dx = np.array([-1, 0, 1]).reshape((1, 1, 3))
+#     dy = np.array([-1, 0, 1]).reshape((1, 3, 1))
+#     dz = np.array([-1, 0, 1]).reshape((3, 1, 1))
 
-            # Update the deconvolved image with TV regularization
-            deconvolved *= fftconvolve(
-                ratio * np.exp(beta * laplacian), psf, mode="same"
-            )
-            print("deconvolution start")
+#     # Iterate the Richardson-Lucy algorithm with TV regularization
+#     for i in range(iterations):
+#         print("iteration number:", i)
+#         try:
+#             # Compute the convolution of the current deconvolved image with the PSF
+#             convolved = fftconvolve(deconvolved, psf, mode="same")
+#             print("deconvolution start")
 
-            # Apply Gaussian filtering to the deconvolved image
-            deconvolved = gaussian_filter(deconvolved, sigma=1)
-        except Exception as e:
-            print(e)
-    # Removing padding to keep size same as image
-    deconvolved = deconvolved[
-        pad[0] // 2 : -pad[0] // 2,
-        pad[1] // 2 : -pad[1] // 2,
-        pad[2] // 2 : -pad[2] // 2,
-    ]
-    return deconvolved
+#             # Compute the ratio of the input image to the convolution
+#             ratio = imagepadded / convolved
+#             print("deconvolution start")
 
+#             # Compute the convolution of the ratio with the PSF
+#             deconvolved *= fftconvolve(ratio, psf, mode="same")
+#             print("deconvolution start")
+
+#             # Compute the TV gradient of the deconvolved image
+#             grad_x = convolve(deconvolved, dx, mode="same")
+#             grad_y = convolve(deconvolved, dy, mode="same")
+#             grad_z = convolve(deconvolved, dz, mode="same")
+#             print("deconvolution start")
+
+#             # Compute the total variation gradient of the deconvolved image
+#             tv_grad = np.sqrt(grad_x**2 + grad_y**2 + grad_z**2)
+#             print("deconvolution start")
+
+#             # Compute the Laplacian operator of the TV gradient
+#             laplacian = convolve(tv_grad, np.array([[-1, 2, -1]]), mode="same")
+#             print("deconvolution start")
+
+#             # Update the deconvolved image with TV regularization
+#             deconvolved *= fftconvolve(
+#                 ratio * np.exp(beta * laplacian), psf, mode="same"
+#             )
+#             print("deconvolution start")
+
+#             # Apply Gaussian filtering to the deconvolved image
+#             deconvolved = gaussian_filter(deconvolved, sigma=1)
+#         except Exception as e:
+#             print(e)
+#     # Removing padding to keep size same as image
+#     deconvolved = deconvolved[
+#         pad[0] // 2 : -pad[0] // 2,
+#         pad[1] // 2 : -pad[1] // 2,
+#         pad[2] // 2 : -pad[2] // 2,
+#     ]
+#     return deconvolved
+
+# def divergence(F):
+#     """compute the divergence of n-D scalar field `F`"""
+#     return reduce(np.add, np.gradient(F))

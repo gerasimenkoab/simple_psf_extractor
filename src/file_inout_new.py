@@ -25,7 +25,7 @@ def ReadTiffToArray(fileNameList: tuple, tagID = 270):
         try:
             image_tiff = Image.open(fileNameList[0])
         except :
-            raise FileNotFoundError("Can't load file: {} ".format(fileName) )
+            raise FileNotFoundError("Can't load file: {} ".format(fileNameList[0]) )
         print("Color_mode:", image_tiff.mode, ".......", end=" ")
 
         ncols, nrows = image_tiff.size
@@ -46,7 +46,7 @@ def ReadTiffToArray(fileNameList: tuple, tagID = 270):
                 grayImgArr = 0.299 * ra + 0.587 * ga + 0.114 * ba
                 imgArray[i, :, :] = grayImgArr
         else:
-            raise ValueError( "Unsupported tiff file mode: {}".formatstr( str(image_tiff.mode) ) )          
+            raise ValueError( "Unsupported tiff file mode: {}".format( str(image_tiff.mode) ) )          
 
     else:
         # multi file load
@@ -79,7 +79,7 @@ def ReadTiffToArray(fileNameList: tuple, tagID = 270):
             for i, fileName in enumerate(fileNameList):
                 imgArray[i, :, :] = np.array(Image.open(fileName))
         else:
-            raise ValueError( "Unsupported tiff file mode: {}".formatstr( str(image_tiff.mode) ) )
+            raise ValueError( "Unsupported tiff file mode: {}".format( str(image_tiff.mode) ) )
     print("Done.")
     try:
         return imgArray, image_tiff.tag[tagID][0]
