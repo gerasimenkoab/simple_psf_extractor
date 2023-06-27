@@ -5,9 +5,9 @@ TODO:
 
 - deconvolution revision:
 + RL TM regularisation ... done
-+ add method selection for PSF deconvolution app
-+ add progress bar to GUI
-+ add method selection for Image deconvolution app
++ add method selection for PSF deconvolution app... done
++ add progress bar to GUI... done
++ add method selection for Image deconvolution app... done
 
 - implement temporary file using tempfile.SpooledTemporaryFile
 - logging with logger.(from logging.handlers import RotatingFileHandler)
