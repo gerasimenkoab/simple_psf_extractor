@@ -19,6 +19,8 @@ class ImageRaw:
         attributes:
         self.imArray: np.ndarray - array of pixel intensities
         self.voxel: dict - voxel sizes in each dimension
+        voxelSizeIn: List [z,y,x]
+        imArrayIn: np.array[nz,ny,nx]
     """
 
     def __init__(

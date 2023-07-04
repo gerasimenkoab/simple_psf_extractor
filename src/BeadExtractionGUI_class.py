@@ -30,14 +30,13 @@ from plot_for_gui import FigureCanvasTkFrom3DArray, FigureCanvasTk3DFrom3DArray
 # from  ImageRaw_class import ImageRaw
 
 """   TODO:
-       - add tiff tag with voxel size information
+       - add  bead size to tiff tag
 """
 
 
 class BeadExtractionGUI(tk.Toplevel):
     """Class provides instruments for extraction of beads from microscope multilayer photo."""
 
-#    def __init__(self, master = None, wwidth=600, wheight=600):
     def __init__(self, parent, wwidth=600, wheight=600):
         super().__init__(parent)
         # new  class properties
@@ -46,13 +45,8 @@ class BeadExtractionGUI(tk.Toplevel):
         self.intensityFactor = 1.0  # intensity factor for beads selection widget
         self.beadsPhotoLayerID = 0  # default index of beads microscope photo
 
-        # list of arrays
-        beadZlist = []
-        beadXlist = []
-        beadYlist = []
-        beadVal = []
 
-        self.sideHalf = 18  # default selection halfsize
+        self.selectionFrameHalf = 18  # default selection halfsize
 
         self.beadDiameter = (
             0.2  # initial bead diameter in micrometers = diameter(nm)/1000
@@ -120,7 +114,8 @@ class BeadExtractionGUI(tk.Toplevel):
         )  # mu simbol encoding - \u03BC
         frameBeadSize.grid(row=2, column=1, padx=2, pady=2, sticky="we")
         self.beadSizeEntry.insert(0, self.beadDiameter)
-        self.beadSizeEntry.bind("<Return>", self.ReturnBeadSizeEntryContent)
+        self.beadSizeEntry.bind("<Return>", self.SetBeadSize)
+        self.beadSizeEntry.bind("<FocusOut>", self.SetBeadSize)
 
         voxSizeFrame = Frame(f1)
         Label(voxSizeFrame, text="Voxel size (\u03BCm): ", anchor="w").pack(
@@ -132,7 +127,8 @@ class BeadExtractionGUI(tk.Toplevel):
             ent.pack(side=LEFT, padx=2, pady=2)
             Label(voxSizeFrame, text=" ").pack(side=LEFT, padx=2, pady=2)
             ent.insert(0, self.beadVoxelSize[idField])
-            ent.bind("<Return>", self.ReturnVoxelSizeEntryContent)
+            ent.bind("<Return>", self.SetVoxelSize)
+            ent.bind("<FocusOut>", self.SetVoxelSize)
             self.voxelSizeEntries[voxelField] = ent
         voxSizeFrame.grid(row=2, column=0, sticky="we")
         f1.pack(side=TOP)
@@ -152,8 +148,9 @@ class BeadExtractionGUI(tk.Toplevel):
         self.selectSizeEntry = Entry(selectSizeFrame, width=5, bg="green", fg="white")
         self.selectSizeEntry.pack(side=LEFT, padx=2, pady=2)
         Label(selectSizeFrame, text="px").pack(side=LEFT, padx=2, pady=2)
-        self.selectSizeEntry.insert(0, self.sideHalf * 2)
-        self.selectSizeEntry.bind("<Return>", self.ReturnSizeEntryContent)
+        self.selectSizeEntry.insert(0, self.selectionFrameHalf * 2)
+        self.selectSizeEntry.bind("<Return>", self.SetSelectionFrameSize)
+        self.selectSizeEntry.bind("<FocusOut>", self.SetSelectionFrameSize)
         selectSizeFrame.grid(row=1, column=0, sticky="we")
 
         frameMarks = Frame(f2)
@@ -380,45 +377,45 @@ class BeadExtractionGUI(tk.Toplevel):
         self.imgBeadsRaw.seek(self.beadsPhotoLayerID)
         self.UpdateBeadSelectionWidgetImage()
 
-    def Bead2Arrays(self, beadID):
-        bead = self.selectedBeads[int(beadID)]
-        # теперь разбрасываем бид по отдельным массивам .
-        print("shape:", bead.shape[0], bead.shape[1], bead.shape[2])
-        zcoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        xcoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        ycoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        voxelVal = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        nn = 0
-        bead = bead / np.amax(bead) * 255.0
-        for i, j, k in itertools.product(
-            range(bead.shape[0]), range(bead.shape[1]), range(bead.shape[2])
-        ):
-            if bead[i, j, k] > np.exp(-1):
-                zcoord[nn] = i
-                xcoord[nn] = j
-                ycoord[nn] = k
-                voxelVal[nn] = bead[i, j, k]
-                #                 voxelVal[voxelVal < 0.5] = 0
-                nn = nn + 1
-        plotFlag = 0
-        if plotFlag == 1:
-            fig = plt.figure()
-            ax = fig.add_subplot(111, projection="3d")
-            n = nn - 1
-            im = ax.scatter(
-                xcoord[0:n],
-                ycoord[0:n],
-                zcoord[0:n],
-                c=voxelVal[0:n],
-                alpha=0.5,
-                cmap=cm.jet,
-            )
-            fig.colorbar(im)
-            ax.set_xlabel("X Label")
-            ax.set_ylabel("Y Label")
-            ax.set_zlabel("Z Label")
-            plt.show()
-        return zcoord, xcoord, ycoord, voxelVal
+    # def Bead2Arrays(self, beadID):
+    #     bead = self.selectedBeads[int(beadID)]
+    #     # теперь разбрасываем бид по отдельным массивам .
+    #     print("shape:", bead.shape[0], bead.shape[1], bead.shape[2])
+    #     zcoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
+    #     xcoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
+    #     ycoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
+    #     voxelVal = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
+    #     nn = 0
+    #     bead = bead / np.amax(bead) * 255.0
+    #     for i, j, k in itertools.product(
+    #         range(bead.shape[0]), range(bead.shape[1]), range(bead.shape[2])
+    #     ):
+    #         if bead[i, j, k] > np.exp(-1):
+    #             zcoord[nn] = i
+    #             xcoord[nn] = j
+    #             ycoord[nn] = k
+    #             voxelVal[nn] = bead[i, j, k]
+    #             #                 voxelVal[voxelVal < 0.5] = 0
+    #             nn = nn + 1
+    #     plotFlag = 0
+    #     if plotFlag == 1:
+    #         fig = plt.figure()
+    #         ax = fig.add_subplot(111, projection="3d")
+    #         n = nn - 1
+    #         im = ax.scatter(
+    #             xcoord[0:n],
+    #             ycoord[0:n],
+    #             zcoord[0:n],
+    #             c=voxelVal[0:n],
+    #             alpha=0.5,
+    #             cmap=cm.jet,
+    #         )
+    #         fig.colorbar(im)
+    #         ax.set_xlabel("X Label")
+    #         ax.set_ylabel("Y Label")
+    #         ax.set_zlabel("Z Label")
+    #         plt.show()
+    #     return zcoord, xcoord, ycoord, voxelVal
 
     def PlotBead3D(self, bead, treshold=np.exp(-1) * 255.0):
         """Plot 3D view of a given bead"""
@@ -432,177 +429,141 @@ class BeadExtractionGUI(tk.Toplevel):
         FigureCanvasTk3DFrom3DArray( bead, cnvPlot ).get_tk_widget().pack(side='top')
     
 
-    def UpscaleBead3D(self, bead, plotPreview=False):
-        """Upscale of a given bead"""
-        # теперь разбрасываем бид по отдельным массивам .
-        zcoord = np.zeros(bead.shape[0])
-        xcoord = np.zeros(bead.shape[1])
-        ycoord = np.zeros(bead.shape[2])
-        zcoordR = np.zeros(bead.shape[1])
-        bead = bead / np.amax(bead) * 255.0
-        # new code
-        #            maximum = np.amax(bead)
-        #            maxcoords = np.unravel_index(np.argmax(bead, axis=None), bead.shape)
-        #            print("maxcoords:",maxcoords)
-        #
-        print(
-            "range test:",
-            np.linspace(0.0, bead.shape[0], num=bead.shape[0], endpoint=False),
-        )
-        zcoord = np.arange(bead.shape[0]) * self.beadVoxelSize[0]
-        xcoord = np.arange(bead.shape[1]) * self.beadVoxelSize[1]
-        ycoord = np.arange(bead.shape[2]) * self.beadVoxelSize[2]
-        # shift to compensate rescale move relative to center
-        shift = (
-            bead.shape[0] * self.beadVoxelSize[0]
-            - bead.shape[1] * self.beadVoxelSize[1]
-        ) * 0.5
-        #            shift = maxcoords[0] * self.beadVoxelSize[0] - bead.shape[1] * self.beadVoxelSize[1] * 0.5
-        zcoordR = shift + np.arange(bead.shape[1]) * self.beadVoxelSize[1]
-        interp_fun = RegularGridInterpolator((zcoord, xcoord, ycoord), bead)
+    # def UpscaleBead3D(self, bead, plotPreview=False):
+    #     """Upscale of a given bead"""
+    #     # теперь разбрасываем бид по отдельным массивам .
+    #     zcoord = np.zeros(bead.shape[0])
+    #     xcoord = np.zeros(bead.shape[1])
+    #     ycoord = np.zeros(bead.shape[2])
+    #     zcoordR = np.zeros(bead.shape[1])
+    #     bead = bead / np.amax(bead) * 255.0
+    #     # new code
+    #     #            maximum = np.amax(bead)
+    #     #            maxcoords = np.unravel_index(np.argmax(bead, axis=None), bead.shape)
+    #     #            print("maxcoords:",maxcoords)
+    #     #
+    #     print(
+    #         "range test:",
+    #         np.linspace(0.0, bead.shape[0], num=bead.shape[0], endpoint=False),
+    #     )
+    #     zcoord = np.arange(bead.shape[0]) * self.beadVoxelSize[0]
+    #     xcoord = np.arange(bead.shape[1]) * self.beadVoxelSize[1]
+    #     ycoord = np.arange(bead.shape[2]) * self.beadVoxelSize[2]
+    #     # shift to compensate rescale move relative to center
+    #     shift = (
+    #         bead.shape[0] * self.beadVoxelSize[0]
+    #         - bead.shape[1] * self.beadVoxelSize[1]
+    #     ) * 0.5
+    #     #            shift = maxcoords[0] * self.beadVoxelSize[0] - bead.shape[1] * self.beadVoxelSize[1] * 0.5
+    #     zcoordR = shift + np.arange(bead.shape[1]) * self.beadVoxelSize[1]
+    #     interp_fun = RegularGridInterpolator((zcoord, xcoord, ycoord), bead)
 
-        pts = np.array(list(itertools.product(zcoordR, xcoord, ycoord)))
-        pts_ID = list(
-            itertools.product(
-                np.arange(bead.shape[1]),
-                np.arange(bead.shape[1]),
-                np.arange(bead.shape[1]),
-            )
-        )
-        ptsInterp = interp_fun(pts)
-        beadInterp = np.ndarray((bead.shape[1], bead.shape[1], bead.shape[1]))
-        for pID, p_ijk in enumerate(pts_ID):
-            beadInterp[p_ijk[0], p_ijk[1], p_ijk[2]] = ptsInterp[pID]
-        if plotPreview == True:
-            figUpsc, figUpscAxs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-            figUpsc.suptitle("Image preview")
-            figUpscAxs[0].pcolormesh(
-                beadInterp[beadInterp.shape[0] // 2, :, :], cmap=cm.jet
-            )
-            figUpscAxs[1].pcolormesh(
-                beadInterp[:, beadInterp.shape[1] // 2, :], cmap=cm.jet
-            )
-            figUpscAxs[2].pcolormesh(
-                beadInterp[:, :, beadInterp.shape[2] // 2], cmap=cm.jet
-            )
+    #     pts = np.array(list(itertools.product(zcoordR, xcoord, ycoord)))
+    #     pts_ID = list(
+    #         itertools.product(
+    #             np.arange(bead.shape[1]),
+    #             np.arange(bead.shape[1]),
+    #             np.arange(bead.shape[1]),
+    #         )
+    #     )
+    #     ptsInterp = interp_fun(pts)
+    #     beadInterp = np.ndarray((bead.shape[1], bead.shape[1], bead.shape[1]))
+    #     for pID, p_ijk in enumerate(pts_ID):
+    #         beadInterp[p_ijk[0], p_ijk[1], p_ijk[2]] = ptsInterp[pID]
+    #     if plotPreview == True:
+    #         figUpsc, figUpscAxs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
+    #         figUpsc.suptitle("Image preview")
+    #         figUpscAxs[0].pcolormesh(
+    #             beadInterp[beadInterp.shape[0] // 2, :, :], cmap=cm.jet
+    #         )
+    #         figUpscAxs[1].pcolormesh(
+    #             beadInterp[:, beadInterp.shape[1] // 2, :], cmap=cm.jet
+    #         )
+    #         figUpscAxs[2].pcolormesh(
+    #             beadInterp[:, :, beadInterp.shape[2] // 2], cmap=cm.jet
+    #         )
 
-            newWin = Toplevel(self)
-            newWin.geometry("200x600")
-            newWin.title("Image ")
-            cnvFigUpsc = Canvas(newWin, width=200, height=600, bg="white")
-            cnvFigUpsc.pack(side=TOP, fill=BOTH, expand=True)
-            FigureCanvasTkAgg(figUpsc, cnvFigUpsc).get_tk_widget().pack(
-                side=TOP, fill=BOTH, expand=True
-            )
+    #         newWin = Toplevel(self)
+    #         newWin.geometry("200x600")
+    #         newWin.title("Image ")
+    #         cnvFigUpsc = Canvas(newWin, width=200, height=600, bg="white")
+    #         cnvFigUpsc.pack(side=TOP, fill=BOTH, expand=True)
+    #         FigureCanvasTkAgg(figUpsc, cnvFigUpsc).get_tk_widget().pack(
+    #             side=TOP, fill=BOTH, expand=True
+    #         )
 
-        # fig, axs = plt.subplots(3, 1, sharex = False, figsize=(2,6))
-        # axs[0].pcolormesh(beadInterp[beadInterp.shape[0] // 2,:,:],cmap=cm.jet)
-        # axs[1].pcolormesh(beadInterp[:,beadInterp.shape[1] // 2,:],cmap=cm.jet)
-        # axs[2].pcolormesh(beadInterp[:,:,beadInterp.shape[2] // 2],cmap=cm.jet)
-        # plt.show()
-        return beadInterp
+    #     # fig, axs = plt.subplots(3, 1, sharex = False, figsize=(2,6))
+    #     # axs[0].pcolormesh(beadInterp[beadInterp.shape[0] // 2,:,:],cmap=cm.jet)
+    #     # axs[1].pcolormesh(beadInterp[:,beadInterp.shape[1] // 2,:],cmap=cm.jet)
+    #     # axs[2].pcolormesh(beadInterp[:,:,beadInterp.shape[2] // 2],cmap=cm.jet)
+    #     # plt.show()
+    #     return beadInterp
 
-    def UpscaleBead_Zaxis(self, bead, plotPreview=False):
-        """Upscale along Z axis of a given bead"""
-        # теперь разбрасываем бид по отдельным массивам .
-        zcoord = np.zeros(bead.shape[0])
-        xcoord = np.zeros(bead.shape[1])
-        ycoord = np.zeros(bead.shape[2])
-        zcoordR = np.zeros(
-            bead.shape[1]
-        )  # shape of rescaled bead in Z dimension  - same as x shape
-        #            bead = bead/np.amax(bead)*255.0 # normalize bead intensity
-        maxcoords = np.unravel_index(np.argmax(bead, axis=None), bead.shape)
-        #            print("maxcoords:",maxcoords)
+    # def UpscaleBead_Zaxis(self, bead, plotPreview=False):
+    #     """Upscale along Z axis of a given bead"""
+    #     # теперь разбрасываем бид по отдельным массивам .
+    #     zcoord = np.zeros(bead.shape[0])
+    #     xcoord = np.zeros(bead.shape[1])
+    #     ycoord = np.zeros(bead.shape[2])
+    #     zcoordR = np.zeros(
+    #         bead.shape[1]
+    #     )  # shape of rescaled bead in Z dimension  - same as x shape
+    #     #            bead = bead/np.amax(bead)*255.0 # normalize bead intensity
+    #     maxcoords = np.unravel_index(np.argmax(bead, axis=None), bead.shape)
+    #     #            print("maxcoords:",maxcoords)
 
-        zcoord = np.arange(bead.shape[0]) * self.beadVoxelSize[0]
-        xcoord = np.arange(bead.shape[1]) * self.beadVoxelSize[1]
-        ycoord = np.arange(bead.shape[2]) * self.beadVoxelSize[2]
-        # shift to compensate rescale move relative to center
-        #            shift = (bead.shape[0] * self.beadVoxelSize[0] - bead.shape[1] * self.beadVoxelSize[1]) * 0.5
-        # fixed shift now depends on center of the bead
-        shift = (
-            maxcoords[0] * self.beadVoxelSize[0]
-            - bead.shape[1] * self.beadVoxelSize[1] * 0.5
-        )
-        zcoordR = shift + np.arange(bead.shape[1]) * self.beadVoxelSize[1]
-        interp_fun = RegularGridInterpolator((zcoord, xcoord, ycoord), bead)
+    #     zcoord = np.arange(bead.shape[0]) * self.beadVoxelSize[0]
+    #     xcoord = np.arange(bead.shape[1]) * self.beadVoxelSize[1]
+    #     ycoord = np.arange(bead.shape[2]) * self.beadVoxelSize[2]
+    #     # shift to compensate rescale move relative to center
+    #     #            shift = (bead.shape[0] * self.beadVoxelSize[0] - bead.shape[1] * self.beadVoxelSize[1]) * 0.5
+    #     # fixed shift now depends on center of the bead
+    #     shift = (
+    #         maxcoords[0] * self.beadVoxelSize[0]
+    #         - bead.shape[1] * self.beadVoxelSize[1] * 0.5
+    #     )
+    #     zcoordR = shift + np.arange(bead.shape[1]) * self.beadVoxelSize[1]
+    #     interp_fun = RegularGridInterpolator((zcoord, xcoord, ycoord), bead)
 
-        pts = np.array(list(itertools.product(zcoordR, xcoord, ycoord)))
-        pts_ID = list(
-            itertools.product(
-                np.arange(bead.shape[1]),
-                np.arange(bead.shape[1]),
-                np.arange(bead.shape[1]),
-            )
-        )
-        ptsInterp = interp_fun(pts)
-        beadInterp = np.ndarray((bead.shape[1], bead.shape[1], bead.shape[1]))
-        for pID, p_ijk in enumerate(pts_ID):
-            beadInterp[p_ijk[0], p_ijk[1], p_ijk[2]] = ptsInterp[pID]
-        self.__upscaledBead = np.ndarray((bead.shape[1], bead.shape[1], bead.shape[1]))
-        self.__upscaledBead = beadInterp
-        self.beadVoxelSize[0] = self.beadVoxelSize[1]
-        if plotPreview == True:  # draw 3 projections of bead
-            figUpsc, figUpscAxs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-            figUpsc.suptitle("Image preview")
-            figUpscAxs[0].pcolormesh(
-                beadInterp[beadInterp.shape[0] // 2, :, :], cmap=cm.jet
-            )
-            figUpscAxs[1].pcolormesh(
-                beadInterp[:, beadInterp.shape[1] // 2, :], cmap=cm.jet
-            )
-            figUpscAxs[2].pcolormesh(
-                beadInterp[:, :, beadInterp.shape[2] // 2], cmap=cm.jet
-            )
+    #     pts = np.array(list(itertools.product(zcoordR, xcoord, ycoord)))
+    #     pts_ID = list(
+    #         itertools.product(
+    #             np.arange(bead.shape[1]),
+    #             np.arange(bead.shape[1]),
+    #             np.arange(bead.shape[1]),
+    #         )
+    #     )
+    #     ptsInterp = interp_fun(pts)
+    #     beadInterp = np.ndarray((bead.shape[1], bead.shape[1], bead.shape[1]))
+    #     for pID, p_ijk in enumerate(pts_ID):
+    #         beadInterp[p_ijk[0], p_ijk[1], p_ijk[2]] = ptsInterp[pID]
+    #     self.__upscaledBead = np.ndarray((bead.shape[1], bead.shape[1], bead.shape[1]))
+    #     self.__upscaledBead = beadInterp
+    #     self.beadVoxelSize[0] = self.beadVoxelSize[1]
+    #     if plotPreview == True:  # draw 3 projections of bead
+    #         figUpsc, figUpscAxs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
+    #         figUpsc.suptitle("Image preview")
+    #         figUpscAxs[0].pcolormesh(
+    #             beadInterp[beadInterp.shape[0] // 2, :, :], cmap=cm.jet
+    #         )
+    #         figUpscAxs[1].pcolormesh(
+    #             beadInterp[:, beadInterp.shape[1] // 2, :], cmap=cm.jet
+    #         )
+    #         figUpscAxs[2].pcolormesh(
+    #             beadInterp[:, :, beadInterp.shape[2] // 2], cmap=cm.jet
+    #         )
 
-            newWin = Toplevel(self)
-            newWin.geometry("200x600")
-            newWin.title("Image ")
-            cnvFigUpsc = Canvas(newWin, width=200, height=600, bg="white")
-            cnvFigUpsc.pack(side=TOP, fill=BOTH, expand=True)
-            FigureCanvasTkAgg(figUpsc, cnvFigUpsc).get_tk_widget().pack(
-                side=TOP, fill=BOTH, expand=True
-            )
+    #         newWin = Toplevel(self)
+    #         newWin.geometry("200x600")
+    #         newWin.title("Image ")
+    #         cnvFigUpsc = Canvas(newWin, width=200, height=600, bg="white")
+    #         cnvFigUpsc.pack(side=TOP, fill=BOTH, expand=True)
+    #         FigureCanvasTkAgg(figUpsc, cnvFigUpsc).get_tk_widget().pack(
+    #             side=TOP, fill=BOTH, expand=True
+    #         )
 
-        return beadInterp
+    #     return beadInterp
 
-    def PlotBead3DResample(self, bead):
-        """may be removed."""
-        zcoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        xcoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        ycoord = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        voxelVal = np.zeros(bead.shape[0] * bead.shape[1] * bead.shape[2])
-        nn = 0
-        bead = bead / np.amax(bead) * 255.0
-        treshold = np.exp(-1) * 255.0
-        for i, j, k in itertools.product(
-            range(bead.shape[0]), range(bead.shape[1]), range(bead.shape[2])
-        ):
-            if bead[i, j, k] > treshold:
-                zcoord[nn] = i
-                xcoord[nn] = j
-                ycoord[nn] = k
-                voxelVal[nn] = bead[i, j, k]
-                nn = nn + 1
-        plotFlag = True
-        if plotFlag:
-            fig = plt.figure()
-            ax = fig.add_subplot(111, projection="3d")
-            n = nn - 1
-            im = ax.scatter(
-                xcoord[0:n],
-                ycoord[0:n],
-                zcoord[0:n],
-                c=voxelVal[0:n],
-                alpha=0.5,
-                cmap=cm.jet,
-            )
-            fig.colorbar(im)
-            ax.set_xlabel("X Label")
-            ax.set_ylabel("Y Label")
-            ax.set_zlabel("Z Label")
-            plt.show()
 
     def LoadBeadsPhoto(self):
         """Loading raw beads photo from file"""
@@ -694,34 +655,18 @@ class BeadExtractionGUI(tk.Toplevel):
     
     
 
-    def BeadMarkClickOld(self, event):
-        """Append mouse event coordinates to global list."""
-        cnv = event.widget
-        self.xr, self.yr = cnv.canvasx(event.x), cnv.canvasy(event.y)
-        self.beadMarks.append(
-            cnv.create_rectangle(
-                self.xr - self.sideHalf,
-                self.yr - self.sideHalf,
-                self.xr + self.sideHalf,
-                self.yr + self.sideHalf,
-                outline="chartreuse1",
-                width=2,
-            )
-        )
-        self.beadCoords.append([self.xr, self.yr])
 
     def BeadMarkClick(self, event):
         """Append mouse event coordinates to global list. Center is adjusted according to max intensity."""
         cnv = event.widget
         self.xr, self.yr = cnv.canvasx(event.x), cnv.canvasy(event.y)
-        #            self.xr,self.yr = self.LocateFrameMAxIntensity2D()   # 2d center
         self.xr, self.yr = self.LocateFrameMAxIntensity3D()
         self.beadMarks.append(
             cnv.create_rectangle(
-                self.xr - self.sideHalf,
-                self.yr - self.sideHalf,
-                self.xr + self.sideHalf,
-                self.yr + self.sideHalf,
+                self.xr - self.selectionFrameHalf,
+                self.yr - self.selectionFrameHalf,
+                self.xr + self.selectionFrameHalf,
+                self.yr + self.selectionFrameHalf,
                 outline="chartreuse1",
                 width=2,
             )
@@ -734,47 +679,22 @@ class BeadExtractionGUI(tk.Toplevel):
         for self.xr, self.yr in self.beadCoords:
             self.beadMarks.append(
                 cnv.create_rectangle(
-                    self.xr - self.sideHalf,
-                    self.yr - self.sideHalf,
-                    self.xr + self.sideHalf,
-                    self.yr + self.sideHalf,
+                    self.xr - self.selectionFrameHalf,
+                    self.yr - self.selectionFrameHalf,
+                    self.xr + self.selectionFrameHalf,
+                    self.yr + self.selectionFrameHalf,
                     outline="chartreuse1",
                     width=2,
                 )
             )
 
-    def LocateFrameMAxIntensity2D(self):
-        """Locate point with maximum intensity in current 2d array.
-        In: array - np.array
-        Out: coords - list
-        """
-        d = self.sideHalf
-        # dimension 0 - its z- plane
-        # dimension 1 - y
-        # dimension 2 - x
-        xi = self.xr
-        yi = self.yr
-        bound3 = int(xi - d)
-        bound4 = int(xi + d)
-        bound1 = int(yi - d)
-        bound2 = int(yi + d)
-        #                  print("coords: ",bound1,bound2,bound3,bound4)
-        sample = self.imgCnvArr[
-            int(self.imgBeadsRaw.n_frames / 2), bound1:bound2, bound3:bound4
-        ]
-        maximum = np.amax(sample)
-        coords = np.unravel_index(np.argmax(sample, axis=None), sample.shape)
-        #    print("LocateMaxIntensity: amax: ", maximum)
-        print("LocateMaxIntensity: coords:", coords)
-        return coords[2] + bound3, coords[1] + bound1
 
-    # TODO: 3D need additional testing. Maybe centering along z-axis also?
     def LocateFrameMAxIntensity3D(self):
         """Locate point with maximum intensity in current 3d array.
         In: array - np.array
         Out: coords - list
         """
-        d = self.sideHalf
+        d = self.selectionFrameHalf
         # dimension 0 - its z- plane
         # dimension 1 - y
         # dimension 2 - x
@@ -804,60 +724,53 @@ class BeadExtractionGUI(tk.Toplevel):
             self.cnv1.delete(sq)
         self.beadMarks = []
 
-    def IsFloat(self, string):
-        """Checks if string is float or not ( isnumeric() works only for integers )"""
-        try:
-            float(string)
-            return True
-        except ValueError:
-            return False
 
-    def ReturnVoxelSizeEntryContent(self, event):
+    def SetVoxelSize(self, event):
         """Bead voxel size change"""
+        zeroTreshold = 0.0000001
         for idField, vField in enumerate(self.voxelFields):
             tmp = self.voxelSizeEntries[vField].get()
-            if not self.IsFloat(tmp):
-                showerror("ReturnVoxelSizeContent", "Bad input: not a number.")
+            try:
+                self.beadVoxelSize[idField] = abs( float(tmp) )
+                if self.beadVoxelSize[idField] < zeroTreshold:
+                    self.beadVoxelSize[idField] = zeroTreshold
+            except:
+                showerror("Set Voxel Size: ", "Bad input: not a Float.")
                 self.voxelSizeEntries[vField].delete(0, END)
                 self.voxelSizeEntries[vField].insert(0, self.beadVoxelSize[idField])
                 return
-            else:
-                if float(tmp) < 0.0000001:
-                    showerror("ReturnVoxelSizeContent", "Bad input: zero or negative.")
-                    self.voxelSizeEntries[vField].delete(0, END)
-                    self.voxelSizeEntries[vField].insert(0, self.beadVoxelSize[idField])
-                    return
-                else:
-                    self.beadVoxelSize[idField] = float(tmp)
 
-    #            print(self.beadVoxelSize)
-
-    def ReturnSizeEntryContent(self, event):
-        """Bead selection size change"""
-        tmp = self.selectSizeEntry.get()
-        if not tmp.isnumeric():
-            showerror("ReturnSizeEntryContent", "Bad input")
-            self.selectSizeEntry.delete(0, END)
-            self.selectSizeEntry.insert(0, self.sideHalf * 2)
+    def SetBeadSize(self, event):
+        """Bead diameter size change"""
+        tmp = self.beadSizeEntry.get()
+        try:
+            self.beadDiameter = abs( float(tmp) )
+            self.beadSizeEntry.delete( 0, END )
+            self.beadSizeEntry.insert( 0, str(self.beadDiameter) )
+        except:
+            showerror("Bead Size: ", "Bad input")
+            self.beadSizeEntry.delete( 0, END )
+            self.beadSizeEntry.insert( 0, str(self.beadDiameter) )
             return
-        else:
-            self.sideHalf = int(abs(float(tmp)) / 2)
 
-    def ReturnBeadSizeEntryContent(self, event):
-        """Bead selection size change"""
+    def SetSelectionFrameSize(self, event):
+        """Selection Frame size change"""
         tmp = self.selectSizeEntry.get()
-        if not tmp.isnumeric():
-            showerror("ReturnSizeEntryContent", "Bad input")
+        try:
+            self.selectionFrameHalf = int(abs(float(tmp)) / 2)
             self.selectSizeEntry.delete(0, END)
-            self.selectSizeEntry.insert(0, self.sideHalf * 2)
+            self.selectSizeEntry.insert(0, str(self.selectionFrameHalf * 2))
+        except:
+            showerror("Selection size: ", "Bad input")
+            self.selectSizeEntry.delete(0, END)
+            self.selectSizeEntry.insert(0, self.selectionFrameHalf * 2)
             return
-        else:
-            self.sideHalf = abs(int(float(tmp) / 2))
+
 
     def ExtractBeads(self):
         """Extracting bead stacks from picture set and centering them"""
         self.selectedBeads = []
-        d = self.sideHalf
+        d = self.selectionFrameHalf
         print(self.imgCnvArr.shape)
         elem = np.ndarray([self.imgCnvArr.shape[0], d * 2, d * 2])
         for idx, i in enumerate(self.beadCoords):
@@ -982,11 +895,6 @@ class BeadExtractionGUI(tk.Toplevel):
             showerror("Error", "Extract beads first.")
         else:
             self.__avrageBead = sum(self.selectedBeads) / len(self.selectedBeads)
-            # blurType = self.blurApplyType.get()
-            # if blurType == 'gauss':
-            #       self.__avrageBead = gaussian_filter(self.__avrageBead, sigma = 1)
-            # elif blurType == 'median':
-            #       self.__avrageBead = median_filter(self.__avrageBead, size = 3)
             self.__avrageBead = self.BlurBead(
                 self.__avrageBead, self.blurApplyType.get()
             )
@@ -1019,42 +927,6 @@ class BeadExtractionGUI(tk.Toplevel):
 
     def SaveAverageBead(self):
         """Save averaged bead to file"""
-        #      print("upscaled bead shape:", type(self.__avrageBead))
-        # txt_folder_enquiry = askdirectory()
-
-        # txt_folder = ""
-        # txt_prefix = ""
-        # if txt_prefix == "":
-        #     txt_prefix = "AvrBead_r_"
-        # fname_default = txt_prefix + str(self.beadDiameter * 1000) + "nm".zfill(2)
-        # fname = askstring(
-        #     title="File name.", prompt="Enter file name:", initialvalue=fname_default
-        # )
-        # if txt_folder_enquiry == "":
-        #     txt_folder = str(os.getcwd()) + "/" + "average_bead_folder"
-        # else:
-        #     txt_folder = txt_folder_enquiry
-        # if not os.path.isdir(txt_folder):
-        #     try:
-        #         print("creating dir:", txt_folder)
-        #         os.mkdir(txt_folder)
-        #     except Exception as err:
-        #         showerror("Can't create folder to save avaraged bead", err)
-        # else:
-        #     # TODO: resolve duplicate fname. Duplicate file not detecting correctly somehow
-        #     print(
-        #         txt_folder + "/" + fname + ".tiff",
-        #         "   ",
-        #         os.path.exists(txt_folder + "/" + fname + ".tiff"),
-        #     )
-        #     if os.path.exists(txt_folder + "/" + fname + ".tiff"):
-        #         fname = askstring(
-        #             title="File exist",
-        #             prompt="Enter new file name:",
-        #             initialvalue=fname,
-        #         )
-        #         if fname is None or fname == "":
-        #             fname = fname_default
         tiffBit = self.tiffMenuBitDict[self.tiffSaveBitType.get()]
         #strVoxel = "Voxel(\u03BCm) :" + ';'.join(str(s) for s in self.beadVoxelSize)
         strVoxel = json.dumps({"Z":self.beadVoxelSize[0],"X":self.beadVoxelSize[1],"Y":self.beadVoxelSize[2]})
@@ -1074,148 +946,7 @@ class BeadExtractionGUI(tk.Toplevel):
             print(e)
             return
 
-    def PointFunctionAiry(self, pt, r0, maxIntensity=255, zoomfactor=2.6):
-        """Function of sphere of radius r with center in r0.
-        Function return Airy disk intesity within first circle if pt in sphere and 0 if out of sphere.
-        pt and r0 are np.array vectors : np.array([x,y,z])
-        All  dimension in pixels are equal to x-dimension
-        """
-        pt = pt * self.beadVoxelSize[1]
-        r0 = r0 * self.beadVoxelSize[1]
-        r = self.beadDiameter * zoomfactor / 2.0
-        # pt[0] = pt[0] * self.beadVoxelSize[1]
-        # pt[1] = pt[1] * self.beadVoxelSize[1]/ zoomfactor
-        # pt[2] = pt[2] * self.beadVoxelSize[1]/ zoomfactor
-        # r0[0] = r0[0] * self.beadVoxelSize[1]
-        # r0[1] = r0[1] * self.beadVoxelSize[1]/zoomfactor
-        # r0[2] = r0[2] * self.beadVoxelSize[1]/zoomfactor
-        r = self.beadDiameter / 2.0
 
-        distSq = (pt - r0).dot(pt - r0)
-        dist = np.sqrt(distSq)
-        if distSq <= r * r:
-            x = dist / r * 4.0
-            # NOTE: If 'x' is equal zero - result == nan!. To prevent it - make result equal 'maxIntensity'
-            if abs(x) >= 0.00001:  # Zero-criterion
-                result = (2.0 * jv(1, x) / x) ** 2 * maxIntensity
-            else:
-                result = maxIntensity
-        else:
-            result = 0
-        return result
-
-    def PointFunctionAiryZoomed(self, pt, r0, maxIntensity=255, zoomfactor=2.6):
-        """
-        Zoom of bead circle  from microscope
-        Radius = self.BeadDiameter / 2
-        Center  r0 - np.array[0:2].
-        Function return Airy disk intesity within first circle if pt in sphere and 0 if out of sphere.
-        pt and r0 are np.array vectors : np.array([x,y,z])
-        All  dimension in pixels are equal to x-dimension
-        """
-        l = abs(r0[0] - pt[0]) * self.beadVoxelSize[1]
-        r = self.beadDiameter / 2.0
-        if r**2 - l**2 > 0:
-            R = np.sqrt(r**2 - l**2) * zoomfactor
-            ptd = pt * self.beadVoxelSize[1]
-            r0d = r0 * self.beadVoxelSize[1]
-
-            distSq = (ptd[1] - r0d[1]) ** 2 + (ptd[2] - r0d[2]) ** 2
-            dist = np.sqrt(distSq)
-            #                  print("ZoomedN:",pt,r0,l,r,R)
-            #                  print("ZoomedD:",ptd,r0d,l,r,R)
-            if distSq <= R**2:
-                x = dist / R * 4.0
-                # NOTE: If 'x' is equal zero - result == nan!. To prevent it - make result equal 'maxIntensity'
-                if abs(x) >= 0.00001:  # Zero-criterion
-                    result = (2.0 * jv(1, x) / x) ** 2 * maxIntensity
-                else:
-                    result = maxIntensity
-            else:
-                result = 0
-
-        else:
-            result = 0
-
-        return result
-
-    def MakeIdealSphereArray(self, sphere_type="airy"):
-        """create ideal  sphere array corresponding to sphere_type"""
-        if sphere_type == "airy":
-            imgMidCoord = self.sideHalf
-            imgSize = self.sideHalf * 2
-            imgCenter = np.array([imgMidCoord, imgMidCoord, imgMidCoord])
-            tiffDraw = np.ndarray([imgSize, imgSize, imgSize])
-
-            tiffBit = self.tiffMenuBitDict[self.tiffSaveBitType.get()]
-
-            # NOTE: get max intensity for different output bits types
-            lightIntensity = np.iinfo(tiffBit).max
-            print("Airy parameters:")
-            print("voxel size:", self.beadVoxelSize[1])
-            print("diameter:", self.beadDiameter)
-            print("center:", imgCenter, " intensity:", lightIntensity)
-
-            for i, j, k in itertools.product(range(imgSize), repeat=3):
-                tiffDraw[i, j, k] = self.PointFunctionAiryZoomed(
-                    np.array([i, j, k]), imgCenter, lightIntensity
-                )
-            self.PlotBead3D(tiffDraw, 1)
-        elif sphere_type == "plane":
-            print("Not Implemented")
-            return
-            # тут должна быть сфера с постоянной  яркостью.
-        else:
-            raise ValueError("unsupported sphere_type")
-        return tiffDraw
-
-    def SaveAirySphereBead(self):
-        imgSize = self.sideHalf
-        try:
-            bead = self.MakeIdealSphereArray("airy")
-        except:
-            print("Type problem")
-            return
-        txt_folder = ""
-        txt_prefix = ""
-        if txt_prefix == "":
-            txt_prefix = "Airy_r_"
-        if txt_folder == "":
-            txt_folder = str(os.getcwd()) + "\\" + "airy_bead_folder"
-        if not os.path.isdir(txt_folder):
-            print("creating dir")
-            os.mkdir(txt_folder)
-        tiffBit = self.tiffMenuBitDict[self.tiffSaveBitType.get()]
-        fio.SaveTiffStack(
-            bead,
-            txt_folder,
-            txt_prefix + str(self.beadDiameter * 1000) + "nm".zfill(2),
-            tiffBit,
-        )
-
-    def SavePlaneSphereBead(self):
-        imgSize = self.sideHalf
-        try:
-            bead = self.MakeIdealSphereArray("plane")
-        except:
-            print("Type problem")
-            return
-        txt_folder = ""
-        txt_prefix = ""
-        if txt_prefix == "":
-            txt_prefix = "Airy_r_"
-        if txt_folder == "":
-            txt_folder = str(os.getcwd()) + "\\" + "airy_bead_folder"
-        if not os.path.isdir(txt_folder):
-            print("creating dir")
-            os.mkdir(txt_folder)
-        tiffBit = self.tiffMenuBitDict[self.tiffSaveBitType.get()]
-        fio.SaveTiffStack(
-            bead,
-            txt_folder,
-            txt_prefix + str(self.beadDiameter * 1000) + "nm".zfill(2),
-            tiffBit,
-        )
 
 
 if __name__ == "__main__":
