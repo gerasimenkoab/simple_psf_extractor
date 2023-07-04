@@ -1,5 +1,6 @@
 from ImageRaw_class import ImageRaw
 import numpy as np
+from scipy.ndimage import gaussian_filter, median_filter
 
 class model:
     def __init__(self):
@@ -187,7 +188,7 @@ class model:
         else:
             raise ValueError("No beads extracted","empty_beads_list")
         
-    def BlurBead(self, bead, blurType, plotPreview=False):
+    def BlurBead(self, bead, blurType):
         """
         Blur bead with selected filter
         """
@@ -196,23 +197,6 @@ class model:
             bead = gaussian_filter(bead, sigma=1)
         elif blurType == "median":
             bead = median_filter(bead, size=3)
-
-        if plotPreview == True:  # draw 3 projections of bead
-            figUpsc, figUpscAxs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-            figUpsc.suptitle("Image preview")
-            figUpscAxs[0].pcolormesh(bead[bead.shape[0] // 2, :, :], cmap=cm.jet)
-            figUpscAxs[1].pcolormesh(bead[:, bead.shape[1] // 2, :], cmap=cm.jet)
-            figUpscAxs[2].pcolormesh(bead[:, :, bead.shape[2] // 2], cmap=cm.jet)
-
-            newWin = Toplevel(self)
-            newWin.geometry("200x600")
-            newWin.title("Image ")
-            cnvFigUpsc = Canvas(newWin, width=200, height=600, bg="white")
-            cnvFigUpsc.pack(side=TOP, fill=BOTH, expand=True)
-            FigureCanvasTkAgg(figUpsc, cnvFigUpsc).get_tk_widget().pack(
-                side=TOP, fill=BOTH, expand=True
-            )
-
         return bead
 
     def BeadsArithmeticMean(self):
@@ -226,30 +210,6 @@ class model:
             )
             if self.doRescaleOverZ.get() == 1:
                 self.__avrageBead = self.UpscaleBead_Zaxis(self.__avrageBead)
-            if self.precessBeadPrev.get() == 1:  # draw 3 projections of bead
-                figUpsc, figUpscAxs = plt.subplots(3, 1, sharex=False, figsize=(2, 6))
-                figUpsc.suptitle("Image preview")
-                figUpscAxs[0].pcolormesh(
-                    self.__avrageBead[self.__avrageBead.shape[0] // 2, :, :],
-                    cmap=cm.jet,
-                )
-                figUpscAxs[1].pcolormesh(
-                    self.__avrageBead[:, self.__avrageBead.shape[1] // 2, :],
-                    cmap=cm.jet,
-                )
-                figUpscAxs[2].pcolormesh(
-                    self.__avrageBead[:, :, self.__avrageBead.shape[2] // 2],
-                    cmap=cm.jet,
-                )
-
-                newWin = Toplevel(self)
-                newWin.geometry("200x600")
-                newWin.title("Image ")
-                cnvFigUpsc = Canvas(newWin, width=200, height=600, bg="white")
-                cnvFigUpsc.pack(side=TOP, fill=BOTH, expand=True)
-                FigureCanvasTkAgg(figUpsc, cnvFigUpsc).get_tk_widget().pack(
-                    side=TOP, fill=BOTH, expand=True
-                )
 
     def SaveAverageBead(self):
         """Save averaged bead to file"""
