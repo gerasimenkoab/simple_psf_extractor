@@ -24,7 +24,7 @@ class ImageRaw:
     """
 
     def __init__(
-        self, fpath = None, voxelSizeIn = None, imArrayIn = None
+        self, fpath : str = None, voxelSizeIn : list = None, imArrayIn : np.ndarray = None
     ):
         self.imArray = None
         self.voxel = None #{"Z":0, "Y":0, "X":0}
@@ -207,7 +207,7 @@ class ImageRaw:
             Setting voxel with check
         """
         if newVoxel == None or len(newVoxel) != 3 or np.amin(newVoxel) <= 0:
-            raise ValueError("Wrong Voxel Value.")
+            raise ValueError("Wrong Voxel Value.","bad_voxel_value")
         else:
             self.voxelSize = newVoxel
             self.voxel = dict(zip(self.voxelFields, newVoxel))
@@ -252,9 +252,9 @@ class ImageRaw:
             Return string with array and voxel parameters.
         """
         if output == "full":
-            return "Image size(z,y,x)px: " + str(self.imArray.shape) + "  Voxel(\u03BCm): " + str(self.voxelSize)
+            return "Image size(z,y,x)px: " + str(self.imArray.shape) + "  Voxel(\u03BCm): " + str(list(self.voxel.values()))
         elif output == "dimensions":
-            return str( self.imArray.shape ) + str( self.voxelSize )
+            return str( self.imArray.shape ) + str(list(self.voxel.values()))
         else:
             return None
         
