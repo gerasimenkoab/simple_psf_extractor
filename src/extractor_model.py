@@ -3,7 +3,7 @@ import os
 from scipy.ndimage import gaussian_filter, median_filter
 from ImageRaw_class import ImageRaw
 
-class extractor_model:
+class ExtractorModel:
     def __init__(self):
         self._mainImage = ImageRaw([0.2,0.089,0.089],np.zeros((10,200,200)))
         self._averageBead = None
