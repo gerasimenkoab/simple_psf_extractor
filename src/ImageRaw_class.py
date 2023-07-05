@@ -265,16 +265,19 @@ class ImageRaw:
                outtype - bit type for output
         """
         print("Trying to save TIFF file", outtype)
-        tagID = 270
-        # strVoxel = ';'.join(str(s) for s in self.voxelSize)
-        strVoxel = json.dumps(self.voxel)
-        imlist = []
-        for tmp in self.imArray:
-            imlist.append(Image.fromarray(tmp.astype(outtype)))
-        #imlist[0].tag[270] = strVoxel
-        imlist[0].save(
-            filename, tiffinfo={tagID:strVoxel}, save_all=True, append_images=imlist[1:]
-        )
+        try:
+            tagID = 270
+            # strVoxel = ';'.join(str(s) for s in self.voxelSize)
+            strVoxel = json.dumps(self.voxel)
+            imlist = []
+            for tmp in self.imArray:
+                imlist.append(Image.fromarray(tmp.astype(outtype)))
+            #imlist[0].tag[270] = strVoxel
+            imlist[0].save(
+                filename, tiffinfo={tagID:strVoxel}, save_all=True, append_images=imlist[1:]
+            )
+        except:
+            raise IOError("Cannot save file "+filename,"file_not_saved")
         print("File saved in ", filename)
 
 
