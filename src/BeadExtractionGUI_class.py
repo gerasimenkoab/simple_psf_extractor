@@ -245,7 +245,7 @@ class BeadExtractionGUI(tk.Toplevel):
         frameAvrageBeadsButtons = Frame(frameAvrageBeads)
         Button(
             frameAvrageBeadsButtons,
-            text="Average Bead",
+            text="Process Extracted Beads",
             command=self.BeadsArithmeticMean,
         ).pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
         Button(
