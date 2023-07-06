@@ -204,7 +204,7 @@ class ImageRaw:
         """
             Setting voxel with check
         """
-        if newVoxel == None or len(newVoxel) != 3 or np.amin(newVoxel) <= 0:
+        if newVoxel is None or len(newVoxel) != 3 or np.amin(newVoxel) <= 0:
             raise ValueError("Wrong Voxel Value.")
         else:
             self.voxelSize = newVoxel
