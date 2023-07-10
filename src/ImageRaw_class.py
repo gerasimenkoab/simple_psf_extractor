@@ -98,7 +98,13 @@ class ImageRaw:
         if len(fileNameList) < 1:
             raise ValueError("Empty file name list")
         elif len(fileNameList) == 1:
+            #try:
+            #    validate_fileset = Validate.execute(fileNameList[0])
+            #except :
+            #    raise Exception("The filetype is not allowed: {} ".format(fileNameList[0]) )
+            
             # single file load
+
             try:
                 image_tiff = Image.open(fileNameList[0])
             except :

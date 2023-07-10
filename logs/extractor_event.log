@@ -1,0 +1,3 @@
+2023-07-10 22:58:51,878 BeadExtractor.extractor_controller INFO: Starting logginf in Extractor [in d:\python\simple_psf_extractor\src\BeadExtractor\extractor_controller.py:23]
+2023-07-10 22:58:51,878 BeadExtractor.extractor_model INFO: Model object created [in d:\python\simple_psf_extractor\src\BeadExtractor\extractor_model.py:17]
+2023-07-10 22:58:51,890 BeadExtractor.extractor_controller INFO: _bind: Binding buttons and entries is done. [in d:\python\simple_psf_extractor\src\BeadExtractor\extractor_controller.py:66]

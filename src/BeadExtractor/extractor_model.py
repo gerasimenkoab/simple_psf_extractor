@@ -3,8 +3,19 @@ import os
 from scipy.ndimage import gaussian_filter, median_filter
 from ImageRaw_class import ImageRaw
 
+import logging
+from logging.handlers import RotatingFileHandler
+
 class ExtractorModel:
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.handler = RotatingFileHandler("logs/extractor_event.log",maxBytes=6000, backupCount=5)
+        self.handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+        self.handler.setLevel(logging.INFO)
+        self.logger.addHandler(self.handler)
+        self.logger.setLevel(logging.INFO)
+        self.logger.info("Model object created")
+
         self._mainImage = ImageRaw(None,[0.2,0.089,0.089],np.zeros((10,200,200)))
         self._averageBead = None
         self._beadCoords = None  # Coordinates of beads on the canvas
@@ -32,9 +43,9 @@ class ExtractorModel:
     def averageBead(self, value: ImageRaw):
         self._averageBead = value
 
-    # @property
-    # def beadCoords(self):
-    #     return self._beadCoords
+    @property
+    def beadCoords(self):
+        return self._beadCoords
     
     # @beadCoords.setter
     # def beadCoords(self, coordsList):
@@ -65,11 +76,12 @@ class ExtractorModel:
         else:
             raise ValueError("Wrong selection frame size value","selectionFrameHalf_incorrect")
 
-    def BeadCoordsAdd(self, x, y):
+    def beadMarkAdd(self, beadMarkCoords : list):
         """Append mouse event coordinates to global list. Center is adjusted according to max intensity."""
         if self._beadCoords is None:
             self._beadCoords = []
-        self._beadCoords.append([x, y])
+        self._beadCoords.append(beadMarkCoords)
+
 
     def BeadCoordsRemoveLast(self):
         """Removes the last bead in the list"""
@@ -116,7 +128,11 @@ class ExtractorModel:
 
 
     def MarkedBeadsExtract(self):
-        """Extracting bead stacks from picture set and centering them"""
+        """
+        Extracting bead stacks from picture set and centering them
+        Out:
+            - number of extracted beads.
+        """
         d = self._selectionFrameHalf
         print(self._mainImage.imArray.shape)
         voxel = list( self._mainImage.voxel.values() )
@@ -135,6 +151,7 @@ class ExtractorModel:
             elem = np.roll(elem, shift=shift, axis=0)
             iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
             self._extractedBeads.append( ImageRaw(None, voxel, elem) )
+        return len(self._extractedBeads)
 
     def ExtractedBeadsSave(self, txt_folder_enquiry = "", txt_prefix = "", tiffBit = "uint8"):
         """Save selected beads as multi-page tiffs as is."""
@@ -186,12 +203,12 @@ class ExtractorModel:
             except:
                 raise RuntimeError("Failed to average beads")
             try:
-                self._avrageBead = ImageRaw(None, list(self._extractedBeads[0].voxel.values()), sumArray )
+                self._averageBead = ImageRaw(None, list(self._extractedBeads[0].voxel.values()), sumArray )
             except:
                 raise RuntimeError("Failed to create bead object")
             
     def BlurAveragedBead(self, blurType):
-        self.BlurBead(self._avrageBead, blurType )
+        self.BlurBead(self._averageBead, blurType )
 
     def SaveAverageBead(self,fname, tiffBit ="uint8"):
         """
@@ -199,8 +216,6 @@ class ExtractorModel:
         In:
             fname : str - path including file name
         """
-        if self._averageBead == None:
-            raise ValueError("Average bead was not created.", "averageBead_not_exist")
         try:
             self._averageBead.SaveAsTiff(fname)
         except IOError as e:

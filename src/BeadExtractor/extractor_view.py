@@ -39,6 +39,7 @@ class ExtractorView(tk.Toplevel):
         super().__init__(parent)
         # new  class properties
         self.beadMarks = []  # rectangle pics on the canvas
+        self._beadMarksCounter = 0
         self.beadCoords = []
         self.intensityFactor = 1.0  # intensity factor for beads selection widget
         self.beadsPhotoLayerID = 0  # default index of beads microscope photo
@@ -432,6 +433,26 @@ class ExtractorView(tk.Toplevel):
                 )
             )
 
+    def beadMarkAdd(self, widget, xr, yr):
+        """
+        Adding bead mark to canvas after mouse RBclick
+        In:
+            widget : canvas vidget name
+            xr, yr : click event coordinates on widget
+        """
+        halfSide = int(self.selectSizeEntry.get()) // 2
+        self.beadMarks.append(
+            widget.create_rectangle(
+                xr - halfSide,
+                yr - halfSide,
+                xr + halfSide,
+                yr + halfSide,
+                outline="chartreuse1",
+                width=2,
+            )
+        )
+        self.beadCoords.append( [xr, yr] )
+        self._beadMarksCounter += 1
 
 
     def BeadMarksRemoveLast(self):
@@ -444,6 +465,7 @@ class ExtractorView(tk.Toplevel):
             self.beadCoords.pop()
         except:
             ValueError("Cant delete mark.")
+        self._beadMarksCounter -= 1
 
     def BeadMarksClear(self):
         """Clears all bead marks"""
@@ -453,6 +475,7 @@ class ExtractorView(tk.Toplevel):
             self.mainPhotoCanvas.delete(sq)
         self.beadMarks = []
         self.beadCoords = []
+        self._beadMarksCounter = 0
 
 
 

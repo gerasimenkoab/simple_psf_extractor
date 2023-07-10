@@ -333,7 +333,7 @@ class DeconvolutionGUI(tk.Toplevel):
 
     def GetVoxelDialog(self, text = ""):
         """
-        Create diealog and return list of values
+        Create dialog and return list of values
         """
         voxelStr = askstring("Voxel Dialog", text)
         return [float(a) for a in voxelStr.split(",")]

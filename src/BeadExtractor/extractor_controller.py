@@ -3,14 +3,24 @@ from tkinter.messagebox import askokcancel, showerror
 from tkinter.filedialog import askopenfilenames,  askdirectory, asksaveasfilename
 from tkinter.simpledialog import askstring
 import os
-from extractor_model import ExtractorModel
-from extractor_view import ExtractorView
+from BeadExtractor.extractor_model import ExtractorModel
+from BeadExtractor.extractor_view import ExtractorView
+import logging
+from logging.handlers import RotatingFileHandler
 
 class ExtractorController:
     """
     pass actions and data from gui to model and back
     """    
     def __init__(self, master = None):
+        #setup logger
+        self.logger = logging.getLogger(__name__)
+        self.handler = RotatingFileHandler("logs/extractor_event.log",maxBytes=6000, backupCount=2)
+        self.handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+        self.handler.setLevel(logging.INFO)
+        self.logger.addHandler(self.handler)
+        self.logger.setLevel(logging.INFO)
+        self.logger.info("Starting logginf in Extractor")
         self._master = master
         self.model = ExtractorModel()
         self.view = ExtractorView( self._master )
@@ -31,7 +41,6 @@ class ExtractorController:
     def _bind(self):
         """binding all events"""
         #buttons:
-
         self.view.loadBeadsPhoto_btn.config(command = self.LoadsBeadPhoto)
         self.view.undoMark_btn.config(command = self.UndoMark)
         self.view.clearMarks_btn.config(command = self.ClearMarks)
@@ -43,7 +52,6 @@ class ExtractorController:
         self.view.viewBead2d_btn.config(command = self.ViewBead2D)
         self.view.viewBead3d_btn.config(command = self.ViewBead3D)
         self.view.close_btn.config(command = self.CloseExtractor)
-        print("Binding buttons... Done")
         #entries bind at two events:
         self.view.mainPhotoCanvas.bind("<Button-3>", self.BeadMarkOnClick)
         for key in ("Z","Y","X"):
@@ -55,7 +63,7 @@ class ExtractorController:
         self.view.selectSizeEntry.bind("<Return>", self.UpdateSelectionSizeEntry)
         self.view.beadPrevNum.bind("<FocusOut>", self.SetBeadPrevNum)
         self.view.beadPrevNum.bind("<Return>", self.SetBeadPrevNum)
-        print("Binding Entries...  Done.")
+        self.logger.info("_bind: Binding buttons and entries is done.")
 
     def GetVoxelDialog(self, text = ""):
         """
@@ -67,6 +75,8 @@ class ExtractorController:
     def LoadsBeadPhoto(self):
         """Loading raw beads photo from file"""
         fNames = askopenfilenames(title="Load Beads Photo")
+        if fNames is None:
+            raise ValueError("No file name recieved", "filename_empty")
         try:
             self.model.SetMainImage(fNames)
         except ValueError as vE:
@@ -82,23 +92,31 @@ class ExtractorController:
                 raise ValueError(vE.args[0],vE.args[1])
         self.model.BeadCoordsClear()
         self.model.mainImage.ShowClassInfo()
+        self.logger.info("LoadsBeadPhoto: file(s) loaded. ")
         try:
             self.model.mainImage.SaveAsTiff(filename="tmp.tiff")
             self.view.SetMainPhotoImage("tmp.tiff")
             self.view.SetVoxelValues(self.model.mainImage.voxel)
-        except:
+            self.logger.info( "LoadsBeadPhoto: tmp.tiff created " )
+        except Exception as e:
+            self.logger.error("LoadsBeadPhoto: can't create tmp.tiff "+ str(e))
             raise IOError("Cant update GUI properly")        
 
     def ClearMarks(self):
+        """Clear bead marks"""
         self.view.BeadMarksClear()
         self.model.BeadCoordsClear()
 
     def UndoMark(self):
+        """Remove the last bead mark"""
         self.view.BeadMarksRemoveLast()
         self.model.BeadCoordsRemoveLast()
 
     def ExtractBeads(self):
-        self.model.MarkedBeadsExtract()
+        """Extract marked beads as a list"""
+        numberExtractedBeads = self.model.MarkedBeadsExtract()
+        self.logger.info("ExtractBeads: number of extracted beads = "+ str(numberExtractedBeads))
+
 
     def SaveExtractedBeads(self):
         try:
@@ -144,23 +162,13 @@ class ExtractorController:
         """
         Append mouse event coordinates to global list. Center is adjusted according to max intensity.
         """
-        cnv = event.widget
-        xClick, yClick = cnv.canvasx(event.x), cnv.canvasy(event.y)
+        widget = event.widget
+        xClick, yClick = widget.canvasx(event.x), widget.canvasy(event.y)
         xr, yr = self.model.LocateFrameMAxIntensity3D(xClick, yClick)
-        halfSide = self.model.selectionFrameHalf
-        self.view.beadMarks.append(
-            cnv.create_rectangle(
-                xr - halfSide,
-                yr - halfSide,
-                xr + halfSide,
-                yr + halfSide,
-                outline="chartreuse1",
-                width=2,
-            )
-        )
-        self.model._beadCoords.append([xr, yr])
-        self.view.beadCoords.append([xr, yr])
+        self.model.beadMarkAdd( [xr, yr] )
+        self.view.beadMarkAdd( widget, xr, yr )
 
+        
 
     def UpdateMainImageVoxelValue(self):
         try:
@@ -182,31 +190,6 @@ class ExtractorController:
 
 
 
-
-
-    def GetData(self):
-        """Get data from all forms"""
-        self.data ={
-            "voxel" : GetVoxel,
-            "beadSize" : GetBeadSize,
-            "selectionSize" : GetSelectionSize,
-            "tiffType" : "uint8",
-            "blurType:" : "none",
-            "previewTick" : False,
-        }
-
-
-        for idField, vField in enumerate(self.voxelFields):
-            tmp = self.voxelSizeEntries[vField].get()
-            try:
-                self.beadVoxelSize[idField] = abs( float(tmp) )
-                if self.beadVoxelSize[idField] < zeroTreshold:
-                    self.beadVoxelSize[idField] = zeroTreshold
-            except:
-                showerror("Set Voxel Size: ", "Bad input: not a Float.")
-                self.voxelSizeEntries[vField].delete(0, END)
-                self.voxelSizeEntries[vField].insert(0, self.beadVoxelSize[idField])
-                return
 
 if __name__ == "__main__":
     root = tk.Tk()
