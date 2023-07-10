@@ -9,6 +9,7 @@ from AuxTkPlot_class import AuxCanvasPlot
 # from  ImageRaw_class import ImageRaw
 
 """   TODO:
+        - fix  AuxTkPlot_class  for all modules
        - add  bead size to tiff tag
 """
 
@@ -48,7 +49,7 @@ class ExtractorView(tk.Toplevel):
         self.entry_dict = {} # according to list of names {id_name : widget}
         self.label_dict = {} # label {id_name : string}
         # new window widgets
-        self.title("Bead extraction.")
+        self.title("Bead extraction")
         self.resizable(False, False)
         Label(
             self,

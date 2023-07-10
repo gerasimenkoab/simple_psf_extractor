@@ -6,7 +6,7 @@ from ImageRaw_class import ImageRaw
 import logging
 from logging.handlers import RotatingFileHandler
 
-class ExtractorModel:
+class ExtractorModel():
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.handler = RotatingFileHandler("logs/extractor_event.log",maxBytes=6000, backupCount=5)
@@ -241,20 +241,29 @@ class ExtractorModel:
                     else:
                         raise ValueError( "Beads images of different size found", "bead_size_not_coincide" )
                 except ValueError as vErr:
-                    raise ValueError(vErr.args)
+                    raise ValueError(vErr.args[0], vErr.args[1])
         return beadsList
 
-    def AvrageManyBeads(self, fileList, fileSaveName):
+    def AverageManyBeads(self, fileList, fileSaveName):
         """
         Loading many same size bead files and calculate the arithmetic mean.
         Output: file with averaged bead.
         """
         try:
             beadsList = self.LoadManyBeads(fileList)
-            sumArray = np.zeros(beadsList[0].imArray.shape)
-            for bead in beadsList:
-                sumArray = sumArray + bead.imArray
-            sumArray = sumArray / len(beadsList)
-            ImageRaw(list(beadsList[0].voxel.values()), sumArray).SaveAsTiff(fileSaveName)
+        except:
+            raise ValueError("No beads loaded.")
+        try:
+            sumArray = np.zeros(beadsList[0].imArray.shape )
+            try:
+                for bead in beadsList:
+                    sumArray = sumArray + bead.imArray
+            except:
+                raise RuntimeError("Failed to sum beads")
+            try:
+                sumArray = sumArray / len( beadsList )
+            except:
+                raise RuntimeError("Failed to average beads")
+            ImageRaw(None, list(beadsList[0].voxel.values()), sumArray ).SaveAsTiff(fileSaveName)
         except:
             raise RuntimeError("Failed to average beads")

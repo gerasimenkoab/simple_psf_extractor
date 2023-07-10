@@ -1,5 +1,5 @@
 import tkinter as tk
-import BeadExtractionGUI_class as BEGUI_cls
+# import BeadExtractionGUI_class as BEGUI_cls
 import DeconvolutionGUI_class as DeGUI_cls
 from BeadExtractor.extractor_controller import ExtractorController
 
@@ -27,11 +27,11 @@ class main_window_gui(tk.Tk):
         child1.grab_set()
         pass
 
-    def OpenBeadExtractor_old(self):
-        """Loadding Extractor widget window"""
-        child1 = BEGUI_cls.BeadExtractionGUI(self)
-        child1.grab_set()
-        pass
+    # def OpenBeadExtractor_old(self):
+    #     """Loadding Extractor widget window"""
+    #     child1 = BEGUI_cls.BeadExtractionGUI(self)
+    #     child1.grab_set()
+    #     pass
 
     def OpenDeconvolution(self):
         """Loadding Deconvolution widget window"""
