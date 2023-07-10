@@ -1,16 +1,17 @@
 import tkinter as tk
-from tkinter.messagebox import askokcancel, showerror
+from tkinter.messagebox import askokcancel
 from tkinter.filedialog import askopenfilenames,  askdirectory, asksaveasfilename
 from tkinter.simpledialog import askstring
 import os
-from BeadExtractor.extractor_model import ExtractorModel
-from BeadExtractor.extractor_view import ExtractorView
 import logging
 from logging.handlers import RotatingFileHandler
 
+from extractor_model import ExtractorModel
+from extractor_view import ExtractorView
+
 class ExtractorController:
     """
-    pass actions and data from gui to model and back
+    Passing actions and data from gui to model and back
     """    
     def __init__(self, master = None):
         #setup logger
@@ -20,7 +21,7 @@ class ExtractorController:
         self.handler.setLevel(logging.INFO)
         self.logger.addHandler(self.handler)
         self.logger.setLevel(logging.INFO)
-        self.logger.info("Starting logginf in Extractor")
+        self.logger.info("Initializing Bead Extractor.")
         self._master = master
         self.model = ExtractorModel()
         self.view = ExtractorView( self._master )
@@ -138,10 +139,22 @@ class ExtractorController:
         pass
 
     def ViewBead2D(self):
-        pass
+        try:
+            id = int( self.view.beadPrevNum.get() )
+        except:
+            self.beadPrevNum.delete(0, END)
+            self.beadPrevNum.insert(0, str(len(self.selectedBeads) - 1))
+            raise ValueError("Wrong bead index input.")
+        self.view.PlotBeadPreview2D(self.model._extractedBeads[id].imArray)
 
     def ViewBead3D(self):
-        pass
+        try:
+            id = int( self.view.beadPrevNum.get() )
+        except:
+            self.beadPrevNum.delete(0, END)
+            self.beadPrevNum.insert(0, str(len(self.selectedBeads) - 1))
+            raise ValueError("Wrong bead index input.")
+        self.view.PlotBeadPreview3D(self.model._extractedBeads[id].imArray)
 
     def CloseExtractor(self):
         """Closing window and clear tmp files"""
@@ -150,7 +163,7 @@ class ExtractorController:
             try:
                 self.view.imgBeadsRaw.close()
             except:
-                print("Can't close imgBeadsRaw image")
+                pass
             tmppath = os.getcwd() + "\\tmp.tiff"
             try:
                 os.remove(tmppath)
@@ -196,29 +209,3 @@ if __name__ == "__main__":
     ExtractorController(root)
     root.mainloop()
         
-# забиндить ивенты ко всем виджетам и для них сделать функции, обрабатывающие приходящие данные из форм.
-# Buttons:   LoadBeadsPhoto, self.loadBeadsPhoto_btn
-#            UndoMark, self.undoMark_btn
-#            ClearAllMark, self.clearMarks_btn
-#            ExtractSelectedBeads, self.extractBeads_btn
-#            SaveExtractedBeads, self.saveExtractedBeads_btn
-#            ProcessExtractedBeads, self.processBeads_btn
-#            SaveAverageBead, self.saveAverageBead_btn
-#            AverageSeveralBeads, self.AverageSeveralBeads_btn
-#            Bead2D, self.bead2d_btn
-#            Bead3D, self.bead3d_btn
-#            close, self.close_btn
-# total 10
-
-# Entry:     voxel_Z, voxel_z
-#            voxel_Y, voxel_y
-#            voxel_X, voxel_z
-#            beadSize, self.beadSizeEntry
-#            SelectionSize, self.selectSizeEntry
-#            beadNumber, self.beadPrevNum
-# total 6
-
-# Get value with get() when needed.
-# Menu: blurType, self.blurApplyType
-#       tiffType, self.tiffType_menu
-# Tickbox: preview, self.precessBeadPrev

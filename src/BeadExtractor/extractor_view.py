@@ -1,30 +1,11 @@
 import numpy as np
-from scipy.special import jv  # Bessel function
-from scipy.ndimage import gaussian_filter, median_filter
-from scipy.interpolate import RegularGridInterpolator
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showerror, showinfo, askokcancel
-from tkinter.filedialog import (
-    askopenfilenames,
-    askdirectory,
-    asksaveasfilename,
-)
-from tkinter.simpledialog import askstring
 from PIL import ImageTk, Image, ImageEnhance
-from matplotlib import pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.cm as cm
-import os
-import json
-
-# from os import path
-from logging import raiseExceptions
-
-import file_inout as fio
-from plot_for_gui import FigureCanvasTkFrom3DArray, FigureCanvasTk3DFrom3DArray
-
+#from plot_for_gui import FigureCanvasTkFrom3DArray, FigureCanvasTk3DFrom3DArray
+from AuxTkPlot_class import AuxCanvasPlot
 # from  ImageRaw_class import ImageRaw
 
 """   TODO:
@@ -125,12 +106,6 @@ class ExtractorView(tk.Toplevel):
             Label(voxSizeFrame, text= key+"= ").pack(side=LEFT, padx=2, pady=2)
             self.voxelSizeEntries[key] = Entry(voxSizeFrame, width=5, bg="green", fg="white")
             self.voxelSizeEntries[key].pack(side=LEFT, padx=2, pady=2)
-        # Label(voxSizeFrame, text="Y = ").pack(side=LEFT, padx=2, pady=2)
-        # self.voxel_y_entry = Entry(voxSizeFrame, width=5, bg="green", fg="white")
-        # self.voxel_y_entry.pack(side=LEFT, padx=2, pady=2)
-        # Label(voxSizeFrame, text= "X = ").pack(side=LEFT, padx=2, pady=2)
-        # self.voxel_x_entry = Entry(voxSizeFrame, width=5, bg="green", fg="white")
-        # self.voxel_x_entry.pack(side=LEFT, padx=2, pady=2)
         voxSizeFrame.grid(row=2, column=0, sticky="we")
         f1.pack(side=TOP)
         ttk.Separator(f0, orient="horizontal").pack(ipadx=200, pady=10)
@@ -344,19 +319,6 @@ class ExtractorView(tk.Toplevel):
         self.imgBeadsRaw.seek(self.beadsPhotoLayerID)
         self.UpdateBeadSelectionWidgetImage()
 
-    def PlotBead3D(self, bead, treshold=np.exp(-1) * 255.0):
-        """Plot 3D view of a given bead"""
-        # popup window creation with canvas and exit button
-        child_tmp = tk.Toplevel(self)
-        child_tmp.title("3D Bead Preview") 
-        cnvPlot = tk.Canvas(child_tmp,width=300,height=300)
-        cnvPlot.pack(side='top')
-        Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side='top')
-      
-        FigureCanvasTk3DFrom3DArray( bead, cnvPlot ).get_tk_widget().pack(side='top')
-    
-
-
     def SetMainPhotoImage(self,tmpFilePath = None):
         """Loading raw beads photo from file"""
         if tmpFilePath is None:
@@ -413,10 +375,6 @@ class ExtractorView(tk.Toplevel):
             self.selectSizeEntry.delete(0, END)
             self.selectSizeEntry.insert(0, self.selectionFrameHalf * 2)
             return
-
-
-
-
 
     def DrawAllMarks(self):
         """Draw marks for beads on main canvas(cnv1)"""
@@ -477,29 +435,34 @@ class ExtractorView(tk.Toplevel):
         self.beadCoords = []
         self._beadMarksCounter = 0
 
-
-
-
     def PlotBeadPreview2D(self, beadArray):
         """ "Plots three bead in XYZ planes"""
         try:
-            self.imgBeadRaw = beadArray
-            self.figIMG_canvas_agg = FigureCanvasTkFrom3DArray(self.imgBeadRaw, self.cnvImg, plotName = "Bead 2D")
+            self.figIMG_canvas_agg = AuxCanvasPlot.FigureCanvasTkFrom3DArray(beadArray, self.cnvImg, plotName = "")
             self.figIMG_canvas_agg.get_tk_widget().grid(
                 row=1, column=5, rowspan=10, sticky=(N, E, S, W)
             )
         except Exception as e:
-            showerror("Can not plot preview 2D", str(e))
-            return
+            raise RuntimeError("Bead 2D plot failed" + str(e))
 
     def PlotBeadPreview3D(self,beadArray):
         """ "Plots three bead in 3D pointplot"""
         try:
             self.PlotBead3D(beadArray)
         except Exception as e:
-            showerror("Can not plot preview 3D", str(e))
-            return
+            raise RuntimeError("Bead 3D plot failed" + str(e))
 
+    def PlotBead3D(self, bead, treshold=np.exp(-1) * 255.0):
+        """Plot 3D view of a given bead"""
+        # popup window creation with canvas and exit button
+        child_tmp = tk.Toplevel(self)
+        child_tmp.title("3D Bead Preview") 
+        cnvPlot = tk.Canvas(child_tmp,width=300,height=300)
+        cnvPlot.pack(side='top')
+        Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side='top')
+      
+        AuxCanvasPlot.FigureCanvasTk3DFrom3DArray( bead, cnvPlot ).get_tk_widget().pack(side='top')
+    
 
 
 
