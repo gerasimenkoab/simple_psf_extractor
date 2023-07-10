@@ -186,9 +186,12 @@ class ExtractorModel:
             except:
                 raise RuntimeError("Failed to average beads")
             try:
-                self.avrageBead = ImageRaw(None, list(self._extractedBeads[0].voxel.values()), sumArray )
+                self._avrageBead = ImageRaw(None, list(self._extractedBeads[0].voxel.values()), sumArray )
             except:
                 raise RuntimeError("Failed to create bead object")
+            
+    def BlurAveragedBead(self, blurType):
+        self.BlurBead(self._avrageBead, blurType )
 
     def SaveAverageBead(self,fname, tiffBit ="uint8"):
         """

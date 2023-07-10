@@ -109,10 +109,10 @@ class ExtractorController:
 
     def ProcessBeads(self):
         self.model.BeadsArithmeticMean()
-        self.model.BlurBead( self.model.avrageBead, self.view.blurApplyType.get() )
+        self.model.BlurAveragedBead( self.view.blurApplyType.get() )
 
     def SaveAverageBead(self):
-        self.model.avrageBead.SaveAsTiff( asksaveasfilename() )
+        self.model.SaveAverageBead( asksaveasfilename() )
         pass
 
     def AverageSeveralBeads(self):
