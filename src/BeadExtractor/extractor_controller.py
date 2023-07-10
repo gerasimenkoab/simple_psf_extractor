@@ -135,15 +135,17 @@ class ExtractorController:
         pass
 
     def AverageSeveralBeads(self):
-        # self.model.
+        raise NotImplementedError("will do it soon")
+    # TODO fix AverageManyBeads
+        self.model.AverageManyBeads( askopenfilenames(title="Load Beads"), asksaveasfilename() )
         pass
 
     def ViewBead2D(self):
         try:
             id = int( self.view.beadPrevNum.get() )
         except:
-            self.beadPrevNum.delete(0, END)
-            self.beadPrevNum.insert(0, str(len(self.selectedBeads) - 1))
+            self.beadPrevNum.delete( 0, tk.END )
+            self.beadPrevNum.insert( 0, str(self.view._beadMarksCounter) - 1 )
             raise ValueError("Wrong bead index input.")
         self.view.PlotBeadPreview2D(self.model._extractedBeads[id].imArray)
 
@@ -151,8 +153,8 @@ class ExtractorController:
         try:
             id = int( self.view.beadPrevNum.get() )
         except:
-            self.beadPrevNum.delete(0, END)
-            self.beadPrevNum.insert(0, str(len(self.selectedBeads) - 1))
+            self.beadPrevNum.delete(0, tk.END)
+            self.beadPrevNum.insert(0, str(self.view._beadMarksCounter - 1))
             raise ValueError("Wrong bead index input.")
         self.view.PlotBeadPreview3D(self.model._extractedBeads[id].imArray)
 
