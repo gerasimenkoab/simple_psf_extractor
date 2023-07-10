@@ -2,7 +2,7 @@ import numpy as np
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
-from tkinter.messagebox import showerror, showinfo, askokcancel
+from tkinter.messagebox import showerror
 from PIL import ImageTk, Image, ImageEnhance
 #from plot_for_gui import FigureCanvasTkFrom3DArray, FigureCanvasTk3DFrom3DArray
 from AuxTkPlot_class import AuxCanvasPlot
