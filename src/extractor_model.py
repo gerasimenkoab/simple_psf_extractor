@@ -5,10 +5,10 @@ from ImageRaw_class import ImageRaw
 
 class ExtractorModel:
     def __init__(self):
-        self._mainImage = ImageRaw([0.2,0.089,0.089],np.zeros((10,200,200)))
+        self._mainImage = ImageRaw(None,[0.2,0.089,0.089],np.zeros((10,200,200)))
         self._averageBead = None
-        self._beadCoords = []  # Coordinates of beads on the canvas
-        self._extractedBeads = []
+        self._beadCoords = None  # Coordinates of beads on the canvas
+        self._extractedBeads = None
         self._beadDiameter = 0.2
         self._selectionFrameHalf = 18 
 
@@ -16,13 +16,13 @@ class ExtractorModel:
     def mainImage(self):
         return self._mainImage
 
-    @mainImage.setter
-    def mainImage( self, fname = None, voxel = None, array = None ):
-        try:
-            self._mainImage = ImageRaw(fname,voxel,array)
-            self._averageBead = None
-        except ValueError as vE:
-            raise(vE.args)
+    def SetMainImage( self, fname = None, voxel = None, array = None ):
+        # try:
+        self._mainImage = ImageRaw(fname,voxel,array)
+        # except ValueError as vE:
+        #     raise ValueError(vE.args[0],vE.args[1])
+        self._averageBead = None
+        self._beadCoords = []
     
     @property
     def averageBead(self):
@@ -32,13 +32,16 @@ class ExtractorModel:
     def averageBead(self, value: ImageRaw):
         self._averageBead = value
 
-    @property
-    def beadCoords(self):
-        return self._beadCoords
+    # @property
+    # def beadCoords(self):
+    #     return self._beadCoords
     
-    @beadCoords.setter
-    def beadCoords(self, coordsList):
-        self._beadCoords = coordsList
+    # @beadCoords.setter
+    # def beadCoords(self, coordsList):
+    #     self._beadCoords = coordsList
+
+
+
 
     @property
     def beadDiameter(self):
@@ -64,14 +67,21 @@ class ExtractorModel:
 
     def BeadCoordsAdd(self, x, y):
         """Append mouse event coordinates to global list. Center is adjusted according to max intensity."""
+        if self._beadCoords is None:
+            self._beadCoords = []
         self._beadCoords.append([x, y])
 
-    def LastBeadCooordsRemove(self):
+    def BeadCoordsRemoveLast(self):
         """Removes the last bead in the list"""
-        self._beadCoords.pop()
+        try:
+            self._beadCoords.pop()
+        except:
+            raise ValueError("No coordinates to remove in the list","list_empty")
 
     def BeadCoordsClear(self):
         """Clears all bead marks"""
+        if self._beadCoords is None:
+            return
         self._beadCoords = []
 
     def LocateFrameMAxIntensity3D(self, xi, yi):
@@ -86,8 +96,6 @@ class ExtractorModel:
         # dimension 0 - its z- plane
         # dimension 1 - y
         # dimension 2 - x
-        xi = self.xr
-        yi = self.yr
         bound3 = int(xi - d)
         bound4 = int(xi + d)
         bound1 = int(yi - d)
@@ -107,12 +115,14 @@ class ExtractorModel:
 
 
 
-    def ExtractBeads(self):
+    def MarkedBeadsExtract(self):
         """Extracting bead stacks from picture set and centering them"""
         d = self._selectionFrameHalf
-        print(self.imgCnvArr.shape)
+        print(self._mainImage.imArray.shape)
         voxel = list( self._mainImage.voxel.values() )
-        for idx, i in enumerate(self.beadCoords):
+        if self._extractedBeads is None:
+            self._extractedBeads = []
+        for idx, i in enumerate(self._beadCoords):
             bound3 = int(i[0] - d)
             bound4 = int(i[0] + d)
             bound1 = int(i[1] - d)
@@ -124,9 +134,9 @@ class ExtractorModel:
             shift = zc - iMax[0]
             elem = np.roll(elem, shift=shift, axis=0)
             iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
-            self._extractedBeads.append( ImageRaw(voxel, elem) )
+            self._extractedBeads.append( ImageRaw(None, voxel, elem) )
 
-    def SaveSelectedBeads(self, txt_folder_enquiry, txt_prefix = "", tiffBit = "uint8"):
+    def ExtractedBeadsSave(self, txt_folder_enquiry = "", txt_prefix = "", tiffBit = "uint8"):
         """Save selected beads as multi-page tiffs as is."""
         if self._extractedBeads != None:
             if txt_prefix == "":
@@ -162,17 +172,23 @@ class ExtractorModel:
 
     def BeadsArithmeticMean(self):
         #            print("blurtype", self.blurApplyType.get(), "rescale Z", self.doRescaleOverZ.get() )
-        if self._extractedBeads == None:
+        if self._extractedBeads is None:
             raise ValueError("No beads extracted","empty_beads_list")
         else:
+            sumArray = np.zeros( self._extractedBeads[0].imArray.shape )
             try:
-                sumArray = np.zeros( self._extractedBeads[0].imArray.shape )
                 for bead in self._extractedBeads:
                     sumArray = sumArray + bead.imArray
+            except:
+                raise RuntimeError("Failed to sum beads")
+            try:
                 sumArray = sumArray / len( self._extractedBeads )
-                self.avrageBead = ImageRaw( list(self._extractedBeads[0].voxel.values()), sumArray )
             except:
                 raise RuntimeError("Failed to average beads")
+            try:
+                self.avrageBead = ImageRaw(None, list(self._extractedBeads[0].voxel.values()), sumArray )
+            except:
+                raise RuntimeError("Failed to create bead object")
 
     def SaveAverageBead(self,fname, tiffBit ="uint8"):
         """

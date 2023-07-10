@@ -78,7 +78,7 @@ class ImageRaw:
             else:
                 raise ValueError("Only one source of data for pixel values allowed","data_problem")
 
-        self.path =  fpath[0] 
+            self.path =  fpath[0] 
 
 
     # methods
@@ -206,7 +206,7 @@ class ImageRaw:
         """
             Setting voxel with check
         """
-        if newVoxel == None or len(newVoxel) != 3 or np.amin(newVoxel) <= 0:
+        if newVoxel is None or len(newVoxel) != 3 or np.amin(newVoxel) <= 0:
             raise ValueError("Wrong Voxel Value.","bad_voxel_value")
         else:
             self.voxelSize = newVoxel
