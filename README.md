@@ -9,6 +9,7 @@ TODO:
 + add progress bar to GUI... done
 + add method selection for Image deconvolution app... done
 
+- switching to MVC model for backend separation
 - implement temporary file using tempfile.SpooledTemporaryFile
 - logging with logger.(from logging.handlers import RotatingFileHandler)
 - think about interface with ttk.Notebook() for DeconvolutionGUI -  two parts, two notebooks
