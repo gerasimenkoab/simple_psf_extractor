@@ -4,8 +4,6 @@ from tkinter.filedialog import askopenfilenames,  askdirectory, asksaveasfilenam
 from tkinter.simpledialog import askstring
 import os
 import logging
-# from logging.handlers import RotatingFileHandler
-# from app_logger import AppLogger
 
 from model.extractor_model import ExtractorModel
 from view.extractor_view import ExtractorView
@@ -18,14 +16,9 @@ class ExtractorController():
     def __init__(self, master = None):
         super().__init__()
         #setup logger
-        self.logger = logging.getLogger('__main__'+__name__)
-        # self.handler = RotatingFileHandler("logs/extractor_event.log",maxBytes=6000, backupCount=2)
-        # self.handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-        # self.handler.setLevel(logging.INFO)
-        # self.logger.addHandler(self.handler)
-        # self.logger.setLevel(logging.INFO)
-        # self.logger.info("Initializing Bead Extractor.")
-        self.logger.info("Initializing Bead Extractor.")
+        self.logger = logging.getLogger('__main__.'+__name__)
+        self.logger.info("Initializing Bead Extractor module.")
+
         self._master = master
         self.model = ExtractorModel()
         self.view = ExtractorView( self._master )
@@ -68,7 +61,7 @@ class ExtractorController():
         self.view.selectSizeEntry.bind("<Return>", self.UpdateSelectionSizeEntry)
         self.view.beadPrevNum.bind("<FocusOut>", self.SetBeadPrevNum)
         self.view.beadPrevNum.bind("<Return>", self.SetBeadPrevNum)
-        logging.info("_bind: Binding buttons and entries is done.")
+        self.logger.info("_bind: Binding buttons and entries is done.")
 
     def GetVoxelDialog(self, text = ""):
         """
@@ -97,14 +90,14 @@ class ExtractorController():
                 raise ValueError(vE.args[0],vE.args[1])
         self.model.BeadCoordsClear()
         self.model.mainImage.ShowClassInfo()
-        logging.info("LoadsBeadPhoto: file(s) loaded. ")
+        self.logger.info("LoadsBeadPhoto: file(s) loaded. ")
         try:
             self.model.mainImage.SaveAsTiff(filename="tmp.tiff")
             self.view.SetMainPhotoImage("tmp.tiff")
             self.view.SetVoxelValues(self.model.mainImage.voxel)
-            logging.info( "LoadsBeadPhoto: tmp.tiff created " )
+            self.logger.info( "LoadsBeadPhoto: tmp.tiff created " )
         except Exception as e:
-            logging.error("LoadsBeadPhoto: can't create tmp.tiff "+ str(e))
+            self.logger.error("LoadsBeadPhoto: can't create tmp.tiff "+ str(e))
             raise IOError("Cant update GUI properly")        
 
     def ClearMarks(self):
@@ -120,7 +113,7 @@ class ExtractorController():
     def ExtractBeads(self):
         """Extract marked beads as a list"""
         numberExtractedBeads = self.model.MarkedBeadsExtract()
-        logging.info("ExtractBeads: number of extracted beads = "+ str(numberExtractedBeads))
+        self.logger.info("ExtractBeads: number of extracted beads = "+ str(numberExtractedBeads))
 
 
     def SaveExtractedBeads(self):

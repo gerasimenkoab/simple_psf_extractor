@@ -4,13 +4,12 @@ from scipy.ndimage import gaussian_filter, median_filter
 from .ImageRaw_class import ImageRaw
 
 import logging
-# from logging.handlers import RotatingFileHandler
-# from app_logger import AppLogger
 
 class ExtractorModel():
     def __init__(self):
         super().__init__
-        logging.info("Extractor object created")
+        self.logger = logging.getLogger('__main__.'+__name__)
+        self.logger.info("Extractor object created")
 
         self._mainImage = ImageRaw(None,[0.2,0.089,0.089],np.zeros((10,200,200)))
         self._averageBead = None

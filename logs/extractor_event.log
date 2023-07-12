@@ -1,0 +1,7 @@
+2023-07-12 17:35:46,751 __main__ INFO: Main GUI started. [in d:\python\simple_psf_extractor\src\main.py:15]
+2023-07-12 17:35:48,379 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module. [in d:\python\simple_psf_extractor\src\controller\extractor_controller.py:20]
+2023-07-12 17:35:48,379 __main__.model.extractor_model INFO: Extractor object created [in d:\python\simple_psf_extractor\src\model\extractor_model.py:12]
+2023-07-12 17:35:48,389 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done. [in d:\python\simple_psf_extractor\src\controller\extractor_controller.py:64]
+2023-07-12 17:36:20,211 __main__.controller.extractor_controller INFO: LoadsBeadPhoto: file(s) loaded.  [in d:\python\simple_psf_extractor\src\controller\extractor_controller.py:93]
+2023-07-12 17:36:20,370 __main__.controller.extractor_controller INFO: LoadsBeadPhoto: tmp.tiff created  [in d:\python\simple_psf_extractor\src\controller\extractor_controller.py:98]
+2023-07-12 17:36:29,796 __main__.controller.extractor_controller INFO: ExtractBeads: number of extracted beads = 5 [in d:\python\simple_psf_extractor\src\controller\extractor_controller.py:116]
