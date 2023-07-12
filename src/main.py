@@ -3,14 +3,16 @@ import tkinter as tk
 import DeconvolutionGUI_class as DeGUI_cls
 from controller.extractor_controller import ExtractorController
 import logging
+import logging.config
+import os
 from logging.handlers import RotatingFileHandler
 
 
 class main_window_gui(tk.Tk):
     def __init__(self, master=None, width = 300, height = 250):
         super().__init__()
-        logger = logging.getLogger(__name__)
-        logger.info("Main GUI started.")
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("Main GUI started.")
 
         self.title("Simple experimental PSF extractor")
         tk.Label(self, text = "Avialable Widgets:").pack(side = 'top',pady=10)
@@ -71,12 +73,13 @@ class main_window_gui(tk.Tk):
 
 
 def main():
+    try:
+        logging_conf_path = os.path.join(os.path.dirname(__file__), 'logging.conf')
+        logging.config.fileConfig(logging_conf_path)
+    except FileNotFoundError as e:
+        print(str(e))
+        return
     logger = logging.getLogger(__name__)
-    handler = RotatingFileHandler("logs/extractor_event.log",maxBytes=6000, backupCount=2)
-    handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-    handler.setLevel(logging.INFO)
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
 
     root_win = main_window_gui()
     root_win.mainloop()
