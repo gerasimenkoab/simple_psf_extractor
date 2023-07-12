@@ -1,8 +1,7 @@
 from model.decon_psf_model import DeconPsfModel
 from view.decon_psf_view import DeconPsfView
-from app_logger import AppLogger
 import logging
-class DeconPsfController(AppLogger):
+class DeconPsfController():
     def __init__(self,master) -> None:
         super().__init__()
         #setup logger

@@ -169,6 +169,7 @@ class ExtractorController():
             except:
                 pass
             self.view.destroy()
+            self.logger.info("Bead Extractor Closed.")
 
     def BeadMarkOnClick(self,event):
         """

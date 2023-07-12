@@ -1,11 +1,10 @@
 import tkinter as tk
-# import BeadExtractionGUI_class as BEGUI_cls
 import DeconvolutionGUI_class as DeGUI_cls
 from controller.extractor_controller import ExtractorController
 import logging
 import logging.config
 import os
-from logging.handlers import RotatingFileHandler
+#from logging.handlers import RotatingFileHandler
 
 
 class main_window_gui(tk.Tk):
