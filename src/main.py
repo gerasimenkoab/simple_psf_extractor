@@ -1,12 +1,17 @@
 import tkinter as tk
 # import BeadExtractionGUI_class as BEGUI_cls
 import DeconvolutionGUI_class as DeGUI_cls
-from BeadExtractor.extractor_controller import ExtractorController
+from controller.extractor_controller import ExtractorController
+import logging
+from logging.handlers import RotatingFileHandler
 
 
 class main_window_gui(tk.Tk):
     def __init__(self, master=None, width = 300, height = 250):
         super().__init__()
+        logger = logging.getLogger(__name__)
+        logger.info("Main GUI started.")
+
         self.title("Simple experimental PSF extractor")
         tk.Label(self, text = "Avialable Widgets:").pack(side = 'top',pady=10)
         b1 = tk.Button(self, text="Launch Bead Extractor Widget", command = lambda: self.OpenBeadExtractor())
@@ -23,9 +28,7 @@ class main_window_gui(tk.Tk):
 
     def OpenBeadExtractor(self):
         """Loadding Extractor widget window"""
-        child1 = ExtractorController(self)
-        child1.grab_set()
-        pass
+        ExtractorController(self)
 
     # def OpenBeadExtractor_old(self):
     #     """Loadding Extractor widget window"""
@@ -66,6 +69,17 @@ class main_window_gui(tk.Tk):
     def CloseApplication(self):
         self.quit()
 
-if __name__=="__main__":
+
+def main():
+    logger = logging.getLogger(__name__)
+    handler = RotatingFileHandler("logs/extractor_event.log",maxBytes=6000, backupCount=2)
+    handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+    handler.setLevel(logging.INFO)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+
     root_win = main_window_gui()
     root_win.mainloop()
+
+if __name__=="__main__":
+    main()
