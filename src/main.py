@@ -72,7 +72,7 @@ class main_window_gui(tk.Tk):
 
 
 def main():
-     if not os.path.exists('logs'):
+    if not os.path.exists('logs'):
         os.mkdir('logs')
     try:
         logging_conf_path = os.path.join(os.path.dirname(__file__), 'logging.conf')
