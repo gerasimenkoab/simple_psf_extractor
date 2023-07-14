@@ -24,7 +24,6 @@ class ExtractorView(tk.Toplevel):
         self.intensityFactor = 1.0  # intensity factor for beads selection widget
         self.beadsPhotoLayerID = 0  # default index of beads microscope photo
 
-
         self.voxelFields = "Z", "X", "Y"
         self.voxelSizeEntries = {}
 
@@ -41,11 +40,11 @@ class ExtractorView(tk.Toplevel):
             "AverageSeveralBeads": "Average Several Beads",
             "Bead2D": "Show bead in 2D",
             "Bead3D": "Show bead in 3D",
-            "Close": "Close Extractor"
-            }
-        self.button_dict = {} # according to list of names {id_name : widget}
-        self.entry_dict = {} # according to list of names {id_name : widget}
-        self.label_dict = {} # label {id_name : string}
+            "Close": "Close Extractor",
+        }
+        self.button_dict = {}  # according to list of names {id_name : widget}
+        self.entry_dict = {}  # according to list of names {id_name : widget}
+        self.label_dict = {}  # label {id_name : string}
         # new window widgets
         self.title("Bead extraction")
         self.resizable(False, False)
@@ -67,9 +66,9 @@ class ExtractorView(tk.Toplevel):
         ).grid(row=0, column=0, columnspan=2, sticky="w")
 
         f1_1 = Frame(f1)
-        
+
         self.loadBeadsPhoto_btn = Button(f1_1, text="Load Beads Photo")
-        self.loadBeadsPhoto_btn.pack( side=LEFT, padx=52, pady=2 )
+        self.loadBeadsPhoto_btn.pack(side=LEFT, padx=52, pady=2)
         Label(f1_1, text=" Adjust canvas brightness:").pack(side=LEFT, padx=2, pady=2)
         Button(f1_1, text="+", command=self.AddBrightnessToBeadSelectionWidget).pack(
             side=LEFT, padx=2, pady=2
@@ -101,9 +100,11 @@ class ExtractorView(tk.Toplevel):
         Label(voxSizeFrame, text="Voxel size (\u03BCm): ", anchor="w").pack(
             side=LEFT, padx=2, pady=2
         )
-        for key in  ("Z","Y","X"):
-            Label(voxSizeFrame, text= key+"= ").pack(side=LEFT, padx=2, pady=2)
-            self.voxelSizeEntries[key] = Entry(voxSizeFrame, width=5, bg="green", fg="white")
+        for key in ("Z", "Y", "X"):
+            Label(voxSizeFrame, text=key + "= ").pack(side=LEFT, padx=2, pady=2)
+            self.voxelSizeEntries[key] = Entry(
+                voxSizeFrame, width=5, bg="green", fg="white"
+            )
             self.voxelSizeEntries[key].pack(side=LEFT, padx=2, pady=2)
         voxSizeFrame.grid(row=2, column=0, sticky="we")
         f1.pack(side=TOP)
@@ -127,9 +128,9 @@ class ExtractorView(tk.Toplevel):
 
         frameMarks = Frame(f2)
         self.undoMark_btn = Button(frameMarks, text="Undo mark")
-        self.undoMark_btn.pack( side=LEFT, padx=2, pady=2, fill=BOTH, expand=1 )
+        self.undoMark_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
         self.clearMarks_btn = Button(frameMarks, text="Clear All Marks")
-        self.clearMarks_btn.pack( side=LEFT, padx=2, pady=2, fill=BOTH, expand=1 )
+        self.clearMarks_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
         frameMarks.grid(row=1, column=1, sticky="we")
         f2.pack(side=TOP)
         ttk.Separator(f0, orient="horizontal").pack(ipadx=200, pady=10)
@@ -141,10 +142,10 @@ class ExtractorView(tk.Toplevel):
         ).grid(row=0, column=0, columnspan=2, sticky="w")
 
         self.extractBeads_btn = Button(f3, text="Extract Selected Beads")
-        self.extractBeads_btn.grid( row=1, column=0, padx=2, pady=2, sticky="we" )
+        self.extractBeads_btn.grid(row=1, column=0, padx=2, pady=2, sticky="we")
 
         self.saveExtractedBeads_btn = Button(f3, text="Save Extracted Beads")
-        self.saveExtractedBeads_btn.grid( row=1, column=1, padx=2, pady=2, sticky="we" )
+        self.saveExtractedBeads_btn.grid(row=1, column=1, padx=2, pady=2, sticky="we")
 
         self.tiffMenuBitText = ["8 bit", "16 bit", "32 bit"]
         self.tiffMenuBitDict = {
@@ -225,21 +226,22 @@ class ExtractorView(tk.Toplevel):
         frameAvrageBeadsButtons.pack(side=TOP)
         frameAvrageBeads.pack(side=TOP)  # grid(row =6,column = 0,sticky='we')
 
-
         ttk.Separator(f0, orient="horizontal").pack(ipadx=200, pady=10)
         self.averageSeveralBeads_btn = Button(f0, text="Average Several Beads")
-        self.averageSeveralBeads_btn.pack( side=TOP, padx=2, pady=2 )
+        self.averageSeveralBeads_btn.pack(side=TOP, padx=2, pady=2)
 
         f0.grid(row=1, column=0, sticky="NSWE")
 
         self.close_btn = Button(f0, text="Close")
-        self.close_btn.pack( side=TOP, padx=2, pady=2 )
+        self.close_btn.pack(side=TOP, padx=2, pady=2)
 
         f0.grid(row=1, column=0, sticky="NSWE")
 
         # ---------------- Bead Photo Frame -----------------------------
         canvasFrame = Frame(self)
-        self.mainPhotoCanvas = Canvas(canvasFrame, width=wwidth, height=wheight, bg="white")
+        self.mainPhotoCanvas = Canvas(
+            canvasFrame, width=wwidth, height=wheight, bg="white"
+        )
         self.mainPhotoCanvas.grid(row=0, column=0, sticky=(N, E, S, W))
         # main image scrollbars
         self.hScroll = Scrollbar(canvasFrame, orient="horizontal")
@@ -263,16 +265,12 @@ class ExtractorView(tk.Toplevel):
         beadPreviewMenuFrame = Frame(beadPreviewFrame)
         self.beadPrevNum = Entry(beadPreviewMenuFrame, width=5)
         self.beadPrevNum.pack(side=LEFT)
-        self.viewBead2d_btn = Button(
-            beadPreviewMenuFrame, text="Bead 2D"
-        )
+        self.viewBead2d_btn = Button(beadPreviewMenuFrame, text="Bead 2D")
         self.viewBead2d_btn.pack(side=LEFT)
-        self.viewBead3d_btn = Button( beadPreviewMenuFrame, text="Bead 3D" )
+        self.viewBead3d_btn = Button(beadPreviewMenuFrame, text="Bead 3D")
         self.viewBead3d_btn.pack(side=LEFT)
         beadPreviewMenuFrame.pack(side=TOP, padx=2, pady=2)
         beadPreviewFrame.grid(row=1, column=2, sticky="NSWE")
-
-
 
     def UpdateBeadSelectionWidgetImage(self):
         """
@@ -318,7 +316,7 @@ class ExtractorView(tk.Toplevel):
         self.imgBeadsRaw.seek(self.beadsPhotoLayerID)
         self.UpdateBeadSelectionWidgetImage()
 
-    def SetMainPhotoImage(self,tmpFilePath = None):
+    def SetMainPhotoImage(self, tmpFilePath=None):
         """Loading raw beads photo from file"""
         if tmpFilePath is None:
             raise FileNotFoundError("No file name provided", "no_file_path")
@@ -329,16 +327,22 @@ class ExtractorView(tk.Toplevel):
                 pass
             self.imgBeadsRaw = Image.open(tmpFilePath)
         except:
-            raise FileNotFoundError("Cant set canvas image with beads photo.", "cant_read_file")
-        self.beadsPhotoLayerID = int( (self.imgBeadsRaw.n_frames + 1) / 2)
+            raise FileNotFoundError(
+                "Cant set canvas image with beads photo.", "cant_read_file"
+            )
+        self.beadsPhotoLayerID = int((self.imgBeadsRaw.n_frames + 1) / 2)
         self.imgBeadsRaw.seek(self.beadsPhotoLayerID)
         self.BeadMarksClear()
         # updating label on interface
         self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
         # preparing image for canvas from desired frame
-        self.imgCnv = ImageTk.PhotoImage(image = self.imgBeadsRaw, master = self.mainPhotoCanvas)
+        self.imgCnv = ImageTk.PhotoImage(
+            image=self.imgBeadsRaw, master=self.mainPhotoCanvas
+        )
         # replacing image on the canvas
-        self.mainPhotoCanvas.create_image((0, 0), image=self.imgCnv, state = 'normal', anchor=NW)
+        self.mainPhotoCanvas.create_image(
+            (0, 0), image=self.imgCnv, state="normal", anchor=NW
+        )
         # updating scrollers
         self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
 
@@ -350,17 +354,16 @@ class ExtractorView(tk.Toplevel):
             self.voxelSizeEntries[axisName].delete(0, END)
             self.voxelSizeEntries[axisName].insert(0, voxelInDict[axisName])
 
-
     def SetBeadSize(self, valueIn):
         """Bead diameter size change"""
         try:
-            beadDiameter = abs( float(valueIn) )
-            self.beadSizeEntry.delete( 0, END )
-            self.beadSizeEntry.insert( 0, str(beadDiameter) )
+            beadDiameter = abs(float(valueIn))
+            self.beadSizeEntry.delete(0, END)
+            self.beadSizeEntry.insert(0, str(beadDiameter))
         except:
             showerror("Bead Size: ", "Bad input")
-            self.beadSizeEntry.delete( 0, END )
-            self.beadSizeEntry.insert( 0, str(beadDiameter) )
+            self.beadSizeEntry.delete(0, END)
+            self.beadSizeEntry.insert(0, str(beadDiameter))
             return
 
     def SetSelectionFrameSize(self, valueIn):
@@ -408,9 +411,8 @@ class ExtractorView(tk.Toplevel):
                 width=2,
             )
         )
-        self.beadCoords.append( [xr, yr] )
+        self.beadCoords.append([xr, yr])
         self._beadMarksCounter += 1
-
 
     def BeadMarksRemoveLast(self):
         """Removes the last bead in the list"""
@@ -437,14 +439,16 @@ class ExtractorView(tk.Toplevel):
     def PlotBeadPreview2D(self, beadArray):
         """ "Plots three bead in XYZ planes"""
         try:
-            self.figIMG_canvas_agg = AuxCanvasPlot.FigureCanvasTkFrom3DArray(beadArray, self.cnvImg, plotName = "")
+            self.figIMG_canvas_agg = AuxCanvasPlot.FigureCanvasTkFrom3DArray(
+                beadArray, self.cnvImg, plotName=""
+            )
             self.figIMG_canvas_agg.get_tk_widget().grid(
                 row=1, column=5, rowspan=10, sticky=(N, E, S, W)
             )
         except Exception as e:
             raise RuntimeError("Bead 2D plot failed" + str(e))
 
-    def PlotBeadPreview3D(self,beadArray):
+    def PlotBeadPreview3D(self, beadArray):
         """ "Plots three bead in 3D pointplot"""
         try:
             self.PlotBead3D(beadArray)
@@ -455,14 +459,14 @@ class ExtractorView(tk.Toplevel):
         """Plot 3D view of a given bead"""
         # popup window creation with canvas and exit button
         child_tmp = tk.Toplevel(self)
-        child_tmp.title("3D Bead Preview") 
-        cnvPlot = tk.Canvas(child_tmp,width=300,height=300)
-        cnvPlot.pack(side='top')
-        Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side='top')
-      
-        AuxCanvasPlot.FigureCanvasTk3DFrom3DArray( bead, cnvPlot ).get_tk_widget().pack(side='top')
-    
+        child_tmp.title("3D Bead Preview")
+        cnvPlot = tk.Canvas(child_tmp, width=300, height=300)
+        cnvPlot.pack(side="top")
+        Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side="top")
 
+        AuxCanvasPlot.FigureCanvasTk3DFrom3DArray(bead, cnvPlot).get_tk_widget().pack(
+            side="top"
+        )
 
 
 if __name__ == "__main__":
