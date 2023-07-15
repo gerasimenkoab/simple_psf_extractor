@@ -2,3 +2,6 @@ docs/.~lock.class_diag.odg#
 docs/class_diag.odg
 tmp.tiff
 venv-spsf/
+src/view/__pycache__/
+src/controller/__pycache__/
+src/model/__pycache__/
