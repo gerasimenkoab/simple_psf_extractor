@@ -1,5 +1,5 @@
 from model.decon_psf_model import DeconPsfModel
-from view.decon_psf_view import DeconPsfView
+from view.decon_view_psf import DeconPsfView
 import logging
 class DeconPsfController():
     def __init__(self,master) -> None:

@@ -1,5 +1,5 @@
 from model.decon_image_model import DeconImageModel
-from view.decon_image_view import DeconImageView
+from view.decon_view_image import DeconImageView
 import logging
 
 class DeconImageController():
