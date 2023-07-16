@@ -11,7 +11,7 @@ class DeconPSFFrameNb(ttk.Frame):
         self.step1_frm = ttk.Frame(self.deconPSF_settings)
         self.step1_frm.configure(height=200, width=200)
         self.step1_lbl = ttk.Label(self.step1_frm)
-        self.step1_lbl.configure(font="TkHeadingFont", text='Load Bead Image')
+        self.step1_lbl.configure(font="Helvetica 10 bold", text='Load Bead Image')
         self.step1_lbl.pack(pady=10, side="top")
         self.step1_load_frm = ttk.Frame(self.step1_frm)
         self.step1_load_frm.configure(height=200, width=200)
@@ -41,7 +41,7 @@ class DeconPSFFrameNb(ttk.Frame):
         self.step2 = ttk.Frame(self.deconPSF_settings)
         self.step2.configure(height=200, width=200)
         self.step2_lbl = ttk.Label(self.step2)
-        self.step2_lbl.configure(text='Bead Parameters')
+        self.step2_lbl.configure(font="Helvetica 10 bold", text='Bead Parameters')
         self.step2_lbl.pack(side="top")
         self.beadParamFrame = ttk.Frame(self.step2)
         self.beadParamFrame.configure(height=200, width=200)
@@ -119,7 +119,7 @@ class DeconPSFFrameNb(ttk.Frame):
         self.psfDeconParamFrame = ttk.Frame(self.deconPSF_settings)
         self.psfDeconParamFrame.configure(height=200, width=200)
         self.step3_lbl = ttk.Label(self.psfDeconParamFrame)
-        self.step3_lbl.configure(text='Deconvolution parameters')
+        self.step3_lbl.configure(font="Helvetica 10 bold", text='Deconvolution parameters')
         self.step3_lbl.pack(side="top")
         self.methodFrame = ttk.Frame(self.psfDeconParamFrame)
         self.methodFrame.configure(height=200, width=200)
@@ -132,39 +132,48 @@ class DeconPSFFrameNb(ttk.Frame):
             textvariable=self.deconMethodMenuStrVal)
         self.deconType_combobox.pack(padx=2, pady=5, side="left")
         self.methodFrame.pack(side="top")
-        self.psfDeconBtmFrame = ttk.Frame(self.psfDeconParamFrame)
-        self.psfDeconBtmFrame.configure(height=200, width=200)
-        self.deconPSF_pgbar = ttk.Progressbar(self.psfDeconBtmFrame)
-        self.deconPSF_pgbar.configure(orient="horizontal")
-        self.deconPSF_pgbar.pack(padx=2, pady=5, side="top")
-        self.calcPSF_btn = ttk.Button(self.psfDeconBtmFrame)
-        self.calcPSF_btn.configure(text='Calculate PSF')
-        self.calcPSF_btn.pack(padx=2, pady=5, side="top")
-        self.calcPSF_btn.bind("<1>", self.CalcPSF_btn_click, add="")
-        self.psfDeconBtmFrame.pack(side="top")
         self.psfIterNumFrame = ttk.Frame(self.psfDeconParamFrame)
         self.psfIterNumFrame.configure(height=200, width=200)
         label14 = ttk.Label(self.psfIterNumFrame)
         label14.configure(text='Iteration number:')
-        label14.pack(padx=2, pady=5, side="left")
+        label14.grid(column=0, padx=2, pady=2, row=0, sticky="e")
         self.psfIterNum_entry = ttk.Entry(self.psfIterNumFrame)
         self.psfIterNum_entry.configure(width=10)
-        self.psfIterNum_entry.pack(padx=2, pady=5, side="left")
+        self.psfIterNum_entry.grid(column=1, padx=2, pady=2, row=0, sticky="w")
         self.psfIterNum_entry.bind("<Enter>", self.UpdatePsfIterlValue, add="")
         self.psfIterNum_entry.bind(
             "<FocusOut>", self.UpdatePsfIterlValue, add="")
         self.psfIterNumFrame.pack(side="top")
+        self.psfIterNumFrame.grid_anchor("center")
+        self.psfIterNumFrame.rowconfigure(0, uniform=0)
+        self.psfIterNumFrame.columnconfigure(0, uniform=1, weight=1)
+        self.psfIterNumFrame.columnconfigure(1, uniform=1, weight=1)
         frame25 = ttk.Frame(self.psfDeconParamFrame)
         frame25.configure(height=200, width=200)
         label19 = ttk.Label(frame25)
-        label19.configure(text='Regularisation:')
-        label19.pack(padx=2, pady=5, side="left")
+        label19.configure(text='Regularization:')
+        label19.grid(column=0, padx=2, pady=2, row=0, sticky="e")
         self.psfReg_entry = ttk.Entry(frame25)
         self.psfReg_entry.configure(width=10)
-        self.psfReg_entry.pack(padx=2, pady=5, side="left")
+        self.psfReg_entry.grid(column=1, padx=2, pady=2, row=0, sticky="w")
         self.psfReg_entry.bind("<Enter>", self.UpdatePsfReglValue, add="")
         self.psfReg_entry.bind("<FocusOut>", self.UpdatePsfReglValue, add="")
-        frame25.pack(side="top")
+        frame25.pack(pady=2, side="top")
+        frame25.rowconfigure(0, uniform=0)
+        frame25.columnconfigure(0, uniform=1)
+        frame25.columnconfigure(1, uniform=1)
+        self.psfDeconBtmFrame = ttk.Frame(self.psfDeconParamFrame)
+        self.psfDeconBtmFrame.configure(height=200, width=200)
+        self.deconPSF_pgbar = ttk.Progressbar(self.psfDeconBtmFrame)
+        self.deconPSF_pgbar.configure(orient="horizontal")
+        self.deconPSF_pgbar.grid(column=0, padx=2, pady=2, row=0, sticky="w")
+        self.calcPSF_btn = ttk.Button(self.psfDeconBtmFrame)
+        self.calcPSF_btn.configure(text='Calculate PSF')
+        self.calcPSF_btn.grid(column=1, padx=2, pady=2, row=0)
+        self.calcPSF_btn.bind("<1>", self.CalcPSF_btn_click, add="")
+        self.psfDeconBtmFrame.pack(side="top")
+        self.psfDeconBtmFrame.columnconfigure(0, uniform=1)
+        self.psfDeconBtmFrame.columnconfigure(1, uniform=1)
         self.psfDeconRegFrame = ttk.Frame(self.psfDeconParamFrame)
         self.psfDeconRegFrame.configure(height=200, width=200)
         self.savePsf_btn = ttk.Button(self.psfDeconRegFrame)
@@ -198,13 +207,13 @@ class DeconPSFFrameNb(ttk.Frame):
     def UpdateBeadVoxelValues(self, event=None):
         pass
 
-    def CalcPSF_btn_click(self, event=None):
-        pass
-
     def UpdatePsfIterlValue(self, event=None):
         pass
 
     def UpdatePsfReglValue(self, event=None):
+        pass
+
+    def CalcPSF_btn_click(self, event=None):
         pass
 
     def SavePSF_btn_click(self, event=None):
