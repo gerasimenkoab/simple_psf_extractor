@@ -1,0 +1,444 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.3">
+  <object class="ttk.Frame" id="frame2">
+    <property name="height">600</property>
+    <property name="width">800</property>
+    <layout manager="pack">
+      <property name="expand">true</property>
+      <property name="fill">both</property>
+      <property name="padx">2</property>
+      <property name="pady">2</property>
+      <property name="side">top</property>
+    </layout>
+    <child>
+      <object class="ttk.Frame" id="imageFrame" named="True">
+        <property name="height">200</property>
+        <property name="width">200</property>
+        <layout manager="pack">
+          <property name="expand">true</property>
+          <property name="fill">both</property>
+          <property name="padx">2</property>
+          <property name="side">left</property>
+        </layout>
+        <child>
+          <object class="ttk.Frame" id="headerImageFrame" named="True">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="imageFrameLbl" named="True">
+                <property name="text" translatable="yes">Image</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Button" id="imageLoad_btn" named="True">
+                <property name="text" translatable="yes">Load Image</property>
+                <property name="width">15</property>
+                <bind sequence="&lt;1&gt;" handler="DeconLoadImage_clb" add="" />
+                <layout manager="pack">
+                  <property name="padx">2</property>
+                  <property name="pady">2</property>
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="imageInfo_lbl" named="True">
+                <property name="text" translatable="yes">No Image Loaded</property>
+                <layout manager="pack">
+                  <property name="padx">2</property>
+                  <property name="pady">2</property>
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Canvas" id="image_cnv" named="True">
+            <property name="height">300</property>
+            <property name="width">300</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="padx">2</property>
+              <property name="pady">2</property>
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Frame" id="imageOptionsFrame" named="True">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">both</property>
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="ttk.Frame" id="imageLayerSwitch" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="expand">true</property>
+                  <property name="fill">both</property>
+                  <property name="padx">2</property>
+                  <property name="pady">2</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="ttk.Label" id="imageLayer_lbl" named="True">
+                    <property name="state">normal</property>
+                    <property name="text" translatable="yes">Z Layer</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Spinbox" id="imageLayer_spinbox" named="True">
+                    <property name="justify">center</property>
+                    <property name="text" translatable="yes">0</property>
+                    <property name="width">4</property>
+                    <bind sequence="&lt;&lt;Decrement&gt;&gt;" handler="ImageLayer_spDown" add="" />
+                    <bind sequence="&lt;&lt;Increment&gt;&gt;" handler="ImageLayer_spUp" add="" />
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Separator" id="separator2">
+        <property name="orient">vertical</property>
+        <layout manager="pack">
+          <property name="expand">true</property>
+          <property name="fill">y</property>
+          <property name="side">left</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Frame" id="psfFrame" named="True">
+        <property name="height">200</property>
+        <property name="width">200</property>
+        <layout manager="pack">
+          <property name="fill">both</property>
+          <property name="padx">2</property>
+          <property name="side">left</property>
+        </layout>
+        <child>
+          <object class="ttk.Frame" id="headerPsfFrame" named="True">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="psfFrame_lbl" named="True">
+                <property name="text" translatable="yes">PSF</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Button" id="psfLoad_btn" named="True">
+                <property name="text" translatable="yes">Load PSF</property>
+                <property name="width">15</property>
+                <bind sequence="&lt;1&gt;" handler="DeconPSF_clb" add="" />
+                <layout manager="pack">
+                  <property name="padx">2</property>
+                  <property name="pady">2</property>
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="psfInfo_lbl" named="True">
+                <property name="text" translatable="yes">No PSF Loaded</property>
+                <layout manager="pack">
+                  <property name="padx">2</property>
+                  <property name="pady">2</property>
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Canvas" id="psf_cnv" named="True">
+            <property name="height">300</property>
+            <property name="width">100</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="padx">2</property>
+              <property name="pady">2</property>
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Frame" id="frame18" named="True">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">both</property>
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="ttk.Frame" id="frame19" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="expand">true</property>
+                  <property name="fill">both</property>
+                  <property name="padx">2</property>
+                  <property name="pady">2</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="ttk.Label" id="label12" named="True">
+                    <property name="state">normal</property>
+                    <layout manager="pack">
+                      <property name="expand">true</property>
+                      <property name="fill">x</property>
+                      <property name="padx">2</property>
+                      <property name="pady">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Separator" id="separator3">
+        <property name="orient">vertical</property>
+        <layout manager="pack">
+          <property name="expand">true</property>
+          <property name="fill">y</property>
+          <property name="side">left</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Frame" id="resultFrame" named="True">
+        <property name="height">200</property>
+        <property name="width">200</property>
+        <layout manager="pack">
+          <property name="expand">true</property>
+          <property name="fill">both</property>
+          <property name="padx">2</property>
+          <property name="side">left</property>
+        </layout>
+        <child>
+          <object class="ttk.Frame" id="headerResFrame" named="True">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="resFrame_lbl" named="True">
+                <property name="text" translatable="yes">Result</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="methodFrame" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="fill">x</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="ttk.Label" id="deconMethod_lbl" named="True">
+                    <property name="text" translatable="yes">Method:</property>
+                    <property name="width">9</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Combobox" id="combobox1">
+                    <property name="width">25</property>
+                    <layout manager="pack">
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Progressbar" id="decon_progbar" named="True">
+                    <property name="length">50</property>
+                    <property name="orient">horizontal</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Button" id="deconStart_btn" named="True">
+                    <property name="text" translatable="yes">Start</property>
+                    <property name="width">10</property>
+                    <bind sequence="&lt;1&gt;" handler="DeconStart_clb" add="" />
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="settingsFrame" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="fill">x</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="ttk.Label" id="deconIter_lbl" named="True">
+                    <property name="text" translatable="yes">Iteration Number:</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Entry" id="deconIter_entry" named="True">
+                    <property name="text" translatable="yes">1</property>
+                    <property name="width">5</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Label" id="deconReg_lbl" named="True">
+                    <property name="text" translatable="yes"> Regularization:</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Entry" id="entry3">
+                    <property name="text" translatable="yes">0.000001</property>
+                    <property name="width">8</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Button" id="resSave_btn" named="True">
+                    <property name="text" translatable="yes">Save Result</property>
+                    <property name="width">10</property>
+                    <bind sequence="&lt;1&gt;" handler="SaveDeconImage_clb" add="" />
+                    <layout manager="pack">
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Canvas" id="result_cnv" named="True">
+            <property name="height">300</property>
+            <property name="width">300</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="padx">2</property>
+              <property name="pady">2</property>
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Frame" id="resultOptionsFrame" named="True">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">both</property>
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="ttk.Frame" id="resLayerSwitch" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="expand">true</property>
+                  <property name="fill">both</property>
+                  <property name="padx">2</property>
+                  <property name="pady">2</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="ttk.Label" id="resLayer_lbl" named="True">
+                    <property name="state">normal</property>
+                    <property name="text" translatable="yes">Z Layer</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Spinbox" id="resLayer_spinbox" named="True">
+                    <property name="justify">center</property>
+                    <property name="text" translatable="yes">0</property>
+                    <property name="width">4</property>
+                    <bind sequence="&lt;&lt;Decrement&gt;&gt;" handler="ResLayer_spDown" add="" />
+                    <bind sequence="&lt;&lt;Increment&gt;&gt;" handler="ResLayer_spUp" add="" />
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">2</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
