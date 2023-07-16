@@ -16,7 +16,9 @@ class DeconPsfModel():
         super().__init__
         self.logger = logging.getLogger('__main__.'+__name__)
         self.logger.info("Decon PSF object created")
-        self._PSFImage = ImageRaw(None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)))
+        self._mainImage = ImageRaw( None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)) )
+        self._psfImage = ImageRaw( None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)) )
+        self._resultImage = ImageRaw( None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)) )
         self._beadDiameter = 0.2
 
     @property

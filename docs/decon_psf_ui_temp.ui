@@ -1,261 +1,111 @@
 <?xml version='1.0' encoding='utf-8'?>
 <interface version="1.3">
-  <object class="tk.Toplevel" id="DeconPsfView" named="True">
-    <property name="geometry">1024x768</property>
-    <property name="height">768</property>
-    <property name="maxsize">1920|1080</property>
-    <property name="minsize">1024|768</property>
-    <property name="padx">5</property>
-    <property name="pady">5</property>
-    <property name="resizable">both</property>
-    <property name="takefocus">true</property>
-    <property name="title" translatable="yes">Deconvolution widget</property>
-    <property name="width">1024</property>
+  <object class="ttk.Frame" id="deconPsfFrame" named="True">
+    <property name="height">200</property>
+    <property name="width">200</property>
+    <layout manager="pack">
+      <property name="expand">true</property>
+      <property name="fill">both</property>
+      <property name="side">top</property>
+    </layout>
     <child>
-      <object class="ttk.Frame" id="deconPsfFrame" named="True">
+      <object class="ttk.Frame" id="deconPSF_settings" named="True">
         <property name="height">200</property>
         <property name="width">200</property>
         <layout manager="pack">
           <property name="expand">true</property>
           <property name="fill">both</property>
-          <property name="side">top</property>
+          <property name="side">left</property>
         </layout>
         <child>
-          <object class="ttk.Frame" id="deconPSF_settings" named="True">
+          <object class="ttk.Frame" id="step1_frm" named="True">
             <property name="height">200</property>
             <property name="width">200</property>
             <layout manager="pack">
               <property name="expand">true</property>
               <property name="fill">both</property>
-              <property name="side">left</property>
+              <property name="side">top</property>
             </layout>
             <child>
-              <object class="ttk.Frame" id="step1_frm" named="True">
-                <property name="height">200</property>
-                <property name="width">200</property>
+              <object class="ttk.Label" id="step1_lbl" named="True">
+                <property name="font">TkHeadingFont</property>
+                <property name="text" translatable="yes">Load Bead Image</property>
                 <layout manager="pack">
-                  <property name="expand">true</property>
-                  <property name="fill">both</property>
+                  <property name="pady">10</property>
                   <property name="side">top</property>
                 </layout>
-                <child>
-                  <object class="ttk.Label" id="step1_lbl" named="True">
-                    <property name="font">TkCaptionFont</property>
-                    <property name="text" translatable="yes">Load Bead Image</property>
-                    <layout manager="pack">
-                      <property name="pady">10</property>
-                      <property name="side">top</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="ttk.Frame" id="step1_load_frm" named="True">
-                    <property name="height">200</property>
-                    <property name="width">200</property>
-                    <layout manager="pack">
-                      <property name="expand">true</property>
-                      <property name="fill">both</property>
-                      <property name="padx">5</property>
-                      <property name="side">top</property>
-                    </layout>
-                    <child>
-                      <object class="ttk.Button" id="loadPSF_btn" named="True">
-                        <property name="text" translatable="yes">Load Image</property>
-                        <layout manager="pack">
-                          <property name="padx">5</property>
-                          <property name="side">left</property>
-                        </layout>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="ttk.Entry" id="entry4">
-                        <property name="state">readonly</property>
-                        <property name="text" translatable="yes">No Image Loaded</property>
-                        <layout manager="pack">
-                          <property name="expand">true</property>
-                          <property name="fill">x</property>
-                          <property name="padx">5</property>
-                          <property name="pady">5</property>
-                          <property name="side">right</property>
-                        </layout>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="ttk.Separator" id="step1_sep" named="True">
-                    <property name="orient">horizontal</property>
-                    <layout manager="pack">
-                      <property name="expand">true</property>
-                      <property name="fill">x</property>
-                      <property name="padx">10</property>
-                      <property name="pady">10</property>
-                      <property name="side">top</property>
-                    </layout>
-                  </object>
-                </child>
               </object>
             </child>
             <child>
-              <object class="ttk.Frame" id="step2" named="True">
+              <object class="ttk.Frame" id="step1_load_frm" named="True">
                 <property name="height">200</property>
                 <property name="width">200</property>
                 <layout manager="pack">
                   <property name="expand">true</property>
                   <property name="fill">both</property>
                   <property name="padx">5</property>
-                  <property name="pady">5</property>
                   <property name="side">top</property>
                 </layout>
                 <child>
-                  <object class="ttk.Label" id="step2_lbl" named="True">
-                    <property name="text" translatable="yes">Bead Parameters</property>
+                  <object class="ttk.Button" id="loadPSF_btn" named="True">
+                    <property name="text" translatable="yes">Load Image</property>
+                    <bind sequence="&lt;1&gt;" handler="LoadBead_btn_click" add="" />
                     <layout manager="pack">
-                      <property name="side">top</property>
+                      <property name="padx">5</property>
+                      <property name="side">left</property>
                     </layout>
                   </object>
                 </child>
                 <child>
-                  <object class="ttk.Frame" id="frame16">
-                    <property name="height">200</property>
-                    <property name="width">200</property>
+                  <object class="ttk.Entry" id="loadPsfInfo_entry" named="True">
+                    <property name="state">readonly</property>
+                    <property name="text" translatable="yes">No Image Loaded</property>
                     <layout manager="pack">
                       <property name="expand">true</property>
-                      <property name="fill">both</property>
-                      <property name="side">top</property>
-                    </layout>
-                    <child>
-                      <object class="ttk.Frame" id="frame17">
-                        <property name="height">200</property>
-                        <property name="width">200</property>
-                        <layout manager="pack">
-                          <property name="side">top</property>
-                        </layout>
-                        <child>
-                          <object class="ttk.Label" id="beadSize_lbl" named="True">
-                            <property name="text" translatable="yes">Bead Size (nm):</property>
-                            <layout manager="pack">
-                              <property name="padx">5</property>
-                              <property name="pady">5</property>
-                              <property name="side">left</property>
-                            </layout>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="ttk.Entry" id="beadSize_entry" named="True">
-                            <property name="validate">focusout</property>
-                            <property name="width">10</property>
-                            <layout manager="pack">
-                              <property name="padx">5</property>
-                              <property name="pady">5</property>
-                              <property name="side">left</property>
-                            </layout>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="ttk.Frame" id="frame18">
-                        <property name="height">200</property>
-                        <property name="width">200</property>
-                        <layout manager="pack">
-                          <property name="side">top</property>
-                        </layout>
-                        <child>
-                          <object class="ttk.Label" id="label8">
-                            <property name="text" translatable="yes">Voxel</property>
-                            <layout manager="pack">
-                              <property name="padx">2</property>
-                              <property name="pady">2</property>
-                              <property name="side">left</property>
-                            </layout>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="ttk.Label" id="label11">
-                            <property name="text" translatable="yes">X:</property>
-                            <layout manager="pack">
-                              <property name="padx">2</property>
-                              <property name="pady">2</property>
-                              <property name="side">left</property>
-                            </layout>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="ttk.Entry" id="entry6">
-                            <property name="state">normal</property>
-                            <property name="validate">focusout</property>
-                            <property name="width">5</property>
-                            <layout manager="pack">
-                              <property name="padx">5</property>
-                              <property name="pady">5</property>
-                              <property name="side">left</property>
-                            </layout>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="ttk.Label" id="label9">
-                            <property name="text" translatable="yes">Y:</property>
-                            <layout manager="pack">
-                              <property name="padx">2</property>
-                              <property name="pady">2</property>
-                              <property name="side">left</property>
-                            </layout>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="ttk.Entry" id="entry7">
-                            <property name="state">normal</property>
-                            <property name="validate">focusout</property>
-                            <property name="width">5</property>
-                            <layout manager="pack">
-                              <property name="padx">2</property>
-                              <property name="pady">2</property>
-                              <property name="side">left</property>
-                            </layout>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="ttk.Label" id="label10">
-                            <property name="text" translatable="yes">Z:</property>
-                            <layout manager="pack">
-                              <property name="padx">2</property>
-                              <property name="pady">2</property>
-                              <property name="side">left</property>
-                            </layout>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="ttk.Entry" id="entry8">
-                            <property name="state">normal</property>
-                            <property name="validate">focusout</property>
-                            <property name="width">5</property>
-                            <layout manager="pack">
-                              <property name="padx">2</property>
-                              <property name="pady">2</property>
-                              <property name="side">left</property>
-                            </layout>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="ttk.Separator" id="separator3">
-                    <property name="orient">horizontal</property>
-                    <layout manager="pack">
                       <property name="fill">x</property>
-                      <property name="padx">10</property>
-                      <property name="pady">10</property>
-                      <property name="side">top</property>
+                      <property name="padx">5</property>
+                      <property name="pady">5</property>
+                      <property name="side">right</property>
                     </layout>
                   </object>
                 </child>
               </object>
             </child>
             <child>
-              <object class="ttk.Frame" id="step3" named="True">
+              <object class="ttk.Separator" id="step1_sep" named="True">
+                <property name="orient">horizontal</property>
+                <layout manager="pack">
+                  <property name="expand">true</property>
+                  <property name="fill">x</property>
+                  <property name="padx">10</property>
+                  <property name="pady">10</property>
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Frame" id="step2" named="True">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">both</property>
+              <property name="padx">5</property>
+              <property name="pady">5</property>
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="step2_lbl" named="True">
+                <property name="text" translatable="yes">Bead Parameters</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="beadParamFrame" named="True">
                 <property name="height">200</property>
                 <property name="width">200</property>
                 <layout manager="pack">
@@ -264,93 +114,31 @@
                   <property name="side">top</property>
                 </layout>
                 <child>
-                  <object class="ttk.Label" id="label12">
-                    <property name="text" translatable="yes">Deconvolution parameters</property>
-                    <layout manager="pack">
-                      <property name="side">top</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="ttk.Frame" id="frame24">
+                  <object class="ttk.Frame" id="psfBeadSizeFrame" named="True">
                     <property name="height">200</property>
                     <property name="width">200</property>
                     <layout manager="pack">
                       <property name="side">top</property>
                     </layout>
                     <child>
-                      <object class="ttk.Label" id="label17">
-                        <property name="text" translatable="yes">Method:</property>
+                      <object class="ttk.Label" id="beadSize_lbl" named="True">
+                        <property name="text" translatable="yes">Bead Size (nm):</property>
                         <layout manager="pack">
-                          <property name="padx">2</property>
+                          <property name="padx">5</property>
                           <property name="pady">5</property>
                           <property name="side">left</property>
                         </layout>
                       </object>
                     </child>
                     <child>
-                      <object class="ttk.Combobox" id="combobox2">
-                        <property name="textvariable">string:deconMethodMenuStrVal</property>
-                        <layout manager="pack">
-                          <property name="padx">2</property>
-                          <property name="pady">5</property>
-                          <property name="side">left</property>
-                        </layout>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="ttk.Frame" id="frame20">
-                    <property name="height">200</property>
-                    <property name="width">200</property>
-                    <layout manager="pack">
-                      <property name="side">top</property>
-                    </layout>
-                    <child>
-                      <object class="ttk.Progressbar" id="progressbar1">
-                        <property name="orient">horizontal</property>
-                        <layout manager="pack">
-                          <property name="padx">2</property>
-                          <property name="pady">5</property>
-                          <property name="side">top</property>
-                        </layout>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="ttk.Button" id="calc" named="True">
-                        <property name="text" translatable="yes">Calculate PSF</property>
-                        <layout manager="pack">
-                          <property name="padx">2</property>
-                          <property name="pady">5</property>
-                          <property name="side">top</property>
-                        </layout>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="ttk.Frame" id="frame22">
-                    <property name="height">200</property>
-                    <property name="width">200</property>
-                    <layout manager="pack">
-                      <property name="side">top</property>
-                    </layout>
-                    <child>
-                      <object class="ttk.Label" id="label14">
-                        <property name="text" translatable="yes">Iteration number:</property>
-                        <layout manager="pack">
-                          <property name="padx">2</property>
-                          <property name="pady">5</property>
-                          <property name="side">left</property>
-                        </layout>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="ttk.Entry" id="entry9">
+                      <object class="ttk.Entry" id="beadSize_entry" named="True">
+                        <property name="text" translatable="yes">0.1</property>
+                        <property name="validate">focusout</property>
                         <property name="width">10</property>
+                        <bind sequence="&lt;Enter&gt;" handler="UpdateBeadSizeValue" add="" />
+                        <bind sequence="&lt;FocusOut&gt;" handler="UpdateBeadSizeValue" add="" />
                         <layout manager="pack">
-                          <property name="padx">2</property>
+                          <property name="padx">5</property>
                           <property name="pady">5</property>
                           <property name="side">left</property>
                         </layout>
@@ -359,106 +147,323 @@
                   </object>
                 </child>
                 <child>
-                  <object class="ttk.Frame" id="frame25">
+                  <object class="ttk.Frame" id="psfVoxelSizeFrame" named="True">
                     <property name="height">200</property>
                     <property name="width">200</property>
                     <layout manager="pack">
                       <property name="side">top</property>
                     </layout>
                     <child>
-                      <object class="ttk.Label" id="label19">
-                        <property name="text" translatable="yes">Regularisation:</property>
+                      <object class="ttk.Label" id="label8">
+                        <property name="text" translatable="yes">Voxel</property>
                         <layout manager="pack">
                           <property name="padx">2</property>
+                          <property name="pady">2</property>
+                          <property name="side">left</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label11">
+                        <property name="text" translatable="yes">X:</property>
+                        <layout manager="pack">
+                          <property name="padx">2</property>
+                          <property name="pady">2</property>
+                          <property name="side">left</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="voxelX_entry" named="True">
+                        <property name="state">normal</property>
+                        <property name="text" translatable="yes">0.02</property>
+                        <property name="validate">focusout</property>
+                        <property name="width">5</property>
+                        <bind sequence="&lt;Enter&gt;" handler="UpdateBeadVoxelValues" add="" />
+                        <bind sequence="&lt;FocusOut&gt;" handler="UpdateBeadVoxelValues" add="" />
+                        <layout manager="pack">
+                          <property name="padx">5</property>
                           <property name="pady">5</property>
                           <property name="side">left</property>
                         </layout>
                       </object>
                     </child>
                     <child>
-                      <object class="ttk.Entry" id="entry12">
-                        <property name="width">10</property>
+                      <object class="ttk.Label" id="label9">
+                        <property name="text" translatable="yes">Y:</property>
                         <layout manager="pack">
                           <property name="padx">2</property>
-                          <property name="pady">5</property>
+                          <property name="pady">2</property>
+                          <property name="side">left</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="voxelY_entry" named="True">
+                        <property name="state">normal</property>
+                        <property name="text" translatable="yes">0.02</property>
+                        <property name="validate">focusout</property>
+                        <property name="width">5</property>
+                        <bind sequence="&lt;Enter&gt;" handler="UpdateBeadVoxelValues" add="" />
+                        <bind sequence="&lt;FocusOut&gt;" handler="UpdateBeadVoxelValues" add="" />
+                        <layout manager="pack">
+                          <property name="padx">2</property>
+                          <property name="pady">2</property>
+                          <property name="side">left</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label10">
+                        <property name="text" translatable="yes">Z:</property>
+                        <layout manager="pack">
+                          <property name="padx">2</property>
+                          <property name="pady">2</property>
+                          <property name="side">left</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="voxelZ_entry" named="True">
+                        <property name="state">normal</property>
+                        <property name="text" translatable="yes">0.1</property>
+                        <property name="validate">focusout</property>
+                        <property name="width">5</property>
+                        <bind sequence="&lt;Enter&gt;" handler="UpdateBeadVoxelValues" add="" />
+                        <bind sequence="&lt;FocusOut&gt;" handler="UpdateBeadVoxelValues" add="" />
+                        <layout manager="pack">
+                          <property name="padx">2</property>
+                          <property name="pady">2</property>
                           <property name="side">left</property>
                         </layout>
                       </object>
                     </child>
                   </object>
                 </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Separator" id="separator3">
+                <property name="orient">horizontal</property>
+                <layout manager="pack">
+                  <property name="fill">x</property>
+                  <property name="padx">10</property>
+                  <property name="pady">10</property>
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Frame" id="psfDeconParamFrame" named="True">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">both</property>
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="step3_lbl" named="True">
+                <property name="text" translatable="yes">Deconvolution parameters</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="methodFrame" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
                 <child>
-                  <object class="ttk.Frame" id="frame26">
-                    <property name="height">200</property>
-                    <property name="width">200</property>
+                  <object class="ttk.Label" id="label17">
+                    <property name="text" translatable="yes">Method:</property>
                     <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">5</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Combobox" id="deconType_combobox" named="True">
+                    <property name="textvariable">string:deconMethodMenuStrVal</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">5</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="psfDeconBtmFrame" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="ttk.Progressbar" id="deconPSF_pgbar" named="True">
+                    <property name="orient">horizontal</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">5</property>
                       <property name="side">top</property>
                     </layout>
-                    <child>
-                      <object class="ttk.Button" id="button6">
-                        <property name="text" translatable="yes">Save Image</property>
-                        <layout manager="pack">
-                          <property name="padx">2</property>
-                          <property name="pady">5</property>
-                          <property name="side">left</property>
-                        </layout>
-                      </object>
-                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Button" id="calcPSF_btn" named="True">
+                    <property name="text" translatable="yes">Calculate PSF</property>
+                    <bind sequence="&lt;1&gt;" handler="CalcPSF_btn_click" add="" />
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">5</property>
+                      <property name="side">top</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="psfIterNumFrame" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="ttk.Label" id="label14">
+                    <property name="text" translatable="yes">Iteration number:</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">5</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Entry" id="psfIterNum_entry" named="True">
+                    <property name="width">10</property>
+                    <bind sequence="&lt;Enter&gt;" handler="UpdatePsfIterlValue" add="" />
+                    <bind sequence="&lt;FocusOut&gt;" handler="UpdatePsfIterlValue" add="" />
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">5</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="frame25">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="ttk.Label" id="label19">
+                    <property name="text" translatable="yes">Regularisation:</property>
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">5</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Entry" id="psfReg_entry" named="True">
+                    <property name="width">10</property>
+                    <bind sequence="&lt;Enter&gt;" handler="UpdatePsfReglValue" add="" />
+                    <bind sequence="&lt;FocusOut&gt;" handler="UpdatePsfReglValue" add="" />
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">5</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="psfDeconRegFrame" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="ttk.Button" id="savePsf_btn" named="True">
+                    <property name="text" translatable="yes">Save PSF</property>
+                    <bind sequence="&lt;1&gt;" handler="SavePSF_btn_click" add="" />
+                    <layout manager="pack">
+                      <property name="padx">2</property>
+                      <property name="pady">5</property>
+                      <property name="side">left</property>
+                    </layout>
                   </object>
                 </child>
               </object>
             </child>
           </object>
         </child>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Frame" id="deconPSF_plot" named="True">
+        <property name="height">200</property>
+        <property name="width">600</property>
+        <layout manager="pack">
+          <property name="expand">true</property>
+          <property name="fill">both</property>
+          <property name="side">right</property>
+        </layout>
         <child>
-          <object class="ttk.Frame" id="deconPSF_plot" named="True">
-            <property name="height">200</property>
-            <property name="width">600</property>
+          <object class="tk.Canvas" id="canvas1">
+            <property name="background">#c0c0c0</property>
+            <property name="borderwidth">2</property>
+            <property name="width">100</property>
             <layout manager="pack">
               <property name="expand">true</property>
               <property name="fill">both</property>
-              <property name="side">right</property>
+              <property name="padx">5</property>
+              <property name="pady">20</property>
+              <property name="side">left</property>
             </layout>
-            <child>
-              <object class="tk.Canvas" id="canvas1">
-                <property name="background">#c0c0c0</property>
-                <property name="borderwidth">2</property>
-                <property name="width">200</property>
-                <layout manager="pack">
-                  <property name="expand">true</property>
-                  <property name="fill">y</property>
-                  <property name="padx">5</property>
-                  <property name="pady">20</property>
-                  <property name="side">left</property>
-                </layout>
-              </object>
-            </child>
-            <child>
-              <object class="tk.Canvas" id="canvas4">
-                <property name="background">#c0c0c0</property>
-                <property name="width">200</property>
-                <layout manager="pack">
-                  <property name="expand">true</property>
-                  <property name="fill">y</property>
-                  <property name="padx">5</property>
-                  <property name="pady">20</property>
-                  <property name="side">left</property>
-                </layout>
-              </object>
-            </child>
-            <child>
-              <object class="tk.Canvas" id="canvas6">
-                <property name="background">#c0c0c0</property>
-                <property name="width">200</property>
-                <layout manager="pack">
-                  <property name="expand">true</property>
-                  <property name="fill">y</property>
-                  <property name="padx">5</property>
-                  <property name="pady">20</property>
-                  <property name="side">left</property>
-                </layout>
-              </object>
-            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Canvas" id="canvas4">
+            <property name="background">#c0c0c0</property>
+            <property name="width">100</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">both</property>
+              <property name="padx">5</property>
+              <property name="pady">20</property>
+              <property name="side">left</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Canvas" id="canvas6">
+            <property name="background">#c0c0c0</property>
+            <property name="width">100</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">both</property>
+              <property name="padx">5</property>
+              <property name="pady">20</property>
+              <property name="side">left</property>
+            </layout>
           </object>
         </child>
       </object>

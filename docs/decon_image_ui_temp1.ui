@@ -6,19 +6,24 @@
     <layout manager="grid">
       <property name="column">0</property>
       <property name="row">0</property>
+      <property name="sticky">n</property>
     </layout>
     <containerlayout manager="grid">
+      <property name="anchor">center</property>
       <property type="col" id="0" name="pad">1</property>
+      <property type="col" id="0" name="uniform">1</property>
       <property type="col" id="0" name="weight">2</property>
       <property type="col" id="2" name="pad">1</property>
+      <property type="col" id="2" name="uniform">1</property>
       <property type="col" id="2" name="weight">1</property>
       <property type="col" id="4" name="pad">1</property>
+      <property type="col" id="4" name="uniform">1</property>
       <property type="col" id="4" name="weight">2</property>
-      <property type="row" id="0" name="weight">1</property>
+      <property type="row" id="0" name="uniform">1</property>
+      <property type="row" id="1" name="weight">1</property>
     </containerlayout>
     <child>
       <object class="ttk.Frame" id="headerImageFrame" named="True">
-        <property name="height">200</property>
         <property name="width">200</property>
         <layout manager="grid">
           <property name="column">0</property>
@@ -69,6 +74,8 @@
             <property name="insertborderwidth">0</property>
             <property name="width">350</property>
             <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">both</property>
               <property name="padx">2</property>
               <property name="pady">2</property>
             </layout>
@@ -129,13 +136,12 @@
           <property name="ipady">200</property>
           <property name="padx">1</property>
           <property name="row">0</property>
-          <property name="rowspan">4</property>
+          <property name="rowspan">2</property>
         </layout>
       </object>
     </child>
     <child>
       <object class="ttk.Frame" id="headerPsfFrame" named="True">
-        <property name="height">200</property>
         <property name="width">200</property>
         <layout manager="grid">
           <property name="column">2</property>
@@ -180,7 +186,6 @@
         <layout manager="grid">
           <property name="column">2</property>
           <property name="row">1</property>
-          <property name="sticky">n</property>
         </layout>
         <child>
           <object class="tk.Canvas" id="psf_cnv" named="True">
@@ -190,6 +195,8 @@
             <property name="insertborderwidth">0</property>
             <property name="width">100</property>
             <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">both</property>
               <property name="padx">2</property>
               <property name="pady">2</property>
               <property name="side">top</property>
@@ -247,7 +254,6 @@
     </child>
     <child>
       <object class="ttk.Frame" id="headerResFrame" named="True">
-        <property name="height">200</property>
         <property name="width">200</property>
         <layout manager="grid">
           <property name="column">4</property>
@@ -266,6 +272,7 @@
             <property name="height">200</property>
             <property name="width">200</property>
             <layout manager="pack">
+              <property name="expand">true</property>
               <property name="fill">x</property>
               <property name="side">top</property>
             </layout>
@@ -317,6 +324,7 @@
             <property name="height">200</property>
             <property name="width">200</property>
             <layout manager="pack">
+              <property name="expand">true</property>
               <property name="fill">x</property>
               <property name="side">top</property>
             </layout>
@@ -364,6 +372,7 @@
                 <property name="width">10</property>
                 <bind sequence="&lt;1&gt;" handler="SaveDeconImage_clb" add="" />
                 <layout manager="pack">
+                  <property name="expand">true</property>
                   <property name="padx">2</property>
                   <property name="pady">2</property>
                   <property name="side">left</property>

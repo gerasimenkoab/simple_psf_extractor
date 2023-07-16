@@ -3,11 +3,11 @@ import tkinter as tk
 import tkinter.ttk as ttk
 
 
-class deconImageFrameNb(ttk.Frame):
+class DeconImageFrameNb(ttk.Frame):
     def __init__(self, master=None, **kw):
-        super(deconImageFrameNb, self).__init__(master, **kw)
+        super(DeconImageFrameNb, self).__init__(master, **kw)
         self.headerImageFrame = ttk.Frame(self)
-        self.headerImageFrame.configure(height=200, width=200)
+        self.headerImageFrame.configure(width=200)
         self.imageFrameLbl = ttk.Label(self.headerImageFrame)
         self.imageFrameLbl.configure(text='Image')
         self.imageFrameLbl.pack(side="top")
@@ -28,7 +28,7 @@ class deconImageFrameNb(ttk.Frame):
             insertbackground="#c0c0c0",
             insertborderwidth=0,
             width=350)
-        self.image_cnv.pack(padx=2, pady=2)
+        self.image_cnv.pack(expand=True, fill="both", padx=2, pady=2)
         self.imageOptionsFrame = ttk.Frame(self.imageFrame)
         self.imageOptionsFrame.configure(height=200, width=200)
         self.imageLayerSwitch = ttk.Frame(self.imageOptionsFrame)
@@ -56,9 +56,9 @@ class deconImageFrameNb(ttk.Frame):
         self.imageFrame.grid()
         separator2 = ttk.Separator(self)
         separator2.configure(orient="vertical")
-        separator2.grid(column=1, ipady=200, padx=1, row=0, rowspan=4)
+        separator2.grid(column=1, ipady=200, padx=1, row=0, rowspan=2)
         self.headerPsfFrame = ttk.Frame(self)
-        self.headerPsfFrame.configure(height=200, width=200)
+        self.headerPsfFrame.configure(width=200)
         self.psfFrame_lbl = ttk.Label(self.headerPsfFrame)
         self.psfFrame_lbl.configure(text='PSF')
         self.psfFrame_lbl.pack(side="top")
@@ -79,7 +79,7 @@ class deconImageFrameNb(ttk.Frame):
             insertbackground="#c0c0c0",
             insertborderwidth=0,
             width=100)
-        self.psf_cnv.pack(padx=2, pady=2, side="top")
+        self.psf_cnv.pack(expand=True, fill="both", padx=2, pady=2, side="top")
         self.frame18 = ttk.Frame(self.psfFrame)
         self.frame18.configure(height=200, width=200)
         self.frame19 = ttk.Frame(self.frame18)
@@ -89,12 +89,12 @@ class deconImageFrameNb(ttk.Frame):
         self.label12.pack(expand=True, fill="x", padx=2, pady=2, side="left")
         self.frame19.pack(expand=True, fill="both", padx=2, pady=2, side="top")
         self.frame18.pack(pady=1, side="top")
-        self.psfFrame.grid(column=2, row=1, sticky="n")
+        self.psfFrame.grid(column=2, row=1)
         separator3 = ttk.Separator(self)
         separator3.configure(orient="vertical")
         separator3.grid(column=3, ipady=200, padx=1, row=0, rowspan=2)
         self.headerResFrame = ttk.Frame(self)
-        self.headerResFrame.configure(height=200, width=200)
+        self.headerResFrame.configure(width=200)
         self.resFrame_lbl = ttk.Label(self.headerResFrame)
         self.resFrame_lbl.configure(text='Result')
         self.resFrame_lbl.pack(side="top")
@@ -113,7 +113,7 @@ class deconImageFrameNb(ttk.Frame):
         self.deconStart_btn.configure(text='Start', width=10)
         self.deconStart_btn.pack(padx=2, pady=2, side="left")
         self.deconStart_btn.bind("<1>", self.DeconStart_clb, add="")
-        self.methodFrame.pack(fill="x", side="top")
+        self.methodFrame.pack(expand=True, fill="x", side="top")
         self.settingsFrame = ttk.Frame(self.headerResFrame)
         self.settingsFrame.configure(height=200, width=200)
         self.deconIter_lbl = ttk.Label(self.settingsFrame)
@@ -136,9 +136,9 @@ class deconImageFrameNb(ttk.Frame):
         entry3.pack(padx=2, side="left")
         self.resSave_btn = ttk.Button(self.settingsFrame)
         self.resSave_btn.configure(text='Save Result', width=10)
-        self.resSave_btn.pack(padx=2, pady=2, side="left")
+        self.resSave_btn.pack(expand=True, padx=2, pady=2, side="left")
         self.resSave_btn.bind("<1>", self.SaveDeconImage_clb, add="")
-        self.settingsFrame.pack(fill="x", side="top")
+        self.settingsFrame.pack(expand=True, fill="x", side="top")
         self.headerResFrame.grid(column=4, row=0)
         self.resultFrame = ttk.Frame(self)
         self.resultFrame.configure(height=200, width=200)
@@ -180,11 +180,13 @@ class deconImageFrameNb(ttk.Frame):
         self.resultOptionsFrame.pack(side="top")
         self.resultFrame.grid(column=4, row=1)
         self.configure(height=600, width=800)
-        self.grid(column=0, row=0)
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, pad=1, weight=2)
-        self.columnconfigure(2, pad=1, weight=1)
-        self.columnconfigure(4, pad=1, weight=2)
+        self.grid(column=0, row=0, sticky="n")
+        self.grid_anchor("center")
+        self.rowconfigure(0, uniform=1)
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(0, pad=1, uniform=1, weight=2)
+        self.columnconfigure(2, pad=1, uniform=1, weight=1)
+        self.columnconfigure(4, pad=1, uniform=1, weight=2)
 
     def DeconLoadImage_clb(self, event=None):
         pass
@@ -213,7 +215,7 @@ class deconImageFrameNb(ttk.Frame):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    widget = deconImageFrameNb(root)
+    widget = DeconImageFrameNb(root)
     widget.pack(expand=True, fill="both")
     root.mainloop()
 

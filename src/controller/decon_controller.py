@@ -1,7 +1,7 @@
 from model.decon_psf_model import DeconPsfModel
-from view.decon_view_psf import DeconPsfView
+from view.decon_view import DeconView
 import logging
-class DeconPsfController():
+class DeconController():
     def __init__(self,master) -> None:
         super().__init__()
         #setup logger
@@ -11,7 +11,7 @@ class DeconPsfController():
         self._master = master
 
         self.model = DeconPsfModel()
-        self.view = DeconPsfView( self._master )
+        self.view = DeconView( self._master )
         self._beadPrevNum = 0
 
         self.view.SetVoxelValues(self.model.mainImage.voxel)
@@ -26,4 +26,5 @@ class DeconPsfController():
 
  
     def _bind(self):
+
         pass

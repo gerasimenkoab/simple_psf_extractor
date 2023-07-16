@@ -4,8 +4,8 @@ from tkinter import ttk
 from tkinter.messagebox import showerror
 from PIL import ImageTk, Image, ImageEnhance
 #from .AuxTkPlot_class import AuxCanvasPlot
-from decon_view_psf import deconPSFFrameNb
-from decon_view_image import deconImageFrameNb
+from decon_view_psf import DeconPSFFrameNb
+from decon_view_image import DeconImageFrameNb
 
 
 """   TODO:
@@ -27,19 +27,19 @@ class DeconView:
             pady=5,
             takefocus=True,
             width=1024)
-        self.deconPsfToplevel.geometry("1024x768")
+        self.deconPsfToplevel.geometry("950x600")
         self.deconPsfToplevel.maxsize(1920, 1080)
-        self.deconPsfToplevel.minsize(1024, 768)
+        self.deconPsfToplevel.minsize(950, 600)
         self.deconPsfToplevel.resizable(True, True)
         self.deconPsfToplevel.title("Deconvolution widget")
 
         self.deconNotebook = ttk.Notebook(self.deconPsfToplevel)
-        self.deconNotebook.configure(height=200, width=200)
+        self.deconNotebook.configure(height=600, width=900)
         self.deconNotebook.pack(expand=True, fill="both", side="top")
 
-        self.deconPsfFrame = deconPSFFrameNb(self.deconNotebook)
+        self.deconPsfFrame = DeconPSFFrameNb(self.deconNotebook)
         self.deconNotebook.add(self.deconPsfFrame, text = "PSF deconvolution")
-        self.deconImageFrame = deconImageFrameNb(self.deconNotebook)
+        self.deconImageFrame = DeconImageFrameNb(self.deconNotebook)
         self.deconNotebook.add(self.deconImageFrame, text = "Image deconvolution")
 
         self.logOutputLabel = ttk.Label(self.deconPsfToplevel)

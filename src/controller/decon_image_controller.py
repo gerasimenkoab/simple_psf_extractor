@@ -27,4 +27,5 @@ class DeconImageController():
 
  
     def _bind(self):
+        
         pass
