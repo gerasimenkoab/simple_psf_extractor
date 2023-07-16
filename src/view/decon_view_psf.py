@@ -213,7 +213,7 @@ class DeconPSFFrameNb(ttk.Frame):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    widget = deconPSFFrameNb(root)
+    widget = DeconPSFFrameNb(root)
     widget.pack(expand=True, fill="both")
     root.mainloop()
 
