@@ -3,11 +3,11 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.ticker as plticker
 import matplotlib.cm as cm
-from tkinter import Canvas
+from tkinter import Canvas, Widget
 import itertools
 
 
-def FigureCanvasTkFrom3DArray(arr3D: np.ndarray, cnv:Canvas, plotName="Plot"):
+def FigureCanvasTkFrom3DArray(arr3D: np.ndarray, cnv:Widget, plotName="Plot"):
     """Function create FigureCanvasTk  object of figure with 3 slices of 3D array.
     this object can be used to get widget for Tkinter object.get_tk_widget()
     Input: arr3d - 3d ndarray

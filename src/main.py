@@ -1,10 +1,10 @@
 import tkinter as tk
 import DeconvolutionGUI_class as DeGUI_cls
 from controller.extractor_controller import ExtractorController
+from controller.decon_controller import DeconController
 import logging
 import logging.config
 import os
-#from logging.handlers import RotatingFileHandler
 
 
 class main_window_gui(tk.Tk):
@@ -31,16 +31,11 @@ class main_window_gui(tk.Tk):
         """Loadding Extractor widget window"""
         ExtractorController(self)
 
-    # def OpenBeadExtractor_old(self):
-    #     """Loadding Extractor widget window"""
-    #     child1 = BEGUI_cls.BeadExtractionGUI(self)
-    #     child1.grab_set()
-    #     pass
-
     def OpenDeconvolution(self):
         """Loadding Deconvolution widget window"""
-        child2 = DeGUI_cls.DeconvolutionGUI(self)
-        child2.grab_set()
+        DeconController(self)
+        # child2 = DeGUI_cls.DeconvolutionGUI(self)
+        # child2.grab_set()
         pass
 
     def OpenNNDeconvolution(self):

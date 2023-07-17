@@ -3,14 +3,14 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showerror
 from PIL import ImageTk, Image, ImageEnhance
-#from .AuxTkPlot_class import AuxCanvasPlot
-from decon_view_psf import DeconPSFFrameNb
-from decon_view_image import DeconImageFrameNb
+from .AuxTkPlot_class import AuxCanvasPlot
+from view.decon_view_psf import DeconPSFFrameNb
+from view.decon_view_image import DeconImageFrameNb
 
 
 """   TODO:
         - fix  AuxTkPlot_class  for all modules
-       - add  bead size to tiff tag
+        - add  bead size to tiff tag
 """
 
 
@@ -34,13 +34,13 @@ class DeconView:
         self.deconPsfToplevel.title("Deconvolution widget")
 
         self.deconNotebook = ttk.Notebook(self.deconPsfToplevel)
-        self.deconNotebook.configure(height=600, width=900)
+        self.deconNotebook.configure(height=700, width=900)
         self.deconNotebook.pack(expand=True, fill="both", side="top")
 
-        self.deconPsfFrame = DeconPSFFrameNb(self.deconNotebook)
-        self.deconNotebook.add(self.deconPsfFrame, text = "PSF deconvolution")
-        self.deconImageFrame = DeconImageFrameNb(self.deconNotebook)
-        self.deconNotebook.add(self.deconImageFrame, text = "Image deconvolution")
+        self.deconPsfView = DeconPSFFrameNb(self.deconNotebook)
+        self.deconNotebook.add(self.deconPsfView, text = "PSF deconvolution")
+        self.deconImageView = DeconImageFrameNb(self.deconNotebook)
+        self.deconNotebook.add(self.deconImageView, text = "Image deconvolution")
 
         self.logOutputLabel = ttk.Label(self.deconPsfToplevel)
         self.logOutStringVar = tk.StringVar(value='Log Output')
@@ -49,11 +49,49 @@ class DeconView:
             text='Log Output',
             textvariable=self.logOutStringVar)
         self.logOutputLabel.pack(fill="x", side="bottom")
-        self.logOutputLabel.bind("<1>", self.callback, add="")
 
         # Main widget
         self.mainwindow = self.deconPsfToplevel
+    def SetVoxelValues(self, voxelInDict):
+        """Bead voxel size change"""
+        if voxelInDict is None:
+            raise ValueError("No voxel values recived", "voxel_is_none")
+        for axisName in ["X","Y","Z"]:
+            self.deconPsfView.voxel_entry[axisName].delete(0, END)
+            self.deconPsfView.voxel_entry[axisName].insert(0, voxelInDict[axisName])
 
+    def SetBeadSize(self, valueIn):
+        """Bead diameter size change"""
+        try:
+            beadDiameter = abs(float(valueIn))
+            self.deconPsfView.beadSize_entry.delete(0, END)
+            self.deconPsfView.beadSize_entry.insert(0, str(beadDiameter))
+        except:
+            showerror("Bead Size: ", "Bad input")
+            self.deconPsfView.beadSize_entry.delete(0, END)
+            self.deconPsfView.beadSize_entry.insert(0, str(beadDiameter))
+            return
+    def SetFileInfoDeconPSF(self, infoStr:str):
+        self.deconPsfView.loadPsfInfo_entry.configure( state="normal" )
+        self.deconPsfView.loadPsfInfo_entry.delete(0,END)
+        self.deconPsfView.loadPsfInfo_entry.insert( 0, infoStr )
+        self.deconPsfView.loadPsfInfo_entry.configure( state="readonly" )
+
+    def SetBeadImage(self,arrayIn):
+        cnv = self.deconPsfView.canvasBead
+        if cnv: 
+            cnv.pack_forget() # remove old canvas
+        cnvTmp = AuxCanvasPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconPsfView.deconPSF_plot, plotName="Bead")
+        cnvTmp.get_tk_widget().grid(column=0, padx=2, pady=2, row=1)
+        pass
+
+    def SetPSFImage(self,arrayIn):
+        cnv = self.deconPsfView.canvasPSF
+        if cnv: 
+            cnv.pack_forget() # remove old canvas
+        cnvTmp = AuxCanvasPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconPsfView.deconPSF_plot, plotName="Bead")
+        cnvTmp.get_tk_widget().grid(column=1, padx=2, pady=2, row=1)
+        pass
     def run(self):
         self.mainwindow.mainloop()
 

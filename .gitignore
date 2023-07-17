@@ -5,3 +5,7 @@ venv-spsf/
 src/view/__pycache__/
 src/controller/__pycache__/
 src/model/__pycache__/
+docs/class_diag.odg
+docs/decon_image_ui_temp.ui
+docs/decon_image_ui_temp1.ui
+docs/decon_psf_ui_temp.ui

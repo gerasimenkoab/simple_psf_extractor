@@ -302,49 +302,29 @@
               </object>
             </child>
             <child>
-              <object class="ttk.Frame" id="psfDeconBtmFrame" named="True">
-                <property name="height">200</property>
-                <property name="width">200</property>
-                <layout manager="pack">
-                  <property name="side">top</property>
-                </layout>
-                <child>
-                  <object class="ttk.Progressbar" id="deconPSF_pgbar" named="True">
-                    <property name="orient">horizontal</property>
-                    <layout manager="pack">
-                      <property name="padx">2</property>
-                      <property name="pady">5</property>
-                      <property name="side">top</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="ttk.Button" id="calcPSF_btn" named="True">
-                    <property name="text" translatable="yes">Calculate PSF</property>
-                    <bind sequence="&lt;1&gt;" handler="CalcPSF_btn_click" add="" />
-                    <layout manager="pack">
-                      <property name="padx">2</property>
-                      <property name="pady">5</property>
-                      <property name="side">top</property>
-                    </layout>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
               <object class="ttk.Frame" id="psfIterNumFrame" named="True">
                 <property name="height">200</property>
                 <property name="width">200</property>
                 <layout manager="pack">
                   <property name="side">top</property>
                 </layout>
+                <containerlayout manager="grid">
+                  <property name="anchor">center</property>
+                  <property type="col" id="0" name="uniform">1</property>
+                  <property type="col" id="0" name="weight">1</property>
+                  <property type="col" id="1" name="uniform">1</property>
+                  <property type="col" id="1" name="weight">1</property>
+                  <property type="row" id="0" name="uniform">0</property>
+                </containerlayout>
                 <child>
                   <object class="ttk.Label" id="label14">
                     <property name="text" translatable="yes">Iteration number:</property>
-                    <layout manager="pack">
+                    <layout manager="grid">
+                      <property name="column">0</property>
                       <property name="padx">2</property>
-                      <property name="pady">5</property>
-                      <property name="side">left</property>
+                      <property name="pady">2</property>
+                      <property name="row">0</property>
+                      <property name="sticky">e</property>
                     </layout>
                   </object>
                 </child>
@@ -353,10 +333,12 @@
                     <property name="width">10</property>
                     <bind sequence="&lt;Enter&gt;" handler="UpdatePsfIterlValue" add="" />
                     <bind sequence="&lt;FocusOut&gt;" handler="UpdatePsfIterlValue" add="" />
-                    <layout manager="pack">
+                    <layout manager="grid">
+                      <property name="column">1</property>
                       <property name="padx">2</property>
-                      <property name="pady">5</property>
-                      <property name="side">left</property>
+                      <property name="pady">2</property>
+                      <property name="row">0</property>
+                      <property name="sticky">w</property>
                     </layout>
                   </object>
                 </child>
@@ -367,15 +349,23 @@
                 <property name="height">200</property>
                 <property name="width">200</property>
                 <layout manager="pack">
+                  <property name="pady">2</property>
                   <property name="side">top</property>
                 </layout>
+                <containerlayout manager="grid">
+                  <property type="col" id="0" name="uniform">1</property>
+                  <property type="col" id="1" name="uniform">1</property>
+                  <property type="row" id="0" name="uniform">0</property>
+                </containerlayout>
                 <child>
                   <object class="ttk.Label" id="label19">
-                    <property name="text" translatable="yes">Regularisation:</property>
-                    <layout manager="pack">
+                    <property name="text" translatable="yes">Regularization:</property>
+                    <layout manager="grid">
+                      <property name="column">0</property>
                       <property name="padx">2</property>
-                      <property name="pady">5</property>
-                      <property name="side">left</property>
+                      <property name="pady">2</property>
+                      <property name="row">0</property>
+                      <property name="sticky">e</property>
                     </layout>
                   </object>
                 </child>
@@ -384,10 +374,49 @@
                     <property name="width">10</property>
                     <bind sequence="&lt;Enter&gt;" handler="UpdatePsfReglValue" add="" />
                     <bind sequence="&lt;FocusOut&gt;" handler="UpdatePsfReglValue" add="" />
-                    <layout manager="pack">
+                    <layout manager="grid">
+                      <property name="column">1</property>
                       <property name="padx">2</property>
-                      <property name="pady">5</property>
-                      <property name="side">left</property>
+                      <property name="pady">2</property>
+                      <property name="row">0</property>
+                      <property name="sticky">w</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="psfDeconBtmFrame" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+                <containerlayout manager="grid">
+                  <property type="col" id="0" name="uniform">1</property>
+                  <property type="col" id="1" name="uniform">1</property>
+                </containerlayout>
+                <child>
+                  <object class="ttk.Progressbar" id="deconPSF_pgbar" named="True">
+                    <property name="orient">horizontal</property>
+                    <layout manager="grid">
+                      <property name="column">0</property>
+                      <property name="padx">2</property>
+                      <property name="pady">2</property>
+                      <property name="row">0</property>
+                      <property name="sticky">w</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Button" id="calcPSF_btn" named="True">
+                    <property name="text" translatable="yes">Calculate PSF</property>
+                    <bind sequence="&lt;1&gt;" handler="CalcPSF_btn_click" add="" />
+                    <layout manager="grid">
+                      <property name="column">1</property>
+                      <property name="padx">2</property>
+                      <property name="pady">2</property>
+                      <property name="row">0</property>
                     </layout>
                   </object>
                 </child>

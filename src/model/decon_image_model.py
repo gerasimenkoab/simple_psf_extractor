@@ -13,4 +13,8 @@ class DeconImageModel():
         self.logger.info("Decon Image object created")
 
         self._deconImage = ImageRaw(None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)))
-        self._PSFImage = ImageRaw(None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)))
+        self._deconPsf = ImageRaw(None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)))
+        self._deconResult = ImageRaw( None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)) )
+
+    
+
