@@ -16,5 +16,17 @@ class DeconImageModel():
         self._deconPsf = ImageRaw(None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)))
         self._deconResult = ImageRaw( None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)) )
 
-    
+    @property
+    def deconImage(self):
+        return self._deconImage
+
+    def SetDeconImage(self, fname=None, voxel=None, array=None):
+        self._deconImage = ImageRaw(fname, voxel, array)
+
+    @property
+    def deconPsf(self):
+        return self._deconPsf
+
+    def SetDeconPsf(self, fname=None, voxel=None, array=None):
+        self._deconPsf = ImageRaw(fname, voxel, array)
 

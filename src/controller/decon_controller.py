@@ -4,13 +4,12 @@ from model.decon_image_model import DeconImageModel
 from view.decon_view import DeconView
 import logging
 
-
+# TODO: log string output
 class DeconController:
     def __init__(self, master) -> None:
         super().__init__()
         # setup logger
         self.logger = logging.getLogger("__main__." + __name__)
-        self.logger.info("Initializing PSF deconvolution module.")
 
         self._master = master
 
@@ -23,12 +22,12 @@ class DeconController:
         # binding buttons and entries events
         self._bindDeconPSF()
         self._bindDeconImage()
+        self.logger.debug("PSF and Image deconvolution controller initialized")
 
     def _bindDeconPSF(self):
         """
         Binding events for PSF deconvolution 
         """
-
         self.viewDecon.deconPsfView.loadPSF_btn.bind("<1>", self.LoadBead_btn_click, add="")
         self.viewDecon.deconPsfView.beadSize_entry.bind("<Enter>", self.UpdateBeadSizeValue, add="")
         self.viewDecon.deconPsfView.beadSize_entry.bind("<FocusOut>", self.UpdateBeadSizeValue, add="")
@@ -54,20 +53,21 @@ class DeconController:
         self.viewDecon.deconImageView.resLayer_spinbox.bind("<<Increment>>", self.ResLayer_spUp, add="")
 
     # Decon PSF Callbacks
-    def LoadBead_btn_click(self, event=None):
+    def LoadBead_btn_click(self,event):
         """Loading bead photo from file"""
-        fNames = askopenfilenames(title="Load Bead Photo")
-        if fNames is None:
-            raise ValueError("No file name recieved", "filename_empty")
+        eventWgt = event.widget
+        # fNames = askopenfilenames(parent = eventWgt, title="Load Bead Photo")
+        try:
+            fNames = self.viewDecon.GetFileNamesList(eventWgt,"Load Bead Photo")
+        except:
+            return
         try:
             self.modelDeconPSF.SetPSFImage(fNames)
         except ValueError as vE:
             if vE.args[1] == "voxel_problem":
                 try:
-                    tmpList = self.GetVoxelDialog(
-                        "Enter voxel size as z,x,y in \u03BCm"
-                    )
-                    self.modelDeconPSF.SetPSFImage(fNames, tmpList)
+                    voxText = "Enter voxel size as z,x,y in \u03BCm"
+                    self.modelDeconPSF.SetPSFImage(fNames, self.viewDecon.GetVoxelDialog(eventWgt, voxText) )
                 except ValueError as vE1:
                     raise ValueError(vE1.args[0], vE1.args[1])
             elif vE.args[1] == "data_problem":
@@ -77,7 +77,7 @@ class DeconController:
         # self.modelDeconPSF.PSFImage.ShowClassInfo()
         self.viewDecon.SetFileInfoDeconPSF(self.modelDeconPSF.PSFImage.GetImageInfoStr(output = "full") )
         self.viewDecon.SetBeadImage(self.modelDeconPSF.PSFImage.imArray)
-        self.logger.info("Bead Photo Loaded from " + fNames[0])
+        self.logger.info("Bead File Loaded: " + fNames[0])
         
     def UpdateBeadSizeValue(self, event=None):
         pass
@@ -99,7 +99,28 @@ class DeconController:
 
     # Decon Image Callbacks
     def DeconLoadImage_clb(self, event=None):
-        pass
+        """Loading image for deconvolution from file"""
+        eventWgt = event.widget
+        try:
+            fNames = self.viewDecon.GetFileNamesList(eventWgt,"Load Image")
+        except:
+            return
+        try:
+            self.modelDeconImage.SetDeconImage(fNames)
+        except ValueError as vE:
+            if vE.args[1] == "voxel_problem":
+                try:
+                    voxText = "Enter voxel size as z,x,y in \u03BCm"
+                    self.modelDeconImage.SetDeconImage(fNames, self.viewDecon.GetVoxelDialog(eventWgt, voxText) )
+                except ValueError as vE1:
+                    raise ValueError(vE1.args[0], vE1.args[1])
+            elif vE.args[1] == "data_problem":
+                raise ValueError(vE.args[0], vE.args[1])
+            else:
+                raise ValueError(vE.args[0], vE.args[1])
+        self.viewDecon.SetFileInfoImageDeconImage(self.modelDeconImage.deconImage.GetImageInfoStr(output = "full") )
+        self.viewDecon.SetBeadImage(self.modelDeconImage.deconImage.imArray)
+        self.logger.info("Bead File Loaded: " + fNames[0])
 
     def ImageLayer_spDown(self, event=None):
         pass
@@ -108,6 +129,28 @@ class DeconController:
         pass
 
     def DeconPSFLoad_clb(self, event=None):
+        """Loading PSF for deconvolution from file"""
+        eventWgt = event.widget
+        try:
+            fNames = self.viewDecon.GetFileNamesList(eventWgt,"Load PSF")
+        except:
+            return
+        try:
+            self.modelDeconImage.SetDeconPsf(fNames)
+        except ValueError as vE:
+            if vE.args[1] == "voxel_problem":
+                try:
+                    voxText = "Enter voxel size as z,x,y in \u03BCm"
+                    self.modelDeconImage.SetDeconPsf(fNames, self.viewDecon.GetVoxelDialog(eventWgt, voxText) )
+                except ValueError as vE1:
+                    raise ValueError(vE1.args[0], vE1.args[1])
+            elif vE.args[1] == "data_problem":
+                raise ValueError(vE.args[0], vE.args[1])
+            else:
+                raise ValueError(vE.args[0], vE.args[1])
+        self.viewDecon.SetFileInfoPsfDeconImage(self.modelDeconImage.deconPsf.GetImageInfoStr(output = "full") )
+        self.viewDecon.DrawDeconPsf(self.modelDeconImage.deconPsf.imArray)
+        self.logger.info("Bead File Loaded: " + fNames[0]) 
         pass
 
     def DeconStart_clb(self, event=None):
