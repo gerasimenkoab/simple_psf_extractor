@@ -7,6 +7,9 @@ from tkinter import Canvas
 import itertools
 
 class AuxCanvasPlot():
+    def FigureCanvasTkFrom2DArray(arr2D: np.ndarray, cnv:Canvas, plotName="Plot"):
+        pass
+
     def FigureCanvasTkFrom3DArray(arr3D: np.ndarray, cnv:Canvas, plotName="Plot"):
         """Function create FigureCanvasTk  object of figure with 3 slices of 3D array.
         this object can be used to get widget for Tkinter object.get_tk_widget()
