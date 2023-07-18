@@ -45,13 +45,13 @@ class DeconController:
         """
         self.viewDecon.deconImageView.imageLoad_btn.bind("<1>", self.DeconLoadImage_clb, add="")
         self.viewDecon.deconImageView.psfLoad_btn.bind("<1>", self.DeconPSFLoad_clb, add="")
-        self.viewDecon.deconImageView.imageLayer_spinbox.bind("<<Decrement>>", self.ImageLayer_spDown, add="")
-        self.viewDecon.deconImageView.imageLayer_spinbox.bind("<<Increment>>", self.ImageLayer_spUp, add="")
+        self.viewDecon.deconImageView.imageLayer_spinbox.bind("<<Decrement>>", self.ImageLayerChange_clb, add="")
+        self.viewDecon.deconImageView.imageLayer_spinbox.bind("<<Increment>>", self.ImageLayerChange_clb, add="")
         self.viewDecon.deconImageView.imageLayer_spinbox.bind("<Return>", self.ImageLayerChange_clb, add="")
         self.viewDecon.deconImageView.deconStart_btn.bind("<1>", self.DeconStart_clb, add="")
         self.viewDecon.deconImageView.resSave_btn.bind("<1>", self.SaveDeconImage_clb, add="")
-        self.viewDecon.deconImageView.resLayer_spinbox.bind("<<Decrement>>", self.ResLayer_spDown, add="")
-        self.viewDecon.deconImageView.resLayer_spinbox.bind("<<Increment>>", self.ResLayer_spUp, add="")
+        self.viewDecon.deconImageView.resLayer_spinbox.bind("<<Decrement>>", self.ResLayerChange_clb, add="")
+        self.viewDecon.deconImageView.resLayer_spinbox.bind("<<Increment>>", self.ResLayerChange_clb, add="")
         self.viewDecon.deconImageView.imageLayer_spinbox.bind("<Return>", self.ResLayerChange_clb, add="")
 
     # Decon PSF Callbacks
@@ -128,31 +128,7 @@ class DeconController:
 
         self.logger.info("Bead File Loaded: " + fNames[0])
 
-    def ImageLayerChange_clb(self,event = None):
-        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
-        try:
-            spValue = int(wgt.get())
-            arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
-        except:
-            wgt.set("0")
-            return
-        self.viewDecon.DrawDeconImage(arr)       
 
-    
-    def ImageLayer_spDown(self, event=None):
-        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
-        spValue = int(wgt.get())
-        arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
-        self.viewDecon.DrawDeconImage(arr)
-        self.logger.info(" - spinner clicked: " + str(spValue))
-        pass
-
-    def ImageLayer_spUp(self, event=None):
-        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
-        spValue = int(wgt.get())
-        arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
-        self.viewDecon.DrawDeconImage(arr)
-        pass
 
     def DeconPSFLoad_clb(self, event=None):
         """Loading PSF for deconvolution from file"""
@@ -181,7 +157,7 @@ class DeconController:
 
 
     def ImageLayerChange_clb(self,event = None):
-        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
+        wgt = event.widget
         try:
             spValue = int(wgt.get())
             arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
@@ -190,35 +166,8 @@ class DeconController:
             return
         self.viewDecon.DrawDeconImage(arr)       
 
-    
-    def ImageLayer_spDown(self, event=None):
-        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
-        spValue = int(wgt.get())
-        arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
-        self.viewDecon.DrawDeconImage(arr)
-        pass
-
-    def ImageLayer_spUp(self, event=None):
-        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
-        spValue = int(wgt.get())
-        arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
-        self.viewDecon.DrawDeconImage(arr)
-
-
-    def ResLayer_spDown(self, event=None):
-        wgt = self.viewDecon.deconImageView.resLayer_spinbox
-        spValue = int(wgt.get())
-        arr = self.modelDeconImage.deconResult.imArray[spValue,:,:]
-        self.viewDecon.DrawResultImage(arr)
-
-    def ResLayer_spUp(self, event=None):
-        wgt = self.viewDecon.deconImageView.resLayer_spinbox
-        spValue = int(wgt.get())
-        arr = self.modelDeconImage.deconResult.imArray[spValue,:,:]
-        self.viewDecon.DrawResultImage(arr)
-
     def ResLayerChange_clb(self,event = None):
-        wgt = self.viewDecon.deconImageView.resLayer_spinbox
+        wgt = event.widget
         try:
             spValue = int(wgt.get())
             arr = self.modelDeconImage.deconResult.imArray[spValue,:,:]
@@ -229,7 +178,7 @@ class DeconController:
 
     def DeconStart_clb(self, event=None):
         pass
-    
+
     def SaveDeconImage_clb(self, event=None):
         pass
 
