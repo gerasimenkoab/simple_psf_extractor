@@ -7,8 +7,26 @@ from tkinter import Canvas
 import itertools
 
 class AuxCanvasPlot():
-    def FigureCanvasTkFrom2DArray(arr2D: np.ndarray, cnv:Canvas, plotName="Plot"):
-        pass
+    """Class for creation image for tkinter with matplotlib"""
+    def FigureCanvasTkFrom2DArray(arr2D: np.ndarray, cnv:Canvas, plotName=""):
+        """Function create FigureCanvasTk widget  object of 2D array.
+        this object can be used to get widget for Tkinter object.get_tk_widget()
+        Input: arr2d - 2d ndarray
+                cnv - canvas
+                plotName - plot header name. if plotName= " " then no plotName.
+        Returns:
+                FigureCanvasTk widget  object
+                hint: use .pack/grid() after to plot
+        """
+        if arr2D.ndim != 2:
+            raise ValueError("Not a 2D array recieved.", "wrong-array-dimensions")
+        fig, ax = plt.subplots(1, 1, sharex=False, figsize=(1, 1))
+        if plotName != "":
+            fig.suptitle(plotName)
+        dN = arr2D.shape[0]
+        ax.pcolormesh(arr2D, cmap=cm.jet)
+        return FigureCanvasTkAgg(fig, cnv).get_tk_widget()
+        # .pack( side=TOP, fill=BOTH, expand=True )
 
     def FigureCanvasTkFrom3DArray(arr3D: np.ndarray, cnv:Canvas, plotName="Plot"):
         """Function create FigureCanvasTk  object of figure with 3 slices of 3D array.
@@ -20,6 +38,9 @@ class AuxCanvasPlot():
                 FigureCanvasTk  object
                 hint: use FigureCanvasTk.get_tk_widget().pack/grid() after to plot
         """
+        if arr3D.ndim != 3:
+            raise ValueError("Not a 3D array recieved.", "wrong-array-dimensions")
+
         # creating figure with matplotlib
         fig, axs = plt.subplots(nrows=3, sharex=False, figsize=(2, 6), layout="constrained")
         if plotName != " ":
@@ -28,7 +49,6 @@ class AuxCanvasPlot():
         loc = plticker.MultipleLocator(base=10.0)  # ticks step setup
 
         i = 0
-        # axs[i].set_title("X-Y")
         axs[i].set_xlabel("x")
         axs[i].set_ylabel("y")
         axs[i].set_xlim(0, arr3D.shape[2])
@@ -71,6 +91,8 @@ class AuxCanvasPlot():
                 FigureCanvasTk  object
                 hint: use FigureCanvasTk.get_tk_widget().pack/grid() after to plot
         """ 
+        if arr3D.ndim != 3:
+            raise ValueError("Not a 3D array recieved.", "wrong-array-dimensions")
         # теперь разбрасываем бид по отдельным массивам .
         zcoord = np.zeros(arr3D.shape[0] * arr3D.shape[1] * arr3D.shape[2])
         xcoord = np.zeros(arr3D.shape[0] * arr3D.shape[1] * arr3D.shape[2])

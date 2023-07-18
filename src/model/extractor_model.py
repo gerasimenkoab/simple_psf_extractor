@@ -40,9 +40,9 @@ class ExtractorModel:
     def beadCoords(self):
         return self._beadCoords
 
-    # @beadCoords.setter
-    # def beadCoords(self, coordsList):
-    #     self._beadCoords = coordsList
+    @beadCoords.setter
+    def beadCoords(self, coordsList):
+        self._beadCoords = coordsList
 
     @property
     def beadDiameter(self):

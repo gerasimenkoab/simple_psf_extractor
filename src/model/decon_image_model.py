@@ -30,3 +30,8 @@ class DeconImageModel():
     def SetDeconPsf(self, fname=None, voxel=None, array=None):
         self._deconPsf = ImageRaw(fname, voxel, array)
 
+    @property
+    def deconResult(self):
+        return self._deconResult
+
+

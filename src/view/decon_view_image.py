@@ -20,6 +20,7 @@ class DeconImageFrameNb(ttk.Frame):
             textvariable=self.imageInfoStr)
         self.imageInfo_lbl.pack(padx=2, pady=2, side="top")
         self.headerImageFrame.grid(column=0, row=0)
+
         self.imageFrame = ttk.Frame(self)
         self.imageFrame.configure(height=200, width=200)
         self.image_cnv = tk.Canvas(self.imageFrame)
@@ -30,7 +31,10 @@ class DeconImageFrameNb(ttk.Frame):
             insertborderwidth=0,
             width=350,
         )
-        self.image_cnv.pack(expand=True, fill="both", padx=2, pady=2)
+        self.image_cnv.grid(column=0,row=0)#pack(expand=True, fill="both", padx=2, pady=2)
+        self.imageFrame.grid_columnconfigure(0, weight=1)
+        self.imageFrame.grid_rowconfigure(0, weight=1)
+
         self.imageOptionsFrame = ttk.Frame(self.imageFrame)
         self.imageOptionsFrame.configure(height=200, width=200)
         self.imageLayerSwitch = ttk.Frame(self.imageOptionsFrame)
@@ -39,14 +43,15 @@ class DeconImageFrameNb(ttk.Frame):
         self.imageLayer_lbl.configure(state="normal", text="Z Layer")
         self.imageLayer_lbl.pack(padx=2, pady=2, side="left")
         self.imageLayer_spinbox = ttk.Spinbox(self.imageLayerSwitch)
-        self.imageLayer_spinbox.configure(justify="center", width=4)
+        self.imageLayer_spinbox.configure( from_=0, to = 100, increment=1, justify="center", width=4 )
         _text_ = "0"
         self.imageLayer_spinbox.delete("0", "end")
         self.imageLayer_spinbox.insert("0", _text_)
         self.imageLayer_spinbox.pack(padx=2, pady=2, side="left")
         self.imageLayerSwitch.pack(expand=True, fill="both", padx=2, pady=2, side="top")
-        self.imageOptionsFrame.pack()
-        self.imageFrame.grid()
+        self.imageOptionsFrame.grid(column=0,row=1)#pack()
+        self.imageFrame.grid(column=0, row=1)
+        
         separator2 = ttk.Separator(self)
         separator2.configure(orient="vertical")
         separator2.grid(column=1, ipady=200, padx=1, row=0, rowspan=2)
@@ -73,7 +78,7 @@ class DeconImageFrameNb(ttk.Frame):
             insertborderwidth=0,
             width=100,
         )
-        self.psf_cnv.pack(expand=True, fill="both", padx=2, pady=2, side="top")
+        self.psf_cnv.pack(expand=True, fill="both", side="top")
         self.frame18 = ttk.Frame(self.psfFrame)
         self.frame18.configure(height=200, width=200)
         self.frame19 = ttk.Frame(self.frame18)
@@ -142,7 +147,9 @@ class DeconImageFrameNb(ttk.Frame):
             insertborderwidth=2,
             width=350,
         )
-        self.result_cnv.pack(expand=True, fill="both", padx=2, pady=2, side="top")
+        self.result_cnv.grid(column=0,row=0)#pack(expand=True, fill="both", padx=2, pady=2)
+        self.resultFrame.grid_columnconfigure(0, weight=1)
+        self.resultFrame.grid_rowconfigure(0, weight=1)#.pack(expand=True, fill="both", padx=2, pady=2, side="top")
         self.resultOptionsFrame = ttk.Frame(self.resultFrame)
         self.resultOptionsFrame.configure(height=200, width=200)
         self.resLayerSwitch = ttk.Frame(self.resultOptionsFrame)
@@ -151,13 +158,13 @@ class DeconImageFrameNb(ttk.Frame):
         self.resLayer_lbl.configure(state="normal", text="Z Layer")
         self.resLayer_lbl.pack(padx=2, pady=2, side="left")
         self.resLayer_spinbox = ttk.Spinbox(self.resLayerSwitch)
-        self.resLayer_spinbox.configure(justify="center", width=4)
+        self.resLayer_spinbox.configure( from_=0, to = 100, increment=1, justify="center", width=4 )
         _text_ = "0"
         self.resLayer_spinbox.delete("0", "end")
         self.resLayer_spinbox.insert("0", _text_)
         self.resLayer_spinbox.pack(padx=2, pady=2, side="top")
         self.resLayerSwitch.pack(expand=True, fill="both", padx=2, pady=2, side="top")
-        self.resultOptionsFrame.pack(side="top")
+        self.resultOptionsFrame.grid(column=0,row=1)#.pack(side="top")
         self.resultFrame.grid(column=4, row=1)
         self.configure(height=600, width=800)
         self.grid(column=0, row=0, sticky="n")

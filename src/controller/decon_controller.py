@@ -47,10 +47,12 @@ class DeconController:
         self.viewDecon.deconImageView.psfLoad_btn.bind("<1>", self.DeconPSFLoad_clb, add="")
         self.viewDecon.deconImageView.imageLayer_spinbox.bind("<<Decrement>>", self.ImageLayer_spDown, add="")
         self.viewDecon.deconImageView.imageLayer_spinbox.bind("<<Increment>>", self.ImageLayer_spUp, add="")
+        self.viewDecon.deconImageView.imageLayer_spinbox.bind("<Return>", self.ImageLayerChange_clb, add="")
         self.viewDecon.deconImageView.deconStart_btn.bind("<1>", self.DeconStart_clb, add="")
         self.viewDecon.deconImageView.resSave_btn.bind("<1>", self.SaveDeconImage_clb, add="")
         self.viewDecon.deconImageView.resLayer_spinbox.bind("<<Decrement>>", self.ResLayer_spDown, add="")
         self.viewDecon.deconImageView.resLayer_spinbox.bind("<<Increment>>", self.ResLayer_spUp, add="")
+        self.viewDecon.deconImageView.imageLayer_spinbox.bind("<Return>", self.ResLayerChange_clb, add="")
 
     # Decon PSF Callbacks
     def LoadBead_btn_click(self,event):
@@ -101,31 +103,55 @@ class DeconController:
     def DeconLoadImage_clb(self, event=None):
         """Loading image for deconvolution from file"""
         eventWgt = event.widget
+        decon_wgt = self.modelDeconImage
         try:
             fNames = self.viewDecon.GetFileNamesList(eventWgt,"Load Image")
         except:
             return
         try:
-            self.modelDeconImage.SetDeconImage(fNames)
+            decon_wgt.SetDeconImage(fNames)
         except ValueError as vE:
             if vE.args[1] == "voxel_problem":
                 try:
                     voxText = "Enter voxel size as z,x,y in \u03BCm"
-                    self.modelDeconImage.SetDeconImage(fNames, self.viewDecon.GetVoxelDialog(eventWgt, voxText) )
+                    decon_wgt.SetDeconImage(fNames, self.viewDecon.GetVoxelDialog(eventWgt, voxText) )
                 except ValueError as vE1:
                     raise ValueError(vE1.args[0], vE1.args[1])
             elif vE.args[1] == "data_problem":
                 raise ValueError(vE.args[0], vE.args[1])
             else:
                 raise ValueError(vE.args[0], vE.args[1])
-        self.viewDecon.SetFileInfoImageDeconImage(self.modelDeconImage.deconImage.GetImageInfoStr(output = "full") )
-        self.viewDecon.SetBeadImage(self.modelDeconImage.deconImage.imArray)
+        self.viewDecon.SetFileInfoImageDeconImage(decon_wgt.deconImage.GetImageInfoStr(output = "full") )
+        self.viewDecon.deconImageView.imageLayer_spinbox.configure( from_=0, to = decon_wgt.deconImage.imArray.shape[0]-1 )
+        layerId = int(self.viewDecon.deconImageView.imageLayer_spinbox.get())
+        self.viewDecon.DrawDeconImage(decon_wgt.deconImage.imArray[layerId,:,:])
+
         self.logger.info("Bead File Loaded: " + fNames[0])
 
+    def ImageLayerChange_clb(self,event = None):
+        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
+        try:
+            spValue = int(wgt.get())
+            arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
+        except:
+            wgt.set("0")
+            return
+        self.viewDecon.DrawDeconImage(arr)       
+
+    
     def ImageLayer_spDown(self, event=None):
+        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
+        spValue = int(wgt.get())
+        arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
+        self.viewDecon.DrawDeconImage(arr)
+        self.logger.info(" - spinner clicked: " + str(spValue))
         pass
 
     def ImageLayer_spUp(self, event=None):
+        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
+        spValue = int(wgt.get())
+        arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
+        self.viewDecon.DrawDeconImage(arr)
         pass
 
     def DeconPSFLoad_clb(self, event=None):
@@ -153,18 +179,59 @@ class DeconController:
         self.logger.info("Bead File Loaded: " + fNames[0]) 
         pass
 
-    def DeconStart_clb(self, event=None):
+
+    def ImageLayerChange_clb(self,event = None):
+        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
+        try:
+            spValue = int(wgt.get())
+            arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
+        except:
+            wgt.set("0")
+            return
+        self.viewDecon.DrawDeconImage(arr)       
+
+    
+    def ImageLayer_spDown(self, event=None):
+        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
+        spValue = int(wgt.get())
+        arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
+        self.viewDecon.DrawDeconImage(arr)
         pass
 
-    def SaveDeconImage_clb(self, event=None):
-        pass
+    def ImageLayer_spUp(self, event=None):
+        wgt = self.viewDecon.deconImageView.imageLayer_spinbox
+        spValue = int(wgt.get())
+        arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
+        self.viewDecon.DrawDeconImage(arr)
+
 
     def ResLayer_spDown(self, event=None):
-        pass
+        wgt = self.viewDecon.deconImageView.resLayer_spinbox
+        spValue = int(wgt.get())
+        arr = self.modelDeconImage.deconResult.imArray[spValue,:,:]
+        self.viewDecon.DrawResultImage(arr)
 
     def ResLayer_spUp(self, event=None):
-        pass
+        wgt = self.viewDecon.deconImageView.resLayer_spinbox
+        spValue = int(wgt.get())
+        arr = self.modelDeconImage.deconResult.imArray[spValue,:,:]
+        self.viewDecon.DrawResultImage(arr)
 
+    def ResLayerChange_clb(self,event = None):
+        wgt = self.viewDecon.deconImageView.resLayer_spinbox
+        try:
+            spValue = int(wgt.get())
+            arr = self.modelDeconImage.deconResult.imArray[spValue,:,:]
+        except:
+            wgt.set("0")
+            return
+        self.viewDecon.DrawResultImage(arr)       
+
+    def DeconStart_clb(self, event=None):
+        pass
+    
+    def SaveDeconImage_clb(self, event=None):
+        pass
 
     # TODO : remove clicker test
     def buttonClickTest(self):

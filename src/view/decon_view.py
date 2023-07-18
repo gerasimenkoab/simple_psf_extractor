@@ -99,31 +99,42 @@ class DeconView:
         cnvTmp.get_tk_widget().grid(column=0, padx=2, pady=2, row=1)
         pass
 
+
     def SetPSFImage(self,arrayIn):
         """Draw canvas with result of deconvolution (PSF)"""
         cnv = self.deconPsfView.canvasPSF
         if cnv: 
             cnv.pack_forget() # remove old canvas
-        cnvTmp = AuxCanvasPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconPsfView.deconPSF_plot, plotName="Bead")
+        cnvTmp = AuxCanvasPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconPsfView.deconPSF_plot, plotName=" ")
         cnvTmp.get_tk_widget().grid(column=1, padx=2, pady=2, row=1)
         pass
 
     def DrawDeconImage(self,arrayIn):
-        """Draw canvas with result of deconvolution (PSF)"""
+        """Draw canvas with input image"""
         cnv = self.deconImageView.image_cnv
-        if cnv: 
-            cnv.pack_forget() # remove old canvas
-        cnvTmp = AuxCanvasPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconImageView.imageFrame, plotName="Bead")
- # fix grid pack       cnvTmp.get_tk_widget().grid(column=1, padx=2, pady=2, row=1) 
-        pass
+        imageIn = Image.fromarray(arrayIn)
+        # bound ImageTk to out widget - cnv, so set cnv.image. It is done to prevent GC remove image.
+        cnv.image = ImageTk.PhotoImage(image = imageIn.resize((350, 350)))
+        # replacing image on the canvas
+        cnv.create_image((0, 0), image=cnv.image, state = 'normal', anchor=NW)
+
+    def DrawResultImage(self,arrayIn):
+        """Draw canvas with input image"""
+        cnv = self.deconImageView.result_cnv
+        imageIn = Image.fromarray(arrayIn)
+        # bound ImageTk to out widget - cnv, so set cnv.image. It is done to prevent GC remove image.
+        cnv.image = ImageTk.PhotoImage(image = imageIn.resize((350, 350)), master = cnv)
+        # replacing image on the canvas
+        cnv.create_image((0, 0), image = cnv.image, state = 'normal', anchor=NW)
+
 
     def DrawDeconPsf(self,arrayIn):
         """Draw canvas with result of deconvolution (PSF)"""
         cnv = self.deconImageView.psf_cnv
         if cnv: 
             cnv.pack_forget() # remove old canvas
-        cnvTmp = AuxCanvasPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconImageView.psfFrame, plotName="Bead")
- # fix grid pack       cnvTmp.get_tk_widget().grid(column=1, padx=2, pady=2, row=1)
+        cnvTmp = AuxCanvasPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconImageView.psfFrame, plotName="")
+ # fix grid pack       cnvTmp.grid(column=1, padx=2, pady=2, row=1)
         pass
 
     def GetVoxelDialog(self, widget, textInfo=""):
@@ -135,7 +146,7 @@ class DeconView:
             voxelList = [float(a) for a in voxelStr.split(",")]
         except:
             raise ValueError("Can not get voxel values", "bad-voxel-string")
-        if voxelStr is "":
+        if voxelStr == "":
             raise ValueError("Can not get voxel values", "bad-voxel-string")
         return voxelList
 
@@ -145,7 +156,7 @@ class DeconView:
             fNames = askopenfilenames(parent = widget, title = titleTxt)
         except:
             raise ValueError("Can not get file names","no-filenames-read")
-        if fNames is "":
+        if fNames == "":
             raise ValueError("Can not get file names","no-filenames-read")
         return fNames
 
