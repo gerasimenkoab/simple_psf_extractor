@@ -3,13 +3,26 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.ticker as plticker
 import matplotlib.cm as cm
+import tkinter as tk
 from tkinter import Canvas
+from PIL import ImageTk, Image
 import itertools
 
 class AuxCanvasPlot():
-    """Class for creation image for tkinter with matplotlib"""
+    """Class for creation image for tkinter with matplotlib and PIL """
+    def Draw2DArrayOnCanvasPIL(arrayIn, canvas: Canvas):
+         # need to call widget.update to get correct values for winfo_width/height
+        canvas.update()
+        height = canvas.winfo_height()
+        width = canvas.winfo_width()
+        imageIn = Image.fromarray(arrayIn)
+        # bound ImageTk to out widget - cnv, so set cnv.image. It is done to prevent GC remove image.                               
+        canvas.image = ImageTk.PhotoImage(image = imageIn.resize((width, height)))
+        # replacing image on the canvas
+        canvas.create_image((0, 0), image=canvas.image, state = 'normal', anchor=tk.NW)
+
     def FigureCanvasTkFrom2DArray(arr2D: np.ndarray, cnv:Canvas, plotName=""):
-        """Function create FigureCanvasTk widget  object of 2D array.
+        """Function create FigureCanvasTk widget  object of 2D array using matplotlib.
         this object can be used to get widget for Tkinter object.get_tk_widget()
         Input: arr2d - 2d ndarray
                 cnv - canvas
@@ -29,7 +42,7 @@ class AuxCanvasPlot():
         # .pack( side=TOP, fill=BOTH, expand=True )
 
     def FigureCanvasTkFrom3DArray(arr3D: np.ndarray, cnv:Canvas, plotName="Plot"):
-        """Function create FigureCanvasTk  object of figure with 3 slices of 3D array.
+        """Function create FigureCanvasTk  object of figure with 3 slices of 3D array using matplotlib.
         this object can be used to get widget for Tkinter object.get_tk_widget()
         Input: arr3d - 3d ndarray
                 cnv - canvas
@@ -82,7 +95,7 @@ class AuxCanvasPlot():
 
 
     def FigureCanvasTk3DFrom3DArray(arr3D: np.ndarray, cnv:Canvas, treshold=np.exp(-1) * 255.0):
-        """Function create FigureCanvasTk  object 3D view of a given  3D array.
+        """Function create FigureCanvasTk  object 3D view of a given  3D array  using matplotlib.
         this object can be used to get widget for Tkinter object.get_tk_widget()
         Input: arr3d - 3d ndarray
                 cnv - canvas

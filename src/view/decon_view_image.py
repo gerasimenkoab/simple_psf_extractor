@@ -3,9 +3,9 @@ import tkinter as tk
 import tkinter.ttk as ttk
 
 
-class DeconImageFrameNb(ttk.Frame):
+class DeconvolveImageFrame(ttk.Frame):
     def __init__(self, master=None, **kw):
-        super(DeconImageFrameNb, self).__init__(master, **kw)
+        super(DeconvolveImageFrame, self).__init__(master, **kw)
         self.headerImageFrame = ttk.Frame(self)
         self.headerImageFrame.configure(width=200)
         self.imageFrameLbl = ttk.Label(self.headerImageFrame)
@@ -178,6 +178,6 @@ class DeconImageFrameNb(ttk.Frame):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    widget = DeconImageFrameNb(root)
+    widget = DeconvolveImageFrame(root)
     widget.pack(expand=True, fill="both")
     root.mainloop()

@@ -3,9 +3,9 @@ import tkinter as tk
 import tkinter.ttk as ttk
 
 
-class DeconPSFFrameNb(ttk.Frame):
+class DeconvolvePSFFrame(ttk.Frame):
     def __init__(self, master=None, **kw):
-        super(DeconPSFFrameNb, self).__init__(master, **kw)
+        super(DeconvolvePSFFrame, self).__init__(master, **kw)
         self.voxel_entry = {}
         self.deconPSF_settings = ttk.Frame(self)
         self.deconPSF_settings.configure(height=200, width=200)
@@ -161,6 +161,6 @@ class DeconPSFFrameNb(ttk.Frame):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    widget = DeconPSFFrameNb(root)
+    widget = DeconvolvePSFFrame(root)
     widget.pack(expand=True, fill="both")
     root.mainloop()
