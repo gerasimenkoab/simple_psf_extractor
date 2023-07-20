@@ -15,9 +15,9 @@ class AuxCanvasPlot():
         canvas.update()
         height = canvas.winfo_height()
         width = canvas.winfo_width()
-        imageIn = Image.fromarray(arrayIn)
+        imagePIL = Image.fromarray(arrayIn)
         # bound ImageTk to out widget - cnv, so set cnv.image. It is done to prevent GC remove image.                               
-        canvas.image = ImageTk.PhotoImage(image = imageIn.resize((width, height)))
+        canvas.image = ImageTk.PhotoImage(image = imagePIL.resize((width, height)))
         # replacing image on the canvas
         canvas.create_image((0, 0), image=canvas.image, state = 'normal', anchor=tk.NW)
 

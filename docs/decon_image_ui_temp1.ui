@@ -52,6 +52,7 @@
         <child>
           <object class="ttk.Label" id="imageInfo_lbl" named="True">
             <property name="text" translatable="yes">No Image Loaded</property>
+            <property name="textvariable">string:imageInfoStr</property>
             <layout manager="pack">
               <property name="padx">2</property>
               <property name="pady">2</property>
@@ -110,9 +111,13 @@
                 </child>
                 <child>
                   <object class="ttk.Spinbox" id="imageLayer_spinbox" named="True">
+                    <property name="from_">0</property>
+                    <property name="increment">1</property>
                     <property name="justify">center</property>
                     <property name="text" translatable="yes">0</property>
+                    <property name="to">100</property>
                     <property name="width">4</property>
+                    <bind sequence="&lt;1&gt;" handler="callback" add="" />
                     <bind sequence="&lt;&lt;Decrement&gt;&gt;" handler="ImageLayer_spDown" add="" />
                     <bind sequence="&lt;&lt;Increment&gt;&gt;" handler="ImageLayer_spUp" add="" />
                     <layout manager="pack">
