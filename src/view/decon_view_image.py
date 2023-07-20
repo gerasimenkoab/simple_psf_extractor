@@ -4,6 +4,11 @@ import tkinter.ttk as ttk
 
 
 class DeconvolveImageFrame(ttk.Frame):
+    _deconMethodsDict = {
+        "Richardson-Lucy":"RL",
+        "Richardson-Lucy TM Reg":"RLTMR",
+        "Richardson-Lucy TV Reg":"RLTVR"
+        }
     def __init__(self, master=None, **kw):
         super(DeconvolveImageFrame, self).__init__(master, **kw)
         # for i in range(0,4,2):
@@ -117,11 +122,16 @@ class DeconvolveImageFrame(ttk.Frame):
         self.deconMethod_lbl = ttk.Label(self.methodFrame)
         self.deconMethod_lbl.configure(text="Method:", width=9)
         self.deconMethod_lbl.pack(padx=2, side="left")
-        combobox1 = ttk.Combobox(self.methodFrame)
-        combobox1.configure(width=25)
-        combobox1.pack(side="left")
+        self.deconMethod = tk.StringVar()
+        self.deconMethod_combobox = ttk.Combobox(
+            self.methodFrame,
+            textvariable = self.deconMethod,
+            values = list( self._deconMethodsDict.keys() ),
+            state="readonly",)
+        self.deconMethod_combobox.configure(width=20)
+        self.deconMethod_combobox.pack(side="left")
         self.decon_progbar = ttk.Progressbar(self.methodFrame)
-        self.decon_progbar.configure(length=50, orient="horizontal")
+        self.decon_progbar.configure(length=80, orient="horizontal")
         self.decon_progbar.pack(padx=2, pady=2, side="left")
         self.deconStart_btn = ttk.Button(self.methodFrame)
         self.deconStart_btn.configure(text="Start", width=10)
@@ -141,12 +151,12 @@ class DeconvolveImageFrame(ttk.Frame):
         self.deconReg_lbl = ttk.Label(self.settingsFrame)
         self.deconReg_lbl.configure(text=" Regularization:")
         self.deconReg_lbl.pack(padx=2, side="left")
-        entry3 = ttk.Entry(self.settingsFrame)
-        entry3.configure(width=8)
+        self.deconReg_entry = ttk.Entry(self.settingsFrame)
+        self.deconReg_entry.configure(width=8)
         _text_ = "0.000001"
-        entry3.delete("0", "end")
-        entry3.insert("0", _text_)
-        entry3.pack(padx=2, side="left")
+        self.deconReg_entry.delete("0", "end")
+        self.deconReg_entry.insert("0", _text_)
+        self.deconReg_entry.pack(padx=2, side="left")
         self.resSave_btn = ttk.Button(self.settingsFrame)
         self.resSave_btn.configure(text="Save Result", width=10)
         self.resSave_btn.pack(expand=True, padx=2, pady=2, side="left")

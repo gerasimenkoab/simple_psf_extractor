@@ -127,7 +127,8 @@ class DeconView:
         cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconPsfView.deconPSF_plot, plotName=" ")
         cnvTmp.get_tk_widget().grid(column=1, padx=2, pady=2, row=1)
 
-
+    def GetPsfDeconMethod(self):
+        return self.deconPsfView.deconMethod
 # ======= Image deconvolution Widget Functions ===========
 
     def SetFileInfoImageDeconImage(self, infoStr:str):
@@ -147,21 +148,45 @@ class DeconView:
 
     
     def DrawDeconPsf(self,arrayIn):
-        """Draw canvas with result of deconvolution (PSF)"""
+        """Draw selected PSF on canvas at image deconvolution frame """
         cnv = self.deconImageView.psf_cnv
-        # if cnv: 
-        #     cnv.pack_forget() # remove old canvas
-#        cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconImageView.psfFrame, plotName="")
         cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, cnv, " ",150,350)
         cnvTmp.get_tk_widget().grid(column=0, row=0, sticky="n")
-        pass
 
+    def GetImageDeconMethod(self):
+        return self.deconImageView.deconMethod
+    
+    def GetImageDeconIterationNumber(self):
+        return int(self.deconImageView.deconIter_entry.get())
 
+    def GetImageDeconRegularisation(self):
+        return int(self.deconImageView.deconReg_entry.get())
+    
+    def SetImageDeconIterationNumber(self,value):
+        try:
+            value = int(value)
+        except:
+            raise ValueError("Wrong iteration number value", "value-not-int")
+        if value <= 0:
+            raise ValueError("Wrong iteration number value", "value-negative")
+        self.SetValueWidgetNormal(self.deconImageView.deconIter_entry, value)
+
+    def SetImageDeconRegularisation(self,value):
+        try:
+            value = float(value)
+        except:
+            raise ValueError("Wrong iteration number value", "value-not-float")
+        if 0 < value < 1:
+            self.SetValueWidgetNormal(self.deconImageView.deconReg_entry, value)
+        else:
+            raise ValueError("Wrong iteration number value", "not-allowed-value")
+
+    def GetDeconImageProgressbar(self):
+        return self.deconImageView.decon_progbar
+    
     def run(self):
         self.mainwindow.mainloop()
 
-    def callback(self, event=None):
-        pass
 
 
 if __name__ == "__main__":

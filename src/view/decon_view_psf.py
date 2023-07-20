@@ -4,8 +4,15 @@ import tkinter.ttk as ttk
 
 
 class DeconvolvePSFFrame(ttk.Frame):
+    _deconMethodsDict = {
+        "Richardson-Lucy":"RL",
+        "Richardson-Lucy TM Reg":"RLTMR",
+        "Richardson-Lucy TV Reg":"RLTVR"
+        }
+     
     def __init__(self, master=None, **kw):
         super(DeconvolvePSFFrame, self).__init__(master, **kw)
+        self.master = master
         self.voxel_entry = {}
         self.deconPSF_settings = ttk.Frame(self)
         self.deconPSF_settings.configure(height=200, width=200)
@@ -87,10 +94,15 @@ class DeconvolvePSFFrame(ttk.Frame):
         label17 = ttk.Label(self.methodFrame)
         label17.configure(text="Method:")
         label17.pack(padx=2, pady=5, side="left")
-        self.deconType_combobox = ttk.Combobox(self.methodFrame)
+        self.deconMethod = tk.StringVar()
+        self.deconMethod_combobox = ttk.Combobox(
+            self.methodFrame,
+            textvariable = self.deconMethod,
+            values = list( self._deconMethodsDict.keys() ),
+            state="readonly",)
         self.deconMethodMenuStrVal = tk.StringVar()
-        self.deconType_combobox.configure(textvariable=self.deconMethodMenuStrVal)
-        self.deconType_combobox.pack(padx=2, pady=5, side="left")
+        self.deconMethod_combobox.configure(textvariable=self.deconMethodMenuStrVal)
+        self.deconMethod_combobox.pack(padx=2, pady=5, side="left")
         self.methodFrame.pack(side="top")
         self.psfIterNumFrame = ttk.Frame(self.psfDeconParamFrame)
         self.psfIterNumFrame.configure(height=200, width=200)
