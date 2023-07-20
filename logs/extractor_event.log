@@ -1,4 +1,4 @@
-2023-07-20 14:21:16,728 __main__ INFO: Main GUI started. [in d:\python\simple_psf_extractor\src\main.py:15]
-2023-07-20 14:21:17,918 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module. [in d:\python\simple_psf_extractor\src\controller\extractor_controller.py:21]
-2023-07-20 14:21:17,919 __main__.model.extractor_model INFO: Extractor object created [in d:\python\simple_psf_extractor\src\model\extractor_model.py:13]
-2023-07-20 14:21:17,947 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done. [in d:\python\simple_psf_extractor\src\controller\extractor_controller.py:67]
+2023-07-20 16:05:53,735 __main__ INFO: Main GUI started. [in d:\python\simple_psf_extractor\src\main.py:15]
+2023-07-20 16:05:54,919 __main__.model.decon_psf_model INFO: Decon PSF object created [in d:\python\simple_psf_extractor\src\model\decon_psf_model.py:14]
+2023-07-20 16:05:54,921 __main__.model.decon_image_model INFO: Decon Image object created [in d:\python\simple_psf_extractor\src\model\decon_image_model.py:13]
+2023-07-20 16:05:54,953 __main__.view.decon_view INFO: Decon PSF view loaded [in d:\python\simple_psf_extractor\src\view\decon_view.py:58]

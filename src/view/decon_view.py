@@ -149,10 +149,11 @@ class DeconView:
     def DrawDeconPsf(self,arrayIn):
         """Draw canvas with result of deconvolution (PSF)"""
         cnv = self.deconImageView.psf_cnv
-        if cnv: 
-            cnv.pack_forget() # remove old canvas
-        cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconImageView.psfFrame, plotName="")
- # fix grid pack       cnvTmp.grid(column=1, padx=2, pady=2, row=1)
+        # if cnv: 
+        #     cnv.pack_forget() # remove old canvas
+#        cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconImageView.psfFrame, plotName="")
+        cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, cnv, " ",150,350)
+        cnvTmp.get_tk_widget().grid(column=0, row=0, sticky="n")
         pass
 
 

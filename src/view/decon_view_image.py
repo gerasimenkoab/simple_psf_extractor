@@ -6,6 +6,11 @@ import tkinter.ttk as ttk
 class DeconvolveImageFrame(ttk.Frame):
     def __init__(self, master=None, **kw):
         super(DeconvolveImageFrame, self).__init__(master, **kw)
+        # for i in range(0,4,2):
+        #     self.grid_columnconfigure(i, weight=1,uniform=1)
+        # self.grid_rowconfigure(0, weight=0,uniform=1)
+        # self.grid_rowconfigure(1, weight=1,uniform=1)
+# =======Image frame =================
         self.headerImageFrame = ttk.Frame(self)
         self.headerImageFrame.configure(width=200)
         self.imageFrameLbl = ttk.Label(self.headerImageFrame)
@@ -55,30 +60,36 @@ class DeconvolveImageFrame(ttk.Frame):
         separator2 = ttk.Separator(self)
         separator2.configure(orient="vertical")
         separator2.grid(column=1, ipady=200, padx=1, row=0, rowspan=2)
+
+# ========= PSF frame ==============================
         self.headerPsfFrame = ttk.Frame(self)
         self.headerPsfFrame.configure(width=200)
         self.psfFrame_lbl = ttk.Label(self.headerPsfFrame)
-        self.psfFrame_lbl.configure(font="Helvetica 10 bold", text="PSF")
+        self.psfFrame_lbl.configure(font="Helvetica 10 bold", text='PSF')
         self.psfFrame_lbl.pack(side="top")
         self.psfLoad_btn = ttk.Button(self.headerPsfFrame)
-        self.psfLoad_btn.configure(text="Load PSF", width=15)
+        self.psfLoad_btn.configure(text='Load PSF', width=15)
         self.psfLoad_btn.pack(padx=2, pady=2, side="top")
         self.psfInfo_lbl = ttk.Label(self.headerPsfFrame)
         self.psfInfoStr = tk.StringVar(value='No Image Loaded')
-        self.psfInfo_lbl.configure(text="No PSF Loaded",textvariable=self.psfInfoStr)
+        self.imageInfo_lbl.configure(text="No Image Loaded",
+            textvariable=self.psfInfoStr)
+        self.psfInfo_lbl.configure(text='No PSF Loaded')
         self.psfInfo_lbl.pack(padx=2, pady=2, side="top")
         self.headerPsfFrame.grid(column=2, row=0)
         self.psfFrame = ttk.Frame(self)
+        self.psfFrame.grid_columnconfigure(0, weight=1,uniform=1)
+        self.psfFrame.grid_rowconfigure(0, weight=1,uniform=1)
         self.psfFrame.configure(height=200, width=200)
         self.psf_cnv = tk.Canvas(self.psfFrame)
         self.psf_cnv.configure(
             background="#c0c0c0",
-            height=300,
+            height=350,
             insertbackground="#c0c0c0",
             insertborderwidth=0,
-            width=100,
-        )
-        self.psf_cnv.pack(expand=True, fill="both", side="top")
+            width=116)
+        
+        self.psf_cnv.grid(column=0, row=0, sticky="n")
         self.frame18 = ttk.Frame(self.psfFrame)
         self.frame18.configure(height=200, width=200)
         self.frame19 = ttk.Frame(self.frame18)
@@ -87,11 +98,15 @@ class DeconvolveImageFrame(ttk.Frame):
         self.label12.configure(state="normal")
         self.label12.pack(expand=True, fill="x", padx=2, pady=2, side="left")
         self.frame19.pack(expand=True, fill="both", padx=2, pady=2, side="top")
-        self.frame18.pack(pady=1, side="top")
+        self.frame18.grid(column=0, row=1, sticky="s")
         self.psfFrame.grid(column=2, row=1)
+
+
         separator3 = ttk.Separator(self)
         separator3.configure(orient="vertical")
         separator3.grid(column=3, ipady=200, padx=1, row=0, rowspan=2)
+
+# ====== Result frame ==============        
         self.headerResFrame = ttk.Frame(self)
         self.headerResFrame.configure(width=200)
         self.resFrame_lbl = ttk.Label(self.headerResFrame)
