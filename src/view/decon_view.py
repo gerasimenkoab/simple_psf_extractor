@@ -22,20 +22,20 @@ class DeconView:
         # build ui
         self.logger = logging.getLogger('__main__.'+__name__)
 
-        self.deconPsfToplevel = tk.Tk() if master is None else tk.Toplevel(master)
-        self.deconPsfToplevel.configure(
+        self.deconViewToplevel = tk.Tk() if master is None else tk.Toplevel(master)
+        self.deconViewToplevel.configure(
             height=768,
             padx=5,
             pady=5,
             takefocus=True,
             width=1024)
-        self.deconPsfToplevel.geometry("950x600")
-        self.deconPsfToplevel.maxsize(1920, 1080)
-        self.deconPsfToplevel.minsize(950, 600)
-        self.deconPsfToplevel.resizable(True, True)
-        self.deconPsfToplevel.title("Deconvolution widget")
+        self.deconViewToplevel.geometry("950x600")
+        self.deconViewToplevel.maxsize(1920, 1080)
+        self.deconViewToplevel.minsize(950, 600)
+        self.deconViewToplevel.resizable(True, True)
+        self.deconViewToplevel.title("Deconvolution widget")
 
-        self.deconNotebook = ttk.Notebook(self.deconPsfToplevel)
+        self.deconNotebook = ttk.Notebook(self.deconViewToplevel)
         self.deconNotebook.configure(height=700, width=900)
         self.deconNotebook.pack(expand=True, fill="both", side="top")
 
@@ -45,7 +45,7 @@ class DeconView:
         self.deconImageView = DeconvolveImageFrame(self.deconNotebook)
         self.deconNotebook.add(self.deconImageView, text = "Image deconvolution")
 
-        self.logOutputLabel = ttk.Label(self.deconPsfToplevel)
+        self.logOutputLabel = ttk.Label(self.deconViewToplevel)
         self.logOutStringVar = tk.StringVar(value='Log Output')
         self.logOutputLabel.configure(
             compound="top",
@@ -54,7 +54,7 @@ class DeconView:
         self.logOutputLabel.pack(fill="x", side="bottom")
 
         # Main widget
-        self.mainwindow = self.deconPsfToplevel
+        self.mainwindow = self.deconViewToplevel
         self.logger.info("Decon PSF view loaded")
 
 # ======= Auxilary Functions ==========================

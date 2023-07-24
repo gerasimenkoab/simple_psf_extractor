@@ -152,7 +152,7 @@ class DeconController:
         progBar = self.viewDecon.GetPsfDeconProgressbar()
         method = self.viewDecon.GetPsfDeconMethod()
         print("test metod: ",method)
-        self.modelDeconPSF.CalculatePSF( method, progBar, self.viewDecon.deconPsfToplevel )
+        self.modelDeconPSF.CalculatePSF( method, progBar, self.viewDecon.deconViewToplevel )
         try:
             self.viewDecon.SetPSFImage( self.modelDeconPSF.resultImage.imArray )
         except:
@@ -283,8 +283,15 @@ class DeconController:
 
 
     def DeconStart_clb(self, event=None):
-        pass
-
+        progBar = self.viewDecon.GetDeconImageProgressbar()
+        method = self.viewDecon.GetImageDeconMethod()
+        print("test metod: ",method)
+        self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon.deconViewToplevel )
+        try:
+            self.viewDecon.DrawResultImage( self.modelDeconPSF.resultImage.imArray )
+        except:
+            return
+        
     def SaveDeconImage_clb(self, event=None):
         if self.modelDeconImage.deconResult == None:
             self.logger.info("Can not save. Deconvolution result image was not created.")

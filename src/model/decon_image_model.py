@@ -2,6 +2,8 @@ import numpy as np
 import os
 from scipy.ndimage import gaussian_filter, median_filter
 from .ImageRaw_class import ImageRaw
+from .decon_methods import DeconImage
+
 
 import logging
 
@@ -66,5 +68,26 @@ class DeconImageModel():
             self._regularizationParameter = value
         else:
             raise ValueError("Wrong regularisation parameter value", "regularization-parameter-incorrect")
+        
+    def DeconvolveImage(self, deconMethodIn : str, progBarIn, masterWidget):
+        try:
+            PSF = DeconImage(
+                self._deconImage.imArray,
+                self._deconPsf.imArray,
+                self._iterationNumber,
+                deconMethodIn, #self.deconMethodsDict[ self.deconPSFType.get() ],
+                self._regularizationParameter,
+                progBar=progBarIn,
+                parentWin=masterWidget
+                )
+        except Exception as e:
+            self.logger.debug(str(e))
+            return
+        try:
+            self._deconResult = ImageRaw( None, list(self._deconImage.voxel.values()), PSF )
+        except Exception as e:
+            self.logger.debug(str(e))
+            return
+        self.logger.info("Experimental PSF calculated")
 
 
