@@ -69,6 +69,7 @@ class DeconvolvePSFFrame(ttk.Frame):
             label11.configure(text=key + ":")
             label11.pack(padx=2, pady=2, side="left")
             self.voxel_entry[key] = ttk.Entry(self.psfVoxelSizeFrame)
+            self.voxel_entry[key].name = key
             self.voxel_entry[key].configure(
                 state="normal", validate="focusout", width=5
             )
@@ -100,8 +101,6 @@ class DeconvolvePSFFrame(ttk.Frame):
             textvariable = self.deconMethod,
             values = list( self._deconMethodsDict.keys() ),
             state="readonly",)
-        self.deconMethodMenuStrVal = tk.StringVar()
-        self.deconMethod_combobox.configure(textvariable=self.deconMethodMenuStrVal)
         self.deconMethod_combobox.pack(padx=2, pady=5, side="left")
         self.methodFrame.pack(side="top")
         self.psfIterNumFrame = ttk.Frame(self.psfDeconParamFrame)
@@ -150,15 +149,9 @@ class DeconvolvePSFFrame(ttk.Frame):
         self.deconPSF_settings.pack(expand=True, fill="both", side="left")
         self.deconPSF_plot = ttk.Frame(self)
         self.deconPSF_plot.configure(height=200, width=600)
-        # label1 = ttk.Label(self.deconPSF_plot)
-        # label1.configure(text='Bead')
-        # label1.grid(column=0, row=0, sticky="n")
         self.canvasBead = tk.Canvas(self.deconPSF_plot)
         self.canvasBead.configure( width=200)
         self.canvasBead.grid(column=0, padx=2, pady=2, row=1)
-        # label2 = ttk.Label(self.deconPSF_plot)
-        # label2.configure(text='PSF')
-        # label2.grid(column=1, row=0, sticky="n")
         self.canvasPSF = tk.Canvas(self.deconPSF_plot)
         self.canvasPSF.configure( width=200)
         self.canvasPSF.grid(column=1, padx=2, pady=2, row=1)

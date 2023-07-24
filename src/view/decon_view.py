@@ -92,6 +92,16 @@ class DeconView:
             raise ValueError("Can not get file names","no-filenames-read")
         return fNames
 
+    def GetFileName(self, widget, titleTxt = ""):
+        self.logger.debug("GetSaveAsFileName called")
+        try:
+            fName = asksaveasfilename(parent = widget, title = titleTxt)
+        except:
+            raise ValueError("Can not get file names","no-filenames-read")
+        if fName == "":
+            raise ValueError("Can not get file names","no-filenames-read")
+        return fName
+
 # ======= PSF deconvolution Widget Functions ===========
     def SetVoxelValues(self, voxelInDict):
         """Bead voxel size change"""
@@ -128,7 +138,11 @@ class DeconView:
         cnvTmp.get_tk_widget().grid(column=1, padx=2, pady=2, row=1)
 
     def GetPsfDeconMethod(self):
-        return self.deconPsfView.deconMethod
+        return self.deconPsfView._deconMethodsDict[self.deconPsfView.deconMethod.get()]
+
+    def GetPsfDeconProgressbar(self):
+        return self.deconPsfView.deconPSF_pgbar
+    
 # ======= Image deconvolution Widget Functions ===========
 
     def SetFileInfoImageDeconImage(self, infoStr:str):
@@ -183,6 +197,9 @@ class DeconView:
 
     def GetDeconImageProgressbar(self):
         return self.deconImageView.decon_progbar
+
+    def GetImageDeconMethod(self):
+        return self.deconImageView._deconMethodsDict[self.deconImageView.deconMethod.get()]
     
     def run(self):
         self.mainwindow.mainloop()

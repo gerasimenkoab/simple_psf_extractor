@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-import DeconvolutionGUI_class as DeGUI_cls
+#import DeconvolutionGUI_class as DeGUI_cls
 from controller.extractor_controller import ExtractorController
 from controller.decon_controller import DeconController
 import logging
