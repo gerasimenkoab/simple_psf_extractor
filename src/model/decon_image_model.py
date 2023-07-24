@@ -75,7 +75,7 @@ class DeconImageModel():
                 self._deconImage.imArray,
                 self._deconPsf.imArray,
                 self._iterationNumber,
-                deconMethodIn, #self.deconMethodsDict[ self.deconPSFType.get() ],
+                deconMethodIn, 
                 self._regularizationParameter,
                 progBar=progBarIn,
                 parentWin=masterWidget
