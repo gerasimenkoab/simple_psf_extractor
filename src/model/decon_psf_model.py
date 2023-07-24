@@ -105,7 +105,7 @@ class DeconPsfModel():
                 self._psfImage.imArray,
                 self._beadDiameter,
                 self._iterationNumber,
-                deconMethodIn, #self.deconMethodsDict[ self.deconPSFType.get() ],
+                deconMethodIn,
                 self._regularizationParameter,
                 progBar=progBarIn,
                 parentWin=masterWidget
