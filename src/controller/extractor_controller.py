@@ -73,7 +73,7 @@ class ExtractorController:
         voxelStr = askstring("Voxel Dialog", text)
         return [float(a) for a in voxelStr.split(",")]
 
-    def LoadsBeadPhoto(self):
+    def LoadsBeadPhoto(self, event=None):
         """Loading raw beads photo from file"""
         fNames = askopenfilenames( title="Load Beads Photo")
         if fNames is None:
@@ -97,6 +97,10 @@ class ExtractorController:
         self.model.mainImage.ShowClassInfo()
         self.logger.info("LoadsBeadPhoto: file(s) loaded. ")
         try:
+            try:
+                os.remove("tmp.tiff")
+            except:
+                pass
             self.model.mainImage.SaveAsTiff(filename="tmp.tiff")
             self.view.SetMainPhotoImage("tmp.tiff")
             self.view.SetVoxelValues(self.model.mainImage.voxel)
@@ -105,39 +109,39 @@ class ExtractorController:
             self.logger.error("LoadsBeadPhoto: can't create tmp.tiff " + str(e))
             raise IOError("Cant update GUI properly")
 
-    def ClearMarks(self):
+    def ClearMarks(self, event=None):
         """Clear bead marks"""
         self.view.BeadMarksClear()
         self.model.BeadCoordsClear()
 
-    def UndoMark(self):
+    def UndoMark(self, event=None):
         """Remove the last bead mark"""
         self.view.BeadMarksRemoveLast()
         self.model.BeadCoordsRemoveLast()
 
-    def ExtractBeads(self):
+    def ExtractBeads(self, event=None):
         """Extract marked beads as a list"""
         numberExtractedBeads = self.model.MarkedBeadsExtract()
         self.logger.info(
             "ExtractBeads: number of extracted beads = " + str(numberExtractedBeads)
         )
 
-    def SaveExtractedBeads(self):
+    def SaveExtractedBeads(self, event=None):
         try:
             dirPath = askdirectory()
         except:
             dirPath = ""
         self.model.ExtractedBeadsSave(dirPath)
 
-    def ProcessBeads(self):
+    def ProcessBeads(self, event=None):
         self.model.BeadsArithmeticMean()
         self.model.BlurAveragedBead(self.view.blurApplyType.get())
 
-    def SaveAverageBead(self):
+    def SaveAverageBead(self, event=None):
         self.model.SaveAverageBead(asksaveasfilename())
         pass
 
-    def AverageSeveralBeads(self):
+    def AverageSeveralBeads(self, event=None):
         raise NotImplementedError("will do it soon")
         # TODO fix AverageManyBeads
         self.model.AverageManyBeads(
@@ -145,7 +149,7 @@ class ExtractorController:
         )
         pass
 
-    def ViewBead2D(self):
+    def ViewBead2D(self, event=None):
         try:
             id = int(self.view.beadPrevNum.get())
         except:
@@ -154,7 +158,7 @@ class ExtractorController:
             raise ValueError("Wrong bead index input.")
         self.view.PlotBeadPreview2D(self.model._extractedBeads[id].imArray)
 
-    def ViewBead3D(self):
+    def ViewBead3D(self, event=None):
         try:
             id = int(self.view.beadPrevNum.get())
         except:
@@ -163,7 +167,7 @@ class ExtractorController:
             raise ValueError("Wrong bead index input.")
         self.view.PlotBeadPreview3D(self.model._extractedBeads[id].imArray)
 
-    def CloseExtractor(self):
+    def CloseExtractor(self, event=None):
         """Closing window and clear tmp files"""
         # Checking existance of self.imgBeadsRaw.close()
         if askokcancel("Close", "Close Bead Extractor Widget?"):
@@ -179,17 +183,22 @@ class ExtractorController:
             self.view.destroy()
             self.logger.info("Bead Extractor Closed.")
 
-    def BeadMarkOnClick(self, event):
+    def BeadMarkOnClick(self, event=None):
         """
         Append mouse event coordinates to global list. Center is adjusted according to max intensity.
         """
         widget = event.widget
         xClick, yClick = widget.canvasx(event.x), widget.canvasy(event.y)
-        xr, yr = self.model.LocateFrameMAxIntensity3D(xClick, yClick)
+        if self.view.autocorrectSelection.get() == 1:
+            print("corrected")
+            xr, yr = self.model.LocateFrameMAxIntensity3D(xClick, yClick)
+        else:
+            print("no correction")
+            xr, yr = xClick, yClick
         self.model.beadMarkAdd([xr, yr])
         self.view.beadMarkAdd(widget, xr, yr)
 
-    def UpdateMainImageVoxelValue(self):
+    def UpdateMainImageVoxelValue(self, event = None):
         try:
             newVoxel = [
                 float(self.view.voxelSizeEntries["Z"].get()),
@@ -200,11 +209,14 @@ class ExtractorController:
         except:
             raise ValueError("Can not update voxel values.", "cant_update_voxel")
 
-    def UpdateBeadSizeValue(self):
+    def UpdateBeadSizeValue(self, event=None):
         self.model.beadDiameter = float(self.view.beadSizeEntry.get())
 
-    def UpdateSelectionSizeEntry(self):
-        self.model.selectionFrameHalf = int(self.view.selectSizeEntry.get()) * 2
+    def UpdateSelectionSizeEntry(self, event = None):
+        try:
+            self.model.selectionFrameHalf = int(self.view.selectSizeEntry.get()) // 2
+        except:
+            self.logger.debug("Wrong selection size value.")
 
-    def SetBeadPrevNum(self):
+    def SetBeadPrevNum(self, event=None):
         self._beadPrevNum = int(self.view.beadPrevNum.get())

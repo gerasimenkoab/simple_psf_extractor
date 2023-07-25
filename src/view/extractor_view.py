@@ -116,8 +116,9 @@ class ExtractorView(tk.Toplevel):
             text="2.Mark beads by right click on the window",
             font="Helvetica 10 bold",
         ).grid(row=0, column=0, columnspan=2, sticky="w")
+
         selectSizeFrame = Frame(f2)
-        ttk.Label(selectSizeFrame, width=20, text="Selection Size: ", anchor="w").pack(
+        ttk.Label(selectSizeFrame, width=14, text="Selection Size: ", anchor="w").pack(
             side=LEFT, padx=2, pady=2
         )
         self.selectSizeEntry = ttk.Entry(selectSizeFrame, width=5)
@@ -126,11 +127,21 @@ class ExtractorView(tk.Toplevel):
         selectSizeFrame.grid(row=1, column=0, sticky="we")
 
         frameMarks = Frame(f2)
+        self.autocorrectSelection = IntVar(value=1)
+        ttk.Checkbutton(
+            frameMarks,
+            variable = self.autocorrectSelection,
+            text="Auto-correction",
+            onvalue=1,
+            offvalue=0,
+            width=15,
+        ).pack(side=LEFT, padx=5, pady=2, fill=BOTH, expand=1)
         self.undoMark_btn = ttk.Button(frameMarks, text="Undo mark")
         self.undoMark_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
         self.clearMarks_btn = ttk.Button(frameMarks, text="Clear All Marks")
         self.clearMarks_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
         frameMarks.grid(row=1, column=1, sticky="we")
+
         f2.pack(side=TOP)
         ttk.Separator(f0, orient="horizontal").pack(ipadx=200, pady=10)
 

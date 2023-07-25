@@ -5,6 +5,7 @@ from tkinter.filedialog import askopenfilenames, asksaveasfilename
 from tkinter.simpledialog import askstring
 import logging
 
+
 try:
     from .AuxTkPlot_class import AuxCanvasPlot as CnvPlot
 except ImportError:
@@ -156,7 +157,8 @@ class DeconView:
 
     def SetFileInfoImageDeconImage(self, infoStr:str):
         self.deconImageView.imageInfoStr.set(infoStr)
-
+        self.deconImageView.update()
+       
     def SetFileInfoPsfDeconImage(self, infoStr:str):
         self.deconImageView.psfInfoStr.set(infoStr)
 

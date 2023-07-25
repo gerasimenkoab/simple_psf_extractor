@@ -180,31 +180,40 @@ class DeconController:
         self.logger.info("PSF was saved as " + fName)
 
     # ======== Decon Image Callbacks ===============================
+
     def DeconLoadImage_clb(self, event=None):
         """Loading image for deconvolution from file"""
         eventWgt = event.widget
-        decon_wgt = self.modelDeconImage
         try:
             fNames = self.viewDecon.GetFileNamesList(eventWgt,"Load Image")
         except:
             return
         try:
-            decon_wgt.SetDeconImage(fNames)
+            self.modelDeconImage.SetDeconImage(fNames)
         except ValueError as vE:
             if vE.args[1] == "voxel_problem":
                 try:
                     voxText = "Enter voxel size as z,x,y in \u03BCm"
-                    decon_wgt.SetDeconImage(fNames, self.viewDecon.GetVoxelDialog(eventWgt, voxText) )
+                    try:
+                        voxelRead =  self.viewDecon.GetVoxelDialog(eventWgt, voxText) 
+                    except:
+                        self.logger.info("Bad voxel info in dialog.")
+                        return
+                    self.modelDeconImage.SetDeconImage(fNames, voxelRead)
                 except ValueError as vE1:
-                    raise ValueError(vE1.args[0], vE1.args[1])
+                    self.logger.info("Image load failed.")
+                    return
             elif vE.args[1] == "data_problem":
-                raise ValueError(vE.args[0], vE.args[1])
+                self.logger.info("Image load failed. Bad intesity array. ")
+                return
             else:
-                raise ValueError(vE.args[0], vE.args[1])
-        self.viewDecon.SetFileInfoImageDeconImage(decon_wgt.deconImage.GetImageInfoStr(output = "full") )
-        self.viewDecon.deconImageView.imageLayer_spinbox.configure( from_=0, to = decon_wgt.deconImage.imArray.shape[0]-1 )
+                self.logger.info("Image load failed. Unknown problem.")
+                return
+        self.viewDecon.SetFileInfoImageDeconImage(self.modelDeconImage.deconImage.GetImageInfoStr(output = "full") )
+        upLim = self.modelDeconImage.deconImage.imArray.shape[0]-1
+        self.viewDecon.deconImageView.imageLayer_spinbox.configure( from_=0, to = upLim )
         layerId = int(self.viewDecon.deconImageView.imageLayer_spinbox.get())
-        self.viewDecon.DrawDeconImage(decon_wgt.deconImage.imArray[layerId,:,:])
+        self.viewDecon.DrawDeconImage(self.modelDeconImage.deconImage.imArray[layerId,:,:])
 
         self.logger.info("Bead File Loaded: " + fNames[0])
 
@@ -292,8 +301,8 @@ class DeconController:
         decon_wgt = self.modelDeconImage
         self.logger.info("Starting image deconvolution. Method code: " + method)
         try:
-            # self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon.deconViewToplevel )
-            self.modelDeconImage.deconResult = self.modelDeconImage.deconImage
+            self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon.deconViewToplevel )
+            # self.modelDeconImage.deconResult = self.modelDeconImage.deconImage
         except:
             self.logger.info("Image deconvolution failed.")
             return

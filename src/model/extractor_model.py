@@ -61,12 +61,14 @@ class ExtractorModel:
 
     @selectionFrameHalf.setter
     def selectionFrameHalf(self, value):
-        if value > 0 and type(value) == int or float:
+        try:
+            value =int(value)
+        except:
+            raise ValueError("Wrong selection size value", "selectionFrameHalf_incorrect")
+        if value > 0 :
             self._selectionFrameHalf = value
         else:
-            raise ValueError(
-                "Wrong selection frame size value", "selectionFrameHalf_incorrect"
-            )
+            raise ValueError("Wrong selection frame size value", "selectionFrameHalf_incorrect")
 
     def beadMarkAdd(self, beadMarkCoords: list):
         """Append mouse event coordinates to global list. Center is adjusted according to max intensity."""
