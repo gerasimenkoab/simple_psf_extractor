@@ -24,6 +24,10 @@ class DeconImageModel():
     @property
     def deconImage(self):
         return self._deconImage
+    
+    @deconImage.setter
+    def deconImage(self,value : ImageRaw):
+        self._deconImage = value
 
     def SetDeconImage(self, fname=None, voxel=None, array=None):
         self._deconImage = ImageRaw(fname, voxel, array)
@@ -38,7 +42,11 @@ class DeconImageModel():
     @property
     def deconResult(self):
         return self._deconResult
-    
+
+    @deconResult.setter
+    def deconResult(self,value : ImageRaw):
+        self._deconResult = value
+
     @property
     def iterationNumber(self):
         return self._iterationNumber
