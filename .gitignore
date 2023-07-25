@@ -10,4 +10,5 @@ docs/decon_image_ui_temp1.ui
 docs/decon_psf_ui_temp.ui
 logs/
 logs/extractor_event.log
-
+src/cnn/__pycache__
+src/cnn/CNN_Deconvolution/__pycache__
