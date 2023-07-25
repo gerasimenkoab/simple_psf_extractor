@@ -4,15 +4,6 @@ implemintation of simple extractor of experimental PSF
 TODO:
 
 - deconvolution revision:
-+ RL TM regularisation ... done
-+ add method selection for PSF deconvolution app... done
-+ add progress bar to GUI... done
-+ add method selection for Image deconvolution app... done
-+ logging with logger.(from logging.handlers import RotatingFileHandler)
-
-- switching to MVC model for backend separation
-- implement temporary file using tempfile.SpooledTemporaryFile
-- think about interface with ttk.Notebook() for DeconvolutionGUI -  two parts, two notebooks
-- Voxel size rework. partly done. need to finish  in first part of deconvolution_gui 
 - RLTV method update according to article
 - TM method
+- implement temporary file using tempfile.SpooledTemporaryFile
