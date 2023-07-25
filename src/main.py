@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from controller.extractor_controller import ExtractorController
 from controller.decon_controller import DeconController
+from cnn.cnn_deconvolution_gui import *
 import logging
 import logging.config
 import os
@@ -37,7 +38,7 @@ class main_window_gui(tk.Tk):
     
     def OpenNNDeconvolution(self):
         """Loadding NN deconvolution widget window"""
-        pass
+        deconvolver = CNNDeconvGUI(self)
 
     def Authors(self):
         """Loadding Authors List widget window"""
