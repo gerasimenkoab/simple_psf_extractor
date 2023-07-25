@@ -1,4 +1,3 @@
-from tkinter.filedialog import askopenfilenames
 from model.decon_psf_model import DeconPsfModel
 from model.decon_image_model import DeconImageModel
 from view.decon_view import DeconView
@@ -66,7 +65,6 @@ class DeconController:
     def LoadBead_btn_click(self,event):
         """Loading bead photo from file"""
         eventWgt = event.widget
-        # fNames = askopenfilenames(parent = eventWgt, title="Load Bead Photo")
         try:
             fNames = self.viewDecon.GetFileNamesList(eventWgt,"Load Bead Photo")
         except:
@@ -87,6 +85,7 @@ class DeconController:
         # self.modelDeconPSF.PSFImage.ShowClassInfo()
         self.viewDecon.SetFileInfoDeconPSF(self.modelDeconPSF.PSFImage.GetImageInfoStr(output = "full") )
         self.viewDecon.SetBeadImage(self.modelDeconPSF.PSFImage.imArray)
+        self.viewDecon.SetVoxelValues(self.modelDeconPSF.PSFImage.voxel)
         self.logger.info("Bead File Loaded: " + fNames[0])
         
     def UpdateBeadSizeValue(self, event=None):
@@ -151,16 +150,22 @@ class DeconController:
     def CalcPSF_btn_click(self, event=None):
         progBar = self.viewDecon.GetPsfDeconProgressbar()
         method = self.viewDecon.GetPsfDeconMethod()
-        print("test metod: ",method)
-        self.modelDeconPSF.CalculatePSF( method, progBar, self.viewDecon.deconViewToplevel )
+        self.logger.info("Starting bead deconvolution. Method code: " + method)
+        try:
+            self.modelDeconPSF.CalculatePSF( method, progBar, self.viewDecon.deconViewToplevel )
+        except Exception as e:
+            self.logger.info("Bead deconvolution failed with exception: " + str(e))
+            return
         try:
             self.viewDecon.SetPSFImage( self.modelDeconPSF.resultImage.imArray )
         except:
             return
+        self.logger.info("Bead image deconvolution finished.")
+
 
     def SavePSF_btn_click(self, event=None):
 
-        if self.modelDeconPSF.ResultImage == None:
+        if self.modelDeconPSF.resultImage == None:
             self.logger.info("Can not save. PSF was not created.")
             return
         try:
@@ -227,8 +232,7 @@ class DeconController:
                 raise ValueError(vE.args[0], vE.args[1])
         self.viewDecon.SetFileInfoPsfDeconImage(self.modelDeconImage.deconPsf.GetImageInfoStr(output = "full") )
         self.viewDecon.DrawDeconPsf(self.modelDeconImage.deconPsf.imArray)
-        self.logger.info("Bead File Loaded: " + fNames[0]) 
-        pass
+        self.logger.info("PSF File Loaded: " + fNames[0]) 
 
 
     def ImageLayerChange_clb(self,event = None):
@@ -285,16 +289,27 @@ class DeconController:
     def DeconStart_clb(self, event=None):
         progBar = self.viewDecon.GetDeconImageProgressbar()
         method = self.viewDecon.GetImageDeconMethod()
-        print("test metod: ",method)
-        self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon.deconViewToplevel )
+        decon_wgt = self.modelDeconImage
+        self.logger.info("Starting image deconvolution. Method code: " + method)
         try:
-            self.viewDecon.DrawResultImage( self.modelDeconPSF.resultImage.imArray )
+            # self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon.deconViewToplevel )
+            self.modelDeconImage.deconResult = self.modelDeconImage.deconImage
         except:
+            self.logger.info("Image deconvolution failed.")
             return
+
+
+        try:
+            self.viewDecon.deconImageView.resLayer_spinbox.configure( from_=0, to = decon_wgt.deconResult.imArray.shape[0]-1 )
+            layerId = int(self.viewDecon.deconImageView.resLayer_spinbox.get())
+            self.viewDecon.DrawResultImage(decon_wgt.deconResult.imArray[layerId,:,:])
+        except Exception as e:
+            return
+        self.logger.info("Image deconvolution finished.")
         
     def SaveDeconImage_clb(self, event=None):
         if self.modelDeconImage.deconResult == None:
-            self.logger.info("Can not save. Deconvolution result image was not created.")
+            self.logger.info("File not saved. Deconvolution result image was not created.")
             return
         try:
             fName = self.viewDecon.GetFileName(event.widget,"Select file name")
@@ -305,5 +320,5 @@ class DeconController:
         except ValueError as vE:
            self.logger.debug(str(vE[0]))
            return
-        self.logger.info("Deconvolution result image was saved as " + fName)
+        self.logger.info("Result image was saved as " + fName)
 
