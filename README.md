@@ -1,3 +1,3 @@
 # simple_psf_extractor
-implemintation of simple extractor of experimental PSF
+implementation of simple extractor of experimental PSF
 
