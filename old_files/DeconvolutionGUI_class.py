@@ -24,7 +24,7 @@ import matplotlib.ticker as plticker
 import matplotlib.cm as cm
 from scipy.ndimage import gaussian_filter
 
-from plot_for_gui import FigureCanvasTkFrom3DArray
+from old_files.plot_for_gui import FigureCanvasTkFrom3DArray
 
 import numpy as np
 import itertools

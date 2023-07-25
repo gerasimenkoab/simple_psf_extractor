@@ -1,6 +1,5 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-#import DeconvolutionGUI_class as DeGUI_cls
 from controller.extractor_controller import ExtractorController
 from controller.decon_controller import DeconController
 import logging
@@ -35,10 +34,7 @@ class main_window_gui(tk.Tk):
     def OpenDeconvolution(self):
         """Loadding Deconvolution widget window"""
         DeconController(self)
-        # child2 = DeGUI_cls.DeconvolutionGUI(self)
-        # child2.grab_set()
-        pass
-
+    
     def OpenNNDeconvolution(self):
         """Loadding NN deconvolution widget window"""
         pass

@@ -25,7 +25,7 @@ import json
 from logging import raiseExceptions
 
 import file_inout as fio
-from plot_for_gui import FigureCanvasTkFrom3DArray, FigureCanvasTk3DFrom3DArray
+from old_files.plot_for_gui import FigureCanvasTkFrom3DArray, FigureCanvasTk3DFrom3DArray
 
 # from  ImageRaw_class import ImageRaw
 
