@@ -1,18 +1,27 @@
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
-from tkinter.messagebox import showerror
-from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
+from tkinter.filedialog import askopenfilenames, asksaveasfilename
 from tkinter.simpledialog import askstring
-from PIL import ImageTk, Image, ImageEnhance
-from .AuxTkPlot_class import AuxCanvasPlot as CnvPlot
-from view.decon_view_psf import DeconvolvePSFFrame
-from view.decon_view_image import DeconvolveImageFrame
 import logging
+
+try:
+    from .AuxTkPlot_class import AuxCanvasPlot as CnvPlot
+except ImportError:
+    from AuxTkPlot_class import AuxCanvasPlot as CnvPlot
+try:
+    from view.decon_view_psf import DeconvolvePSFFrame
+except:
+    from decon_view_psf import DeconvolvePSFFrame
+try:
+    from view.decon_view_image import DeconvolveImageFrame
+except:
+    from decon_view_image import DeconvolveImageFrame
+
 
 
 """   TODO:
-        - fix  AuxTkPlot_class  for all modules
+        
         - add  bead size to tiff tag
 """
 
@@ -46,12 +55,12 @@ class DeconView:
         self.deconNotebook.add(self.deconImageView, text = "Image deconvolution")
 
         self.logOutputLabel = ttk.Label(self.deconViewToplevel)
-        self.logOutStringVar = tk.StringVar(value='Log Output')
+        self.logOutStringVar = tk.StringVar(value = 'Log Output')
         self.logOutputLabel.configure(
-            compound="top",
-            text='Log Output',
-            textvariable=self.logOutStringVar)
-        self.logOutputLabel.pack(fill="x", side="bottom")
+            compound = "top",
+            text = 'Log Output',
+            textvariable = self.logOutStringVar)
+        self.logOutputLabel.pack(fill="x", side = "bottom")
 
         # Main widget
         self.mainwindow = self.deconViewToplevel
@@ -64,10 +73,10 @@ class DeconView:
         widget.insert(0, str(value))
 
     def SetValueWidgetReadonly(self, widget, infoStr):
-        widget.configure( state="normal" )
+        widget.configure( state = "normal" )
         widget.delete(0,END)
         widget.insert( 0, infoStr )
-        widget.configure( state="readonly" )
+        widget.configure( state = "readonly" )
 
     def GetVoxelDialog(self, widget, textInfo=""):
         """
@@ -115,7 +124,7 @@ class DeconView:
         try:
             self.SetValueWidgetNormal(self.deconPsfView.beadSize_entry, abs(float(valueIn)))
         except:
-            showerror("Bead Size: ", "Bad input")
+            self.logger.info("Bead Size: Bad input")
             self.SetValueWidgetNormal(self.deconPsfView.beadSize_entry, self.deconPsfView.beadSize_entry.get())
 
     def SetFileInfoDeconPSF(self, infoStr:str):
