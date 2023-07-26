@@ -364,8 +364,8 @@ def DeconvolutionRL(image, psf, iterLimit=20, debug_flag=False):
 def DeconvolutionRLTMR(
     image: np.ndarray,
     psf: np.ndarray,
-    lambdaTM=0.0001,
-    iterLimit=20,
+    lambdaTM: float = 0.0001,
+    iterLimit: int = 20,
     debug_flag=False, pb = None , parentWin=None
 ):
     """
