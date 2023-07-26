@@ -12,3 +12,4 @@ logs/
 logs/extractor_event.log
 src/cnn/__pycache__
 src/cnn/CNN_Deconvolution/__pycache__
+extractor_event.log
