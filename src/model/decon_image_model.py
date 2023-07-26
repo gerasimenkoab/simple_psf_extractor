@@ -1,11 +1,12 @@
 import numpy as np
 import os
 from scipy.ndimage import gaussian_filter, median_filter
+from scipy.ndimage import zoom
 from .ImageRaw_class import ImageRaw
 from .decon_methods import DeconImage
 
 import logging
-
+import time
 
 class DeconImageModel:
     """Image Deconvolution module"""
@@ -87,6 +88,16 @@ class DeconImageModel:
             )
 
     def DeconvolveImage(self, deconMethodIn: str, progBarIn, masterWidget):
+        doRescaleZ = True
+        if doRescaleZ:
+            rescaleCoef = self._deconPsf.voxel["Z"] / self._deconImage.voxel["Z"] 
+            try:
+                kernell = zoom(self._deconPsf.imArray,[rescaleCoef, 1.0, 1.0])
+                # self.imagePSF.RescaleZ(self.img.voxelSize[1])
+            except Exception as e:
+                self.logger.debug("rescale failed"+str(e))
+                return
+        start_time = time.time()
         try:
             PSF = DeconImage(
                 self._deconImage.imArray,
@@ -108,4 +119,4 @@ class DeconImageModel:
         except Exception as e:
             self.logger.debug(str(e))
             return
-        self.logger.info("Experimental PSF calculated")
+        self.logger.info("Deconvolution time: %s seconds " % (time.time() - start_time))

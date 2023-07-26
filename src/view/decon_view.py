@@ -136,7 +136,8 @@ class DeconView:
         cnv = self.deconPsfView.canvasBead
         if cnv: 
             cnv.pack_forget() # remove old canvas
-        cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconPsfView.deconPSF_plot, plotName="Bead")
+        #cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconPsfView.deconPSF_plot, plotName="Bead")
+        cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, cnv, "Bead",250,450)
         cnvTmp.get_tk_widget().grid(column=0, padx=2, pady=2, row=1)
 
     def SetPSFImage(self,arrayIn):
@@ -144,7 +145,8 @@ class DeconView:
         cnv = self.deconPsfView.canvasPSF
         if cnv: 
             cnv.pack_forget() # remove old canvas
-        cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconPsfView.deconPSF_plot, plotName=" ")
+        # cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconPsfView.deconPSF_plot, plotName=" ")
+        cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, cnv, "PSF",250,450)
         cnvTmp.get_tk_widget().grid(column=1, padx=2, pady=2, row=1)
 
     def GetPsfDeconMethod(self):

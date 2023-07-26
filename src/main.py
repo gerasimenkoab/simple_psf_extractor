@@ -71,7 +71,7 @@ def main():
         logging_conf_path = os.path.join(os.path.dirname(__file__), 'logging.conf')
         logging.config.fileConfig(logging_conf_path)
     except FileNotFoundError as e:
-        print(str(e))
+        print("Logging.conf file missing." + str(e))
         return
     logger = logging.getLogger(__name__)
 

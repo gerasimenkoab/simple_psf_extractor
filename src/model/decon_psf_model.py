@@ -4,6 +4,7 @@ from .ImageRaw_class import ImageRaw
 from .decon_methods import DeconPSF
 
 import logging
+import time
 
 class DeconPsfModel():
     """
@@ -100,6 +101,7 @@ class DeconPsfModel():
             raise ValueError("Wrong regularisation parameter value", "regularization-parameter-incorrect")
 
     def CalculatePSF(self, deconMethodIn : str, progBarIn, masterWidget):
+        start_time = time.time()
         try:
             PSF = DeconPSF(
                 self._psfImage.imArray,
@@ -118,4 +120,5 @@ class DeconPsfModel():
         except Exception as e:
             self.logger.debug(str(e))
             return
-        self.logger.info("Experimental PSF calculated")
+        self.logger.info("Deconvolution time: %s seconds " % (time.time() - start_time))
+

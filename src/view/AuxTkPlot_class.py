@@ -1,11 +1,12 @@
 import numpy as np
+import tkinter as tk
+from tkinter import Canvas
+from PIL import Image
+from PIL import ImageTk
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.ticker as plticker
 import matplotlib.cm as cm
-import tkinter as tk
-from tkinter import Canvas
-from PIL import ImageTk, Image
 import itertools
 
 class AuxCanvasPlot():

@@ -1,7 +1,17 @@
-2023-07-25 23:43:32,668 __main__ INFO: Main GUI started. [in d:\python\simple_psf_extractor\src\main.py:15]
-2023-07-25 23:43:34,779 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module. [in d:\python\simple_psf_extractor\src\controller\extractor_controller.py:21]
-2023-07-25 23:43:34,779 __main__.model.extractor_model INFO: Extractor object created [in d:\python\simple_psf_extractor\src\model\extractor_model.py:13]
-2023-07-25 23:43:34,812 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done. [in d:\python\simple_psf_extractor\src\controller\extractor_controller.py:67]
-2023-07-25 23:43:37,252 __main__.model.decon_psf_model INFO: Decon PSF object created [in d:\python\simple_psf_extractor\src\model\decon_psf_model.py:15]
-2023-07-25 23:43:37,254 __main__.model.decon_image_model INFO: Decon Image object created [in d:\python\simple_psf_extractor\src\model\decon_image_model.py:16]
-2023-07-25 23:43:37,291 __main__.view.decon_view INFO: Decon PSF view loaded [in d:\python\simple_psf_extractor\src\view\decon_view.py:68]
+2023-07-26 16:56:31,409 __main__ INFO: Main GUI started.
+2023-07-26 16:56:32,687 __main__.model.decon_psf_model INFO: Decon PSF object created
+2023-07-26 16:56:32,688 __main__.model.decon_image_model INFO: Decon Image object created
+2023-07-26 16:56:32,724 __main__.view.decon_view INFO: Decon PSF view loaded
+2023-07-26 16:56:35,557 __main__.controller.decon_controller INFO: Bead File Loaded: D:/tmp/beads_average.tif
+2023-07-26 16:56:52,677 __main__.controller.decon_controller INFO: Starting bead deconvolution. Method code: RLTMR
+2023-07-26 16:57:27,002 __main__.model.decon_psf_model INFO: Deconvolution time: 34.323415756225586 seconds 
+2023-07-26 16:57:27,096 __main__.controller.decon_controller INFO: Bead image deconvolution finished.
+2023-07-26 16:58:11,785 __main__.controller.decon_controller INFO: Starting bead deconvolution. Method code: RLTMR
+2023-07-26 16:59:36,402 __main__.model.decon_psf_model INFO: Deconvolution time: 84.6151192188263 seconds 
+2023-07-26 16:59:36,497 __main__.controller.decon_controller INFO: Bead image deconvolution finished.
+2023-07-26 17:00:09,201 __main__.controller.decon_controller INFO: PSF was saved as D:/tmp/beads_psf1.tif
+2023-07-26 17:00:38,481 __main__.controller.decon_controller INFO: Bead File Loaded: D:/tmp/t2/bead_folder_7/00.tif
+2023-07-26 17:00:44,510 __main__.controller.decon_controller INFO: PSF File Loaded: D:/tmp/beads_psf1.tif
+2023-07-26 17:01:09,375 __main__.controller.decon_controller INFO: Starting image deconvolution. Method code: RLTMR
+2023-07-26 17:02:29,690 __main__.model.decon_image_model INFO: Deconvolution time: 80.28901267051697 seconds 
+2023-07-26 17:02:29,698 __main__.controller.decon_controller INFO: Image deconvolution finished.
