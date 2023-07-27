@@ -1,9 +1,13 @@
-2023-07-27 17:00:44,044 __main__ INFO: Main GUI started.
-2023-07-27 17:00:45,462 __main__.model.decon_psf_model INFO: Decon PSF object created
-2023-07-27 17:00:45,466 __main__.model.decon_image_model INFO: Decon Image object created
-2023-07-27 17:00:45,502 __main__.view.decon_view INFO: Decon PSF view loaded
-2023-07-27 17:00:49,193 __main__.controller.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/00.tif
-2023-07-27 17:00:52,807 __main__.controller.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
-2023-07-27 17:01:03,630 __main__.controller.decon_controller INFO: Starting image deconvolution. Method code: RLTMR
-2023-07-27 17:04:58,215 __main__.model.decon_image_model INFO: Deconvolution time: 234.55691933631897 seconds 
-2023-07-27 17:04:58,272 __main__.controller.decon_controller INFO: Image deconvolution finished.
+2023-07-27 20:08:18,844 __main__ INFO: Main GUI started.
+2023-07-27 20:08:20,395 __main__.model.decon_psf_model INFO: Decon PSF object created
+2023-07-27 20:08:20,398 __main__.model.decon_image_model INFO: Decon Image object created
+2023-07-27 20:08:20,436 __main__.view.decon_view INFO: Decon PSF view loaded
+2023-07-27 20:08:25,908 __main__.controller.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/image256x256.tif
+2023-07-27 20:08:30,250 __main__.controller.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
+2023-07-27 20:08:37,146 __main__.controller.decon_controller INFO: Starting image deconvolution. Method code: RLTMR
+2023-07-27 20:09:00,054 __main__.model.decon_image_model INFO: Deconvolution time: 22.875792980194092 seconds 
+2023-07-27 20:09:00,100 __main__.controller.decon_controller INFO: Image deconvolution finished.
+2023-07-27 20:09:06,940 __main__.controller.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/image512x512.tif
+2023-07-27 20:09:17,467 __main__.controller.decon_controller INFO: Starting image deconvolution. Method code: RLTMR
+2023-07-27 20:10:23,947 __main__.model.decon_image_model INFO: Deconvolution time: 66.45440745353699 seconds 
+2023-07-27 20:10:24,008 __main__.controller.decon_controller INFO: Image deconvolution finished.

@@ -16,7 +16,7 @@ import sys
 #------------------------------------------------
 # Currently known issue with CUDA: 
 # 1.slowdown after iteration. 
-# Possibly may be solved with come proper cashing management
+# Possibly may be solved with come proper kernell queue management
 # 2.Very slow retrieve of ndarray from GPU.
 #------------------------------------------------
 # import cusignal
@@ -395,6 +395,7 @@ def DeconvolutionRLTMR(
     # preparing for start of iteration cycle
     f_old = hm
     # starting iteration cycle
+    totaltime = time.time()
     for k in range(0, iterLimit):
         print("\r", "iter:", k, end=" ")
         # first convolution
@@ -405,17 +406,16 @@ def DeconvolutionRLTMR(
         # second convolution
         p1 = np.flip(p)
         rnew = signal.fftconvolve(r, p1, mode="same")
-        print("CPU Conv time:", time.time()-starttime)
-        starttime = time.time()
         rnew = np.real(rnew)
         regTM = 1.0 + 2.0 * lambdaTM * laplace(f_old)
         f_old = f_old * rnew / regTM
         f_old = f_old / np.amax(f_old) * beadMaxInt
+        print("CPU Conv time:", time.time()-starttime)
         if pb != None:
             # updating progressbar
             pb.step(pb_step)
             parentWin.update_idletasks()
-        print("Regulariz time:", time.time()-starttime)
+    print("CPU total time:", time.time()-totaltime)
 
     f_old = f_old[padSh[0]:-padSh[0], padSh[1]:-padSh[1], padSh[2]:-padSh[2]]
 
@@ -430,14 +430,20 @@ def DeconvolutionRLTMR(
 # 
 
 # @cp.fuse()
-# def r_fuse(hm_gpu, e_gpu):
-#     r_gpu = hm_gpu / e_gpu
+# def fuse1(hm_gpu, b_noize, e_gpu):
+#     r_gpu = hm_gpu / (e_gpu + b_noize)
 #     return r_gpu
 
 # @cp.fuse()
 # def e_fuse(b_noize, e_gpu):
 #     e_gpu = e_gpu + b_noize
 #     return e_gpu
+
+# @cp.fuse()
+# def r_fuse(hm_gpu, e_gpu):
+#     r_gpu = hm_gpu / e_gpu
+#     return r_gpu
+
 
 # @cp.fuse()
 # def f_old_fuse(beadMaxInt, f_old_gpu, rNew_gpu, regTM_gpu,max_f_old_gpu):
@@ -501,12 +507,18 @@ def DeconvolutionRLTMR(
 #         pb_step = 100 / iterLimit
 #     # preparing for start of iteration cycle
 #     f_old = hm
-#     # starting iteration cycle
-#     print("Image memory size %d KB" % (sys.getsizeof(f_old)//1.e3))
+#     # setting CUDA memory limits
+#     # with cp.cuda.Device(0):
+#     #     mempool.set_limit(size=2*1024**3)  # 2 GiB
+#     print("Image memory size %d MB" % (sys.getsizeof(f_old)*1.e-6))
 #     psf_gpu = cp.array(p)
 #     psf_flip_gpu = cp.flip(psf_gpu)
-#     hm_gpu= cp.array(hm)
+#     hm_gpu = cp.array(hm)
 #     f_old_gpu = cp.array(f_old)
+#     totalBytes = hm_gpu.nbytes + psf_gpu.nbytes + f_old_gpu.nbytes
+#     print('Expecting {} GB of GPU memory!'.format(totalBytes * 1e-9)) #4 GB have !!
+#     totaltime= time.time()
+#     # starting iteration cycle
 #     for k in range(0, iterLimit):
 #         # print("\r", "iter:", k, end=" ")
 #         print("iter:", k, end=" ")
@@ -515,15 +527,14 @@ def DeconvolutionRLTMR(
 #         starttime = time.time()
 #         try:
 #             e_gpu = cusignal.fftconvolve(f_old_gpu, psf_gpu, mode="same")
-#             e_gpu = e_fuse(b_noize, e_gpu)
-#             r_gpu = r_fuse(hm_gpu, e_gpu)
+#             r_gpu = fuse1(hm_gpu, b_noize, e_gpu)
 #             rNew_gpu = cusignal.fftconvolve(r_gpu, psf_flip_gpu, mode="same")
 #             lapl_f_old_gpu = laplace_gpu(f_old_gpu)
 #             regTM_gpu = regTM_fuse( lambdaTM, lapl_f_old_gpu)
 #             rNew_gpu =cp.real(rNew_gpu)
 #             max_f_old_gpu = cp.amax(f_old_gpu)
 #             f_old_gpu = f_old_fuse(beadMaxInt, f_old_gpu, rNew_gpu, regTM_gpu, max_f_old_gpu)
-
+#             cp.cuda.runtime.deviceSynchronize()
 #         except Exception as e:
 #             print("CUDA problem "+str(e))
 #             return
@@ -532,6 +543,8 @@ def DeconvolutionRLTMR(
 #             pb.step(pb_step)
 #             parentWin.update_idletasks()
 #         print(" GPU Conv time: %7.4f s" % (time.time()-starttime))
+    
+#     print(" GPU total time: %7.4f s" % (time.time()-totaltime ))
 #     startTime = time.time()
 #     print("Recieving data, from GPU...", end= "")
 #     f_old = cp.ndarray.get(f_old_gpu)
