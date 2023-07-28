@@ -88,11 +88,13 @@ class DeconImageModel:
             )
 
     def DeconvolveImage(self, deconMethodIn: str, progBarIn, masterWidget):
-        doRescaleZ = True
-        if doRescaleZ:
-            rescaleCoef = self._deconPsf.voxel["Z"] / self._deconImage.voxel["Z"] 
+        doRescalePSF = True
+        if doRescalePSF:
+            rescaleCoefZ = self._deconPsf.voxel["Z"] / self._deconImage.voxel["Z"] 
+            rescaleCoefY = self._deconPsf.voxel["Y"] / self._deconImage.voxel["Y"] 
+            rescaleCoefX = self._deconPsf.voxel["X"] / self._deconImage.voxel["X"] 
             try:
-                kernell = zoom(self._deconPsf.imArray,[rescaleCoef, 1.0, 1.0])
+                kernell = zoom(self._deconPsf.imArray,[rescaleCoefZ, rescaleCoefY, rescaleCoefX])
                 # self.imagePSF.RescaleZ(self.img.voxelSize[1])
             except Exception as e:
                 self.logger.debug("rescale failed"+str(e))

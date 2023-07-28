@@ -300,6 +300,7 @@ class DeconController:
         method = self.viewDecon.GetImageDeconMethod()
         decon_wgt = self.modelDeconImage
         self.logger.info("Starting image deconvolution. Method code: " + method)
+        
         try:
             self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon.deconViewToplevel )
             # self.modelDeconImage.deconResult = self.modelDeconImage.deconImage
