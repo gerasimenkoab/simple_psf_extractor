@@ -77,37 +77,55 @@ class ExtractorController:
         """Loading raw beads photo from file"""
         fNames = askopenfilenames( title="Load Beads Photo")
         if fNames is None:
+            self.logger.debug("File list from dialog is empty. "+fNames[0])
             raise ValueError("No file name recieved", "filename_empty")
         try:
             self.model.SetMainImage(fNames)
         except ValueError as vE:
             if vE.args[1] == "voxel_problem":
+                self.logger.debug("No voxel info recieved. Running voxel input dialog.")
                 try:
-                    tmpList = self.GetVoxelDialog(
-                        "Enter voxel size as z,x,y in \u03BCm"
-                    )
+                    tmpList = self.GetVoxelDialog( "Enter voxel size as z,x,y in \u03BCm"  )
+                except Exception as e:
+                    self.logger.debug("file(s) load failed. "+ str(e))
+                    raise ValueError("Can not get voxel info from dialog", "voxel-dialog-fail")
+                self.logger.debug("From dialog recieved: "+str(tmpList))
+                try:
                     self.model.SetMainImage(fNames, tmpList)
                 except ValueError as vE1:
-                    raise ValueError(vE1.args[0], vE1.args[1])
+                    self.logger.error("file(s) load failed. Can not get voxel info from dialog ")
+                    raise ValueError("Can not get voxel info from dialog", "voxel-dialog-fail")
             elif vE.args[1] == "data_problem":
+                self.logger.error("file(s) load failed. "+fNames[0])
                 raise ValueError(vE.args[0], vE.args[1])
             else:
-                raise ValueError(vE.args[0], vE.args[1])
+                self.logger.error("file(s) load failed. "+fNames[0])
+                raise ValueError("Unknown error", "unknown-error")
         self.model.BeadCoordsClear()
         self.model.mainImage.ShowClassInfo()
-        self.logger.info("LoadsBeadPhoto: file(s) loaded. ")
+        self.logger.info("File(s) load success. ")
+
+        # visualisation:
         try:
-            try:
-                os.remove("tmp.tiff")
-            except:
-                pass
+            os.remove(self.view.CloseMainPhotoFile())
+        except:
+            self.logger.debug("tmp.tiff cant be remove or not exist")            
+        try:
             self.model.mainImage.SaveAsTiff(filename="tmp.tiff")
-            self.view.SetMainPhotoImage("tmp.tiff")
-            self.view.SetVoxelValues(self.model.mainImage.voxel)
-            self.logger.info("LoadsBeadPhoto: tmp.tiff created ")
         except Exception as e:
             self.logger.error("LoadsBeadPhoto: can't create tmp.tiff " + str(e))
             raise IOError("Cant update GUI properly")
+        try:
+            self.view.SetMainPhotoImage("tmp.tiff")
+        except Exception as e:
+            self.logger.error("LoadsBeadPhoto: can't show tmp.tiff  " + str(e))
+            raise IOError("Cant update GUI properly")
+        try:
+            self.view.SetVoxelValues(self.model.mainImage.voxel)
+        except Exception as e:
+            self.logger.error("LoadsBeadPhoto: can't set voxel values " + str(e))
+            raise IOError("Cant update GUI properly")
+        self.logger.debug("LoadsBeadPhoto: tmp.tiff created ")
 
     def ClearMarks(self, event=None):
         """Clear bead marks"""

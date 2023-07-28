@@ -133,12 +133,16 @@ class ExtractorModel:
             bound1 = int(i[1] - d)
             bound2 = int(i[1] + d)
             elem = self._mainImage.imArray[:, bound1:bound2, bound3:bound4]
-            # shifting array max intesity toward center along Z axis
-            iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
-            zc = int(elem.shape[0] / 2)
-            shift = zc - iMax[0]
-            elem = np.roll(elem, shift=shift, axis=0)
-            iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
+            if elem.shape[1] < 128: # dont shift if selection bigger than 128x128
+                # shifting array max intesity toward center along Z axis
+                iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
+                zc = int(elem.shape[0] / 2)
+                shift = zc - iMax[0]
+                elem = np.roll(elem, shift=shift, axis=0)
+                #iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
+            print("bead extracted:", idx, np.amax(elem))
+            elem = elem / np.amax(elem) * 255
+            print("bead intensity:", idx, np.amax(elem))
             self._extractedBeads.append(ImageRaw(None, voxel, elem))
         return len(self._extractedBeads)
 

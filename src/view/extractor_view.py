@@ -77,12 +77,12 @@ class ExtractorView(tk.Toplevel):
             side=LEFT, padx=2, pady=2
         )
         ttk.Label(f1_1, text=" Layer:").pack(side=LEFT, padx=2, pady=2)
-        ttk.Button(f1_1, text="+",width=3, command=self.ShowNextLayer).pack(
+        ttk.Button(f1_1, text="-",width=3, command=self.ShowPrevLayer).pack(
             side=LEFT, padx=2, pady=2
         )
         self.label_beadsPhotoLayerID = ttk.Label(f1_1, text=str(self.beadsPhotoLayerID))
         self.label_beadsPhotoLayerID.pack(side=LEFT, padx=2, pady=2)
-        ttk.Button(f1_1, text="-",width=3, command=self.ShowPrevLayer).pack(
+        ttk.Button(f1_1, text="+",width=3, command=self.ShowNextLayer).pack(
             side=LEFT, padx=2, pady=2
         )
         f1_1.grid(row=1, column=0, columnspan=2)
@@ -326,6 +326,11 @@ class ExtractorView(tk.Toplevel):
         self.imgBeadsRaw.seek(self.beadsPhotoLayerID)
         self.UpdateBeadSelectionWidgetImage()
 
+    def CloseMainPhotoFile(self):
+        fileName = self.imgBeadsRaw.filename
+        self.imgBeadsRaw.close()
+        return fileName
+    
     def SetMainPhotoImage(self, tmpFilePath=None):
         """Loading raw beads photo from file"""
         if tmpFilePath is None:

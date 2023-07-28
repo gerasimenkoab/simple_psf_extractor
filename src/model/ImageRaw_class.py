@@ -8,6 +8,8 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.cm as cm
 import json
+
+# for __main__ testing call
 from tkinter.filedialog import askopenfilenames
 import traceback
 
