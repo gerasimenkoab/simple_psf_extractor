@@ -154,6 +154,8 @@ class ExtractorController:
     def ProcessBeads(self, event=None):
         self.model.BeadsArithmeticMean()
         self.model.BlurAveragedBead(self.view.blurApplyType.get())
+        if self.view.precessBeadPrev.get() == 1:
+            self.view.PlotCanvasInWindow(self.model.averageBead.imArray)
 
     def SaveAverageBead(self, event=None):
         self.model.SaveAverageBead(asksaveasfilename())

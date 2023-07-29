@@ -203,14 +203,14 @@ class ExtractorView(tk.Toplevel):
         )
         blurTypeSelect.current(0)
         blurTypeSelect.pack(side=LEFT)
-        self.doRescaleOverZ = IntVar(value=0)
-        ttk.Checkbutton(
-            frameBlurTypeSelect,
-            variable=self.doRescaleOverZ,
-            text=" equal XYZ scale",
-            onvalue=1,
-            offvalue=0,
-        ).pack(side=LEFT, padx=2, pady=2)
+        # self.doRescaleOverZ = IntVar(value=0)
+        # ttk.Checkbutton(
+        #     frameBlurTypeSelect,
+        #     variable=self.doRescaleOverZ,
+        #     text=" equal XYZ scale",
+        #     onvalue=1,
+        #     offvalue=0,
+        # ).pack(side=LEFT, padx=2, pady=2)
         self.precessBeadPrev = IntVar(value=0)
         ttk.Checkbutton(
             frameBlurTypeSelect,
@@ -462,6 +462,15 @@ class ExtractorView(tk.Toplevel):
             )
         except Exception as e:
             raise RuntimeError("Bead 2D plot failed" + str(e))
+    def PlotCanvasInWindow(self, arrayIn: np.ndarray):
+        top = Toplevel(self)
+        top.geometry("600x600")
+        cnvCompare = Canvas(top, width=590, height=590, bg="white")
+        cnvCompare.pack(side=TOP, fill=BOTH, expand=True)
+        figImg = AuxCanvasPlot.FigureCanvasTkFrom3DArray(
+                arrayIn, cnvCompare, plotName=""            )
+        figImg.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
+        tk.Button(top,text="Close",command = lambda :top.destroy()).pack(side=TOP)
 
     def PlotBeadPreview3D(self, beadArray):
         """ "Plots three bead in 3D pointplot"""
