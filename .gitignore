@@ -13,3 +13,10 @@ logs/extractor_event.log
 src/cnn/__pycache__
 src/cnn/CNN_Deconvolution/__pycache__
 extractor_event.log
+src/cnn/help_instuctions/__pycache__/LoadHelpWindow.cpython-310.pyc
+logs/extractor_event.log
+venv/
+src/dist
+src/build
+src/installer-setup.ifp
+src/main.spec

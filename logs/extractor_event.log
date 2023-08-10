@@ -1,7 +1,11 @@
-2023-07-29 11:09:39,590 __main__ INFO: Main GUI started.
-2023-07-29 11:09:40,877 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
-2023-07-29 11:09:40,877 __main__.model.extractor_model INFO: Extractor object created
-2023-07-29 11:09:40,903 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
-2023-07-29 11:09:54,473 __main__.controller.extractor_controller INFO: File(s) load success. 
-2023-07-29 11:09:56,980 __main__.controller.extractor_controller INFO: ExtractBeads: number of extracted beads = 2
-2023-07-29 11:10:10,696 __main__.controller.extractor_controller INFO: Bead Extractor Closed.
+2023-08-10 11:21:36,839 __main__ INFO: Main GUI started.
+2023-08-10 11:21:39,031 __main__.model.decon_psf_model INFO: Decon PSF object created
+2023-08-10 11:21:39,033 __main__.model.decon_image_model INFO: Decon Image object created
+2023-08-10 11:21:39,052 __main__.view.decon_view INFO: Decon PSF view loaded
+2023-08-10 11:22:07,762 __main__.controller.decon_controller INFO: Bead File Loaded: E:/YandexDisk/pyprog_practice/data_check_28_10_2022/tests (0.022, 0.022, 0.1)/microscope _photo/Project.lif_Series026/Project.lif_Series026_z00.tif
+2023-08-10 11:22:39,503 __main__.controller.decon_controller INFO: Bead File Loaded: E:/YandexDisk/pyprog_practice/data_check_28_10_2022/tests (0.022, 0.022, 0.1)/microscope _photo/Project.lif_Series026/Project.lif_Series026_z00.tif
+2023-08-10 11:23:31,453 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
+2023-08-10 11:23:31,454 __main__.model.extractor_model INFO: Extractor object created
+2023-08-10 11:23:31,469 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
+2023-08-10 11:23:48,929 __main__.controller.extractor_controller INFO: File(s) load success. 
+2023-08-10 11:24:31,438 __main__.controller.extractor_controller INFO: ExtractBeads: number of extracted beads = 10
