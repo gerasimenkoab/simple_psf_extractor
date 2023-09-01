@@ -20,3 +20,4 @@ src/dist
 src/build
 src/installer-setup.ifp
 src/main.spec
+src/model/test.py
