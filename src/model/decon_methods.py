@@ -1,9 +1,11 @@
 from scipy import signal 
 import numpy as np
-import itertools
+from itertools import product, repeat
 from scipy.special import jv
 from scipy.ndimage import laplace
 
+from multiprocessing import Pool
+from os import cpu_count, getpid
 
 import time
 import sys
@@ -73,7 +75,7 @@ def DeconPSF(
     return imagePSF
 
 
-def DeconImage(
+def DeconImageOld(
     image: np.ndarray, kernell: np.ndarray,
     iterNum: int, deconType: str, lambdaR: float, progBar, parentWin
 ):
@@ -133,6 +135,107 @@ def DeconImage(
             imageDeconvolved[:,i:iEnd, j:jEnd] = chunkDeconvolved 
     return imageDeconvolved
 
+# ====== decon image with multithreading
+def DeconImage(
+    image: np.ndarray, kernell: np.ndarray,
+    iterNum: int, deconType: str, lambdaR: float, progBar, parentWin
+):
+    """
+    General function for restoration of image with known PSF(kernell)
+    Input:
+        image: np.ndarray  - averaged single bead image
+        kernell: np.ndarray - PSF or other kernell
+        iterNum: int - number of iteration steps
+        deconType: str  - deconvolution method name ( default - RL)
+        lambdaR: float - regularization coefficient
+        progBar : ttk.progressbar - progressbar to update
+        parentWin : tkinter window widget
+
+    Returns:
+        imagePSF: np.ndarray
+    """
+    imageDeconvolved = np.copy(image)
+    chunkDimX = image.shape[2] // 4 # chunk size X
+    chunkDimY = image.shape[1] // 4 # chunk size Y
+    chunkList = [] 
+    poolSize = cpu_count() - 2
+    # crating list of image chunks
+    for i in range(0, image.shape[1], chunkDimY):
+        if i <= image.shape[1]-chunkDimY:
+            iEnd = i + chunkDimY
+        else:
+            iEnd= i + image.shape[1] % chunkDimY
+        for j in range(0,image.shape[2], chunkDimX):
+            if j <= image.shape[1]-chunkDimY:
+                jEnd = j + chunkDimX
+            else:
+                jEnd= j + image.shape[2] % chunkDimX
+            chunkList.append(image[:,i:iEnd, j:jEnd])
+    #preparing list of arguments for mutliprocessing
+    argsList = zip(chunkList,
+                    repeat(kernell),
+                    repeat(iterNum),
+                    repeat(False),
+                    repeat(None),
+                    repeat(None)
+                    ) 
+    # run multiprocess computations.
+    with Pool(processes = poolSize) as workers:
+        if deconType == "RL":
+            # Richardson Lucy
+            argsList = zip(chunkList,
+                        repeat(kernell),
+                        repeat(iterNum),
+                        repeat(False),
+                        # repeat(None),
+                        # repeat(None)
+                        )
+            chunkListDec = workers.starmap(MaxLikelhoodEstimationFFT_3D, argsList)
+        elif deconType == "RLTMR":
+            # Richardson Lucy with Tikhonov-Miller regularisation
+            argsList = zip(chunkList,
+                repeat(kernell),
+                repeat(iterNum),
+                repeat(False),
+                repeat(lambdaR)
+                # repeat(None),
+                # repeat(None)
+                ) 
+            chunkListDec = workers.starmap(DeconvolutionRLTMR, argsList)
+        elif deconType == "RLTVR":
+            # Richardson Lucy with Total Variation regularisation
+            argsList = zip(chunkList,
+                repeat(kernell),
+                repeat(iterNum),
+                repeat(False),
+                repeat(lambdaR)
+                # repeat(None),
+                # repeat(None)
+                ) 
+            chunkListDec = workers.starmap(DeconvolutionRLTVR, argsList)
+        else:
+            chunkListDec = None
+            print("DeconImage: Invalid option. Please choose a valid option.")
+
+    # collect chunks into array.
+    chunkID = 0
+    for i in range(0, image.shape[1], chunkDimY):
+        if i <= image.shape[1]-chunkDimY:
+            iEnd = i + chunkDimY
+        else:
+            iEnd= i + image.shape[1] % chunkDimY
+        for j in range(0,image.shape[2], chunkDimX):
+            if j <= image.shape[1]-chunkDimY:
+                jEnd = j + chunkDimX
+            else:
+                jEnd= j + image.shape[2] % chunkDimX
+            imageDeconvolved[:,i:iEnd, j:jEnd] = chunkListDec[chunkID] 
+            chunkID += 1
+    return imageDeconvolved
+
+
+
+#====== end of decon image with multithreading
 
 def PointFunction(pt, r0, r, maxIntensity):
     """
@@ -224,7 +327,7 @@ def MakeIdealSphereArray(imgSize=36, sphRadius=5):
     # lightIntensity = np.iinfo(tiffBit).max
     lightIntensity = 255
 
-    for i, j, k in itertools.product(range(imgSize), repeat=3):
+    for i, j, k in product(range(imgSize), repeat=3):
         tiffDraw[i, j, k] = PointFunctionAiry(
             np.array([i, j, k]), imgCenter, lightIntensity
         )
@@ -247,61 +350,54 @@ def LoadIdealSphereArray(imgSize=36, sphRadius=5):
     return tiffDraw
 
 
-def MaxLikelhoodEstimationFFT_3D(pImg, idSphImg, iterLimit=20, debug_flag=False, pb = None , parentWin=None):
+def MaxLikelhoodEstimationFFT_3D(image, kernell, iterLimit=20, debug_flag=False, pb = None , parentWin=None):
     """
     Function for  convolution with (Maximum likelihood estimaton)Richardson-Lucy method
+    For psf calculation kernell = ideal sphere
     """
-    hm = pImg
+    print("Chunk on process: %d" %getpid())
+    f_0 = image
     # if there is NAN in image array(seems from source image) replace it with zeros
-    hm[np.isnan(hm)] = 0
-    beadMaxInt = np.amax(pImg)
-#    pImg = pImg / beadMaxInt * np.amax(idSphImg)
-    padSh = idSphImg.shape
-    hm = np.pad(hm, list(zip(padSh, padSh)), "edge")
-    b_noize = (np.mean(hm[0, 0, :]) + np.mean(hm[0, :, 0]) + np.mean(hm[:, 0, 0])) / 3
+    f_0[np.isnan(f_0)] = 0
+    beadMaxInt = np.amax(image)
+    padSh = kernell.shape
+    f_0 = np.pad(f_0, list(zip(padSh, padSh)), "edge")
+    b_noize = (np.mean(f_0[0, 0, :]) + np.mean(f_0[0, :, 0]) + np.mean(f_0[:, 0, 0])) / 3
 
     if debug_flag:
         print("Debug output:")
-        print(np.mean(hm[0, 0, :]), np.mean(hm[0, :, 0]), np.mean(hm[:, 0, 0]))
-        print(np.amax(hm[0, 0, :]), np.amax(hm[0, :, 0]), np.amax(hm[:, 0, 0]))
-        print(hm[0, 0, 56], hm[0, 56, 0], hm[56, 0, 0])
-    #        input("debug end")
-    #    b_noize = 0.1
-    #    print("Background intensity:", b_noize)
-    #    print('max intensity value:', np.amax(hm))
-    p = idSphImg
+        print(np.mean(f_0[0, 0, :]), np.mean(f_0[0, :, 0]), np.mean(f_0[:, 0, 0]))
+        print(np.amax(f_0[0, 0, :]), np.amax(f_0[0, :, 0]), np.amax(f_0[:, 0, 0]))
+        print(f_0[0, 0, 56], f_0[0, 56, 0], f_0[56, 0, 0])
     # preparing for start of iteration cycle
-    f_old = hm
-    P = np.fft.fftn(p)
+    f_i = f_0
+    # initializing progressbar
     if pb != None:
-        # initializing progressbar
         pb['value'] = 0
         pb_step = 100 / iterLimit
     # starting iteration cycle
-    for k in range(0, iterLimit):
-        print("\r", "iter:", k, end=" ")
+    for i in range(0, iterLimit):
+        # print("\r", "iter:", i, end=" ")
         # first convolution
-        e = signal.fftconvolve(f_old, p, mode="same")
-        # e = np.real(e)
+        e = signal.fftconvolve(f_i, kernell, mode="same")
         e = e + b_noize
-        r = hm / e
+        r = f_0 / e
         # second convolution
-        p1 = np.flip(p)
-        rnew = signal.fftconvolve(r, p1, mode="same")
-        rnew = np.real(rnew)
-        #      rnew = rnew.clip(min=0)
-        f_old = f_old * rnew
+        pReversed = np.flip(kernell)
+        rConv = signal.fftconvolve(r, pReversed, mode="same")
+        rConv = np.real(rConv)
+        #      rConv = rConv.clip(min=0)
+        f_i = f_i * rConv
 
-        f_old = f_old / np.amax(f_old) * beadMaxInt
+        f_i = f_i / np.amax(f_i) * beadMaxInt
 
-        if pb != None:             # updaiting progressbar
+        # updaiting progressbar
+        if pb != None: 
             pb.step(pb_step)
             parentWin.update_idletasks()
 
     # end of iteration cycle
-
-    f_old = f_old[padSh[0]:-padSh[0], padSh[1]:-padSh[1], padSh[2]:-padSh[2]]
-    return f_old
+    return f_i[padSh[0]:-padSh[0], padSh[1]:-padSh[1], padSh[2]:-padSh[2]]
 
 
 def DeconvolutionRL(image, psf, iterLimit=20, debug_flag=False):
@@ -330,8 +426,6 @@ def DeconvolutionRL(image, psf, iterLimit=20, debug_flag=False):
         )
     # preparing for start of iteration cycle
     f_old = hm
-    #    Hm = np.fft.fftn(hm)
-    #    P = np.fft.fftn(p)
     # starting iteration cycle
     for k in range(0, iterLimit):
         print("\r", "iter:", k, end=" ")
