@@ -83,18 +83,19 @@ class ExtractorController:
             self.model.SetMainImage(fNames)
         except ValueError as vE:
             if vE.args[1] == "voxel_problem":
-                self.logger.debug("No voxel info recieved. Running voxel input dialog.")
+                self.logger.debug("No voxel info recieved. Open voxel input dialog.")
                 try:
                     tmpList = self.GetVoxelDialog( "Enter voxel size as z,x,y in \u03BCm"  )
+                    print("recieved:", tmpList)
                 except Exception as e:
                     self.logger.debug("file(s) load failed. "+ str(e))
                     raise ValueError("Can not get voxel info from dialog", "voxel-dialog-fail")
                 self.logger.debug("From dialog recieved: "+str(tmpList))
                 try:
-                    self.model.SetMainImage(fNames, tmpList)
+                    self.model.SetMainImage(fname=fNames, voxel = tmpList, array = None)
                 except ValueError as vE1:
-                    self.logger.error("file(s) load failed. Can not get voxel info from dialog ")
-                    raise ValueError("Can not get voxel info from dialog", "voxel-dialog-fail")
+                    self.logger.error("file(s) load failed. Can not use voxel info from dialog ")
+                    raise ValueError("Can not use voxel info from dialog", "voxel-dialog-fail")
             elif vE.args[1] == "data_problem":
                 self.logger.error("file(s) load failed. "+fNames[0])
                 raise ValueError(vE.args[0], vE.args[1])
@@ -105,7 +106,7 @@ class ExtractorController:
         self.model.mainImage.ShowClassInfo()
         self.logger.info("File(s) load success. ")
 
-        # visualisation:
+        # visualization:
         try:
             os.remove(self.view.CloseMainPhotoFile())
         except:

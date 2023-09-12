@@ -1,10 +1,13 @@
-2023-09-12 13:34:54,297 __main__ INFO: Main Utilites Launcher started.
-2023-09-12 13:35:00,257 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
-2023-09-12 13:35:00,258 __main__.model.extractor_model INFO: Extractor object created
-2023-09-12 13:35:00,276 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
-2023-09-12 13:35:03,336 __main__.model.decon_psf_model INFO: Decon PSF object created
-2023-09-12 13:35:03,337 __main__.model.decon_image_model INFO: Decon Image object created
-2023-09-12 13:35:03,358 __main__.view.decon_view INFO: Decon PSF view loaded
-2023-09-12 13:35:16,691 __main__.model.decon_psf_model INFO: Decon PSF object created
-2023-09-12 13:35:16,693 __main__.model.decon_image_model INFO: Decon Image object created
-2023-09-12 13:35:16,713 __main__.view.decon_view INFO: Decon PSF view loaded
+2023-09-12 16:07:04,650 __main__ INFO: Main Utilites Launcher started.
+2023-09-12 16:07:06,654 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
+2023-09-12 16:07:06,654 __main__.model.extractor_model INFO: Extractor object created
+2023-09-12 16:07:06,673 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
+2023-09-12 16:07:17,105 __main__.controller.extractor_controller INFO: File(s) load success. 
+2023-09-12 16:07:44,261 __main__.controller.extractor_controller INFO: Bead Extractor Closed.
+2023-09-12 16:07:45,598 __main__.model.decon_psf_model INFO: Decon PSF object created
+2023-09-12 16:07:45,600 __main__.model.decon_image_model INFO: Decon Image object created
+2023-09-12 16:07:45,620 __main__.view.decon_view INFO: Decon PSF view loaded
+2023-09-12 16:08:14,801 __main__.controller.decon_controller INFO: PSF File Loaded: E:/test/bead_deconv/psf_bead.tif
+2023-09-12 16:08:24,130 __main__.controller.decon_controller INFO: Starting image deconvolution. Method code: RLTMR
+2023-09-12 16:09:02,227 __main__.model.decon_image_model INFO: Deconvolution time: 38.08231163024902 seconds 
+2023-09-12 16:09:02,277 __main__.controller.decon_controller INFO: Image deconvolution finished.

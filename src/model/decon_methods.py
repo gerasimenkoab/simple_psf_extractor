@@ -28,7 +28,7 @@ def DeconPSF(
     deconType: str, lambdaR: float, progBar, parentWin
 ):
     """
-    General function for restoration of PSF
+    General function for restoration of PSF. Singlethreaded since image size is small.
     Input:
         image: np.ndarray  - averaged single bead image
         beadSizePx: int - actual bead size in pixels

@@ -48,13 +48,13 @@ class ImageRaw:
                         raise ValueError("Can not set voxel from the argument.","voxel_problem")
         else:
             if imArrayIn is None:
-                imArrayIn,tagString = self.LoadImageFile(fpath, 270)
+                imArrayFile,tagString = self.LoadImageFile(fpath, 270)
                 if tagString == "" :
                     if voxelSizeIn is None:
                         raise ValueError("No voxel recieved from file or as argument","voxel_problem")
                     else:
                         try:
-                            self.SetArray(imArrayIn)
+                            self.SetArray(imArrayFile)
                         except:
                             raise ValueError("Can not set array from file.","data_problem")
                         try:
@@ -62,19 +62,28 @@ class ImageRaw:
                         except:
                             raise ValueError("Can not set voxel from argument.","voxel_problem")
                 else:
-                    try:
-                        self.SetArray(imArrayIn)
-                    except:
-                        raise ValueError("Can not set array.","data_problem")
-                    try:
+                    if voxelSizeIn is None:
                         try:
-                            voxelSizeIn = json.loads(tagString)
-                        except Exception as e:
-                            print(str(e))
-                            raise ValueError("Can not convert tag. Check tag format.","voxel_problem")
-                        self.SetVoxel( [voxelSizeIn["Z"], voxelSizeIn["X"], voxelSizeIn["Y"]] ) 
-                    except:
-                        raise ValueError("Can not set voxel from tag. Check tag format.","voxel_problem")
+                            self.SetArray(imArrayFile)
+                        except:
+                            raise ValueError("Can not set array from file.","data_problem")
+                        try:
+                            try:
+                                voxelSizeIn = json.loads(tagString)
+                            except :
+                                raise ValueError("Can not convert tag. Check tag format.","voxel_problem")
+                            self.SetVoxel( [voxelSizeIn["Z"], voxelSizeIn["X"], voxelSizeIn["Y"]] ) 
+                        except:
+                            raise ValueError("Can not set voxel from tag. Check tag format.","voxel_problem")
+                    else:
+                        try:
+                            self.SetArray(imArrayFile)
+                        except:
+                            raise ValueError("Can not set array from file.","data_problem")
+                        try:
+                            self.SetVoxel(voxelSizeIn)
+                        except:
+                            raise ValueError("Can not set voxel from argument.","voxel_problem")
             else:
                 raise ValueError("Only one source of data for pixel values allowed","data_problem")
 
