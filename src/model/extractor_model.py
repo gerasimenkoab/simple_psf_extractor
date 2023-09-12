@@ -89,7 +89,7 @@ class ExtractorModel:
             return
         self._beadCoords = []
 
-    def LocateFrameMAxIntensity3D(self, xi, yi):
+    def LocateFrameMaxIntensity3D(self, xi, yi):
         """Locate point with maximum intensity in current 3d array.
         In:
            xi - approximate bead coordinate X
@@ -105,8 +105,10 @@ class ExtractorModel:
         bound4 = int(xi + d)
         bound1 = int(yi - d)
         bound2 = int(yi + d)
-        sample = self._mainImage.imArray[:, bound1:bound2, bound3:bound4]
-        coords = np.unravel_index(np.argmax(sample, axis=None), sample.shape)
+#        # create blured array from sample from slice
+        bluredSample = gaussian_filter(self._mainImage.imArray[:, bound1:bound2, bound3:bound4], sigma=1)
+        # find max coords on blured array
+        coords = np.unravel_index(np.argmax(bluredSample, axis=None), bluredSample.shape)
         return coords[2] + bound3, coords[1] + bound1
 
     def SetVoxelSize(self, newVoxelSizeList):
@@ -139,10 +141,6 @@ class ExtractorModel:
                 zc = int(elem.shape[0] / 2)
                 shift = zc - iMax[0]
                 elem = np.roll(elem, shift=shift, axis=0)
-                #iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
-            print("bead extracted:", idx, np.amax(elem))
-            elem = elem / np.amax(elem) * 255
-            print("bead intensity:", idx, np.amax(elem))
             self._extractedBeads.append(ImageRaw(None, voxel, elem))
         return len(self._extractedBeads)
 

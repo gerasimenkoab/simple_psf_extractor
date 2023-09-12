@@ -210,10 +210,8 @@ class ExtractorController:
         widget = event.widget
         xClick, yClick = widget.canvasx(event.x), widget.canvasy(event.y)
         if self.view.autocorrectSelection.get() == 1:
-            print("corrected")
-            xr, yr = self.model.LocateFrameMAxIntensity3D(xClick, yClick)
+            xr, yr = self.model.LocateFrameMaxIntensity3D(xClick, yClick)
         else:
-            print("no correction")
             xr, yr = xClick, yClick
         self.model.beadMarkAdd([xr, yr])
         self.view.beadMarkAdd(widget, xr, yr)

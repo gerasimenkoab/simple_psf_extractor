@@ -126,6 +126,7 @@ class ImageRaw:
                     ra = np.array(r)
                     ga = np.array(g)
                     ba = np.array(b)
+                    #recalculate greyscale intensity from rgb values
                     grayImgArr = 0.299 * ra + 0.587 * ga + 0.114 * ba
                     imgArray[i, :, :] = grayImgArr
             else:
@@ -136,7 +137,7 @@ class ImageRaw:
             try:
                 image_preread = Image.open(fileNameList[0])
             except:
-                raise Exception
+                raise FileNotFoundError("Can't load file: {} ".format(fileNameList[0]) )
             print("color_mode:", image_preread.mode, ".......", end=" ")
             nlayers = len(fileNameList)
             ncols, nrows = image_preread.size
