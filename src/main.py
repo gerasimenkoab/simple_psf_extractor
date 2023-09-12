@@ -49,7 +49,7 @@ class main_window_gui(tk.Tk):
 
         ttk.Label(child, text="Gerasimenko A.").grid(row=3, column=1)
         ttk.Label(child, text="").grid(row=3, column=2)
-        ttk.Label(child, text="Sachuk A.").grid(row=3, column=3)
+        ttk.Label(child, text="Sachuk A., Zolin I.").grid(row=3, column=3)
         ttk.Label(child, text="").grid(row=3, column=4)
 
         ttk.Label(child, text="").grid(row=3, column=6)
