@@ -473,19 +473,10 @@ class ExtractorView(tk.Toplevel):
         self.beadListBox.insert(0,*self.beadCoords)
         self.beadPrevHeaderVar.set( str(self._beadMarksCounter) )
 
+    def beadListViewGet(self):
+        print('curselection:', self.beadListBox.curselection()[0])
+        return self.beadListBox.curselection()[0]
 
-    def PlotBeadPreview2D(self, beadArray):
-        """ "Plots three bead in XYZ planes"""
-        try:
-            self.figIMG_canvas_agg = AuxCanvasPlot.FigureCanvasTkFrom3DArray(
-                beadArray, self.cnvImg, plotName=""
-            )
-            self.figIMG_canvas_agg.get_tk_widget().grid(
-                row=1, column=5, rowspan=10, sticky=(N, E, S, W)
-            )
-        except Exception as e:
-            raise RuntimeError("Bead 2D plot failed" + str(e))
-        
     def PlotCanvasInWindow(self, arrayIn: np.ndarray):
         top = Toplevel(self)
         top.geometry("600x600")
@@ -496,25 +487,32 @@ class ExtractorView(tk.Toplevel):
         figImg.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
         tk.Button(top,text="Close",command = lambda :top.destroy()).pack(side=TOP)
 
-    def PlotBeadPreview3D(self, beadArray):
-        """ "Plots three bead in 3D pointplot"""
+    def PlotBeadPreview2D(self, beadArray, winTitle = '2D Plot'):
+        """ "Plots three bead in XYZ planes"""
+        child_tmp = tk.Toplevel( self )
+        child_tmp.title( winTitle )
+        cnvPlot = tk.Canvas( child_tmp, width=400, height=600 )
+        cnvPlot.pack( side="top", fill=BOTH )
         try:
-            self.PlotBead3D(beadArray)
+            cnvTmp = AuxCanvasPlot.FigureCanvasTkFrom3DArray(beadArray, cnvPlot, " ",300,700)
+            cnvTmp.get_tk_widget().pack( side="top", fill=BOTH )
         except Exception as e:
-            raise RuntimeError("Bead 3D plot failed" + str(e))
-
-    def PlotBead3D(self, bead, treshold=np.exp(-1) * 255.0):
-        """Plot 3D view of a given bead"""
-        # popup window creation with canvas and exit button
-        child_tmp = tk.Toplevel(self)
-        child_tmp.title("3D Bead Preview")
-        cnvPlot = tk.Canvas(child_tmp, width=300, height=300)
-        cnvPlot.pack(side="top")
+            raise RuntimeError("Bead 2D plot failed" + str(e))
         Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side="top")
 
-        AuxCanvasPlot.FigureCanvasTk3DFrom3DArray(bead, cnvPlot).get_tk_widget().pack(
-            side="top"
-        )
+    def PlotBeadPreview3D(self, beadArray, winTitle = '3D Plot'):
+        """ "Plots three bead in 3D pointplot"""
+        try:
+            # popup window creation with canvas and exit button
+            child_tmp = tk.Toplevel(self)
+            child_tmp.title(winTitle)
+            cnvPlot = tk.Canvas(child_tmp, width=300, height=300)
+            cnvPlot.pack(side="top")
+            Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side="top")
+
+            AuxCanvasPlot.FigureCanvasTk3DFrom3DArray(beadArray, cnvPlot).get_tk_widget().pack( side="top" )
+        except Exception as e:
+            raise RuntimeError("Bead 3D plot failed" + str(e))
 
 
 if __name__ == "__main__":
