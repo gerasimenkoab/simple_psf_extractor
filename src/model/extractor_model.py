@@ -19,6 +19,9 @@ class ExtractorModel:
         self._beadDiameter = 0.2
         self._selectionFrameHalf = 18
 
+        self._beadCoords = []
+        self._extractedBeads = []
+
     @property
     def mainImage(self):
         return self._mainImage
@@ -72,14 +75,14 @@ class ExtractorModel:
 
     def beadMarkAdd(self, beadMarkCoords: list):
         """Append mouse event coordinates to global list. Center is adjusted according to max intensity."""
-        if self._beadCoords is None:
-            self._beadCoords = []
         self._beadCoords.append(beadMarkCoords)
+        self.MarkedBeadExtract( beadMarkCoords)
 
     def BeadCoordsRemoveLast(self):
         """Removes the last bead in the list"""
         try:
             self._beadCoords.pop()
+            self._extractedBeads.pop()
         except:
             raise ValueError("No coordinates to remove in the list", "list_empty")
 
@@ -88,7 +91,7 @@ class ExtractorModel:
         if self._beadCoords is None:
             return
         self._beadCoords = []
-
+        self._extractedBeads = []
     def LocateFrameMaxIntensity3D(self, xi, yi):
         """Locate point with maximum intensity in current 3d array.
         In:
@@ -118,31 +121,27 @@ class ExtractorModel:
         except ValueError as vErr:
             raise ValueError(vErr.args)
 
-    def MarkedBeadsExtract(self):
+    def MarkedBeadExtract(self, beadCoords):
         """
-        Extracting bead stacks from picture set and centering them
+        Extracting bead stacks from picture set and centering it
         Out:
             - number of extracted beads.
         """
         d = self._selectionFrameHalf
-        print(self._mainImage.imArray.shape)
         voxel = list(self._mainImage.voxel.values())
-        if self._extractedBeads is None:
-            self._extractedBeads = []
-        for idx, i in enumerate(self._beadCoords):
-            bound3 = int(i[0] - d)
-            bound4 = int(i[0] + d)
-            bound1 = int(i[1] - d)
-            bound2 = int(i[1] + d)
-            elem = self._mainImage.imArray[:, bound1:bound2, bound3:bound4]
-            if elem.shape[1] < 128: # dont shift if selection bigger than 128x128
-                # shifting array max intesity toward center along Z axis
-                iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
-                zc = int(elem.shape[0] / 2)
-                shift = zc - iMax[0]
-                elem = np.roll(elem, shift=shift, axis=0)
-            self._extractedBeads.append(ImageRaw(None, voxel, elem))
-        return len(self._extractedBeads)
+
+        bound3 = int(beadCoords[0] - d)
+        bound4 = int(beadCoords[0] + d)
+        bound1 = int(beadCoords[1] - d)
+        bound2 = int(beadCoords[1] + d)
+        elem = self._mainImage.imArray[:, bound1:bound2, bound3:bound4]
+        if elem.shape[1] < 128: # dont shift if selection bigger than 128x128
+            # shifting array max intesity toward center along Z axis
+            iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
+            zc = int(elem.shape[0] / 2)
+            shift = zc - iMax[0]
+            elem = np.roll(elem, shift=shift, axis=0)
+        self._extractedBeads.append(ImageRaw(None, voxel, elem))
 
     def ExtractedBeadsSave(self, txt_folder_enquiry="", txt_prefix="", tiffBit="uint8"):
         """Save selected beads as multi-page tiffs as is."""

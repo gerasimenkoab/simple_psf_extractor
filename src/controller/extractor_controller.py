@@ -41,7 +41,6 @@ class ExtractorController:
         self.view.loadBeadsPhoto_btn.config(command=self.LoadsBeadPhoto)
         self.view.undoMark_btn.config(command=self.UndoMark)
         self.view.clearMarks_btn.config(command=self.ClearMarks)
-        self.view.extractBeads_btn.config(command=self.ExtractBeads)
         self.view.saveExtractedBeads_btn.config(command=self.SaveExtractedBeads)
         self.view.processBeads_btn.config(command=self.ProcessBeads)
         self.view.saveAverageBead_btn.config(command=self.SaveAverageBead)
@@ -138,13 +137,6 @@ class ExtractorController:
         self.view.BeadMarksRemoveLast()
         self.model.BeadCoordsRemoveLast()
 
-    def ExtractBeads(self, event=None):
-        """Extract marked beads as a list"""
-        numberExtractedBeads = self.model.MarkedBeadsExtract()
-        self.logger.info(
-            "ExtractBeads: number of extracted beads = " + str(numberExtractedBeads)
-        )
-
     def SaveExtractedBeads(self, event=None):
         try:
             dirPath = askdirectory()
@@ -172,21 +164,17 @@ class ExtractorController:
 
     def ViewBead2D(self, event=None):
         try:
-            id = int(self.view.beadPrevNum.get())
+            id = self.view.beadListViewGet()
         except:
-            self.beadPrevNum.delete(0, tk.END)
-            self.beadPrevNum.insert(0, str(self.view._beadMarksCounter) - 1)
-            raise ValueError("Wrong bead index input.")
-        self.view.PlotBeadPreview2D(self.model._extractedBeads[id].imArray)
+            return
+        self.view.PlotBeadPreview2D(self.model._extractedBeads[id].imArray, '2D Bead plot '+ str(self.model._beadCoords[id]))
 
     def ViewBead3D(self, event=None):
         try:
-            id = int(self.view.beadPrevNum.get())
+            id = self.view.beadListViewGet()
         except:
-            self.beadPrevNum.delete(0, tk.END)
-            self.beadPrevNum.insert(0, str(self.view._beadMarksCounter - 1))
-            raise ValueError("Wrong bead index input.")
-        self.view.PlotBeadPreview3D(self.model._extractedBeads[id].imArray)
+            return
+        self.view.PlotBeadPreview3D(self.model._extractedBeads[id].imArray, '3D Bead plot '+ str(self.model._beadCoords[id]))
 
     def CloseExtractor(self, event=None):
         """Closing window and clear tmp files"""

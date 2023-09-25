@@ -151,11 +151,8 @@ class ExtractorView(tk.Toplevel):
         # ------------------- Extract Beads Frame ------------------------
         f3 = Frame(f0)
         ttk.Label(
-            f3, text="3. Extract selected beads and save set", font="Helvetica 10 bold"
+            f3, text="3. Save extracted set", font="Helvetica 10 bold"
         ).grid(row=0, column=0, columnspan=2, sticky="w")
-
-        self.extractBeads_btn = ttk.Button(f3, text="Extract Selected Beads")
-        self.extractBeads_btn.grid(row=1, column=0, padx=2, pady=2, sticky="we")
 
         self.saveExtractedBeads_btn = ttk.Button(f3, text="Save Extracted Beads")
         self.saveExtractedBeads_btn.grid(row=1, column=1, padx=2, pady=2, sticky="we")
@@ -275,7 +272,7 @@ class ExtractorView(tk.Toplevel):
         # self.cnvImg = Canvas(beadPreviewFrame, width=190, height=570, bg="white")
         # self.cnvImg.pack(side=TOP, padx=2, pady=2)
         beadPrevHeaderFrame = tk.Frame(beadPreviewFrame)
-        ttk.Label(beadPrevHeaderFrame, text="Selected Beads:").pack(side=LEFT, padx=2, pady=2)
+        ttk.Label(beadPrevHeaderFrame, text="Extracted Beads:").pack(side=LEFT, padx=2, pady=2)
         self.beadPrevHeaderVar = StringVar()
         ttk.Label(beadPrevHeaderFrame, textvariable=self.beadPrevHeaderVar).pack(side=LEFT, padx=2, pady=2)
         self.beadPrevHeaderVar.set( str(self._beadMarksCounter) )
