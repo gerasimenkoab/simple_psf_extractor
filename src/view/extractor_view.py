@@ -4,7 +4,10 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showerror
 from PIL import ImageTk, Image, ImageEnhance
-from .AuxTkPlot_class import AuxCanvasPlot
+try: 
+    from .AuxTkPlot_class import AuxCanvasPlot
+except:
+    from AuxTkPlot_class import AuxCanvasPlot
 
 """   TODO:
         - fix  AuxTkPlot_class  for all modules
@@ -268,13 +271,21 @@ class ExtractorView(tk.Toplevel):
         beadPreviewFrame = Frame(self)
 
         # test bead display canvas. May be removed. if implemented separate window.
-        ttk.Label(beadPreviewFrame, text="Bead Preview").pack(side=TOP, padx=2, pady=2)
-        self.cnvImg = Canvas(beadPreviewFrame, width=190, height=570, bg="white")
-        self.cnvImg.pack(side=TOP, padx=2, pady=2)
-
+        # ttk.Label(beadPreviewFrame, text="Bead Preview").pack(side=TOP, padx=2, pady=2)
+        # self.cnvImg = Canvas(beadPreviewFrame, width=190, height=570, bg="white")
+        # self.cnvImg.pack(side=TOP, padx=2, pady=2)
+        beadPrevHeaderFrame = tk.Frame(beadPreviewFrame)
+        ttk.Label(beadPrevHeaderFrame, text="Selected Beads:").pack(side=LEFT, padx=2, pady=2)
+        self.beadPrevHeaderVar = StringVar()
+        ttk.Label(beadPrevHeaderFrame, textvariable=self.beadPrevHeaderVar).pack(side=LEFT, padx=2, pady=2)
+        self.beadPrevHeaderVar.set( str(self._beadMarksCounter) )
+        beadPrevHeaderFrame.pack(side=TOP, padx=2, pady=2)
+        
+        self.beadListBox = tk.Listbox(beadPreviewFrame)
+        self.beadListBox.pack(side=TOP, padx=5, pady=2, fill=BOTH, expand=True)
         beadPreviewMenuFrame = ttk.Frame(beadPreviewFrame)
-        self.beadPrevNum = ttk.Entry(beadPreviewMenuFrame, width=5)
-        self.beadPrevNum.pack(side=LEFT)
+        # self.beadPrevNum = ttk.Entry(beadPreviewMenuFrame, width=5)
+        # self.beadPrevNum.pack(side=LEFT)
         self.viewBead2d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 2D")
         self.viewBead2d_btn.pack(side=LEFT)
         self.viewBead3d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 3D")
@@ -428,6 +439,9 @@ class ExtractorView(tk.Toplevel):
         )
         self.beadCoords.append([xr, yr])
         self._beadMarksCounter += 1
+        self.SetMarkedBeadList()
+
+
 
     def BeadMarksRemoveLast(self):
         """Removes the last bead in the list"""
@@ -440,6 +454,7 @@ class ExtractorView(tk.Toplevel):
         except:
             ValueError("Cant delete mark.")
         self._beadMarksCounter -= 1
+        self.SetMarkedBeadList()
 
     def BeadMarksClear(self):
         """Clears all bead marks"""
@@ -450,6 +465,14 @@ class ExtractorView(tk.Toplevel):
         self.beadMarks = []
         self.beadCoords = []
         self._beadMarksCounter = 0
+        #change list VIEW
+        self.SetMarkedBeadList()
+
+    def SetMarkedBeadList(self):
+        self.beadListBox.delete(0,tk.END)
+        self.beadListBox.insert(0,*self.beadCoords)
+        self.beadPrevHeaderVar.set( str(self._beadMarksCounter) )
+
 
     def PlotBeadPreview2D(self, beadArray):
         """ "Plots three bead in XYZ planes"""
@@ -462,6 +485,7 @@ class ExtractorView(tk.Toplevel):
             )
         except Exception as e:
             raise RuntimeError("Bead 2D plot failed" + str(e))
+        
     def PlotCanvasInWindow(self, arrayIn: np.ndarray):
         top = Toplevel(self)
         top.geometry("600x600")
