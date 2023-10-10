@@ -57,6 +57,37 @@ class ExtractorView(tk.Toplevel):
             font="Helvetica 14 bold",
         ).grid(row=0, column=0, columnspan=2)
 
+        #----------------------------- Menu Bar ----------------------------
+        self.menubar = Menu(self)
+        filemenu = Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="File", menu=filemenu)
+        filemenu.add_command(label="Load Image", command = lambda :1)
+        filemenu.add_command(label="Save Selected Beads", command = lambda :1)
+        filemenu.add_command(label="Save Average Bead", command = lambda :1)
+        filemenu.add_separator()
+        filemenu.add_command(label="Close", command=self.quit)
+
+        editMenu = Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Edit", menu=editMenu)
+        editMenu.add_command(label="Set Voxel...", command = lambda :1)
+        editMenu.add_command(label="Set Bead Size...", command = lambda :1)
+
+        selectionMenu = Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Selection", menu=selectionMenu)
+        selectionMenu.add_command(label="Set Selection Size...", command = lambda :1)
+        selectionMenu.add_command(label="Undo", command = lambda :1)
+        selectionMenu.add_command(label="Clear All", command = lambda :1)
+
+
+        helpMenu = Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Help", menu=helpMenu)
+        helpMenu.add_command(label="Help", command = lambda :1)
+        helpMenu.add_command(label="About", command = lambda :1)
+        self.config(menu=self.menubar)
+        #--------------------------- Menu Bar ------------------------------
+
+
+
         f0 = Frame(self)
         # making frames to pack several fileds in one grid cell
 
