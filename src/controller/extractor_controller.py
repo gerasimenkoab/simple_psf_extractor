@@ -119,7 +119,6 @@ class ExtractorController:
                 self.logger.error("file(s) load failed. "+fNames[0])
                 raise ValueError("Unknown error", "unknown-error")
         self.model.BeadCoordsClear()
-        self.model.mainImage.ShowClassInfo()
         self.logger.info("File(s) load success. ")
 
         # visualization:

@@ -2,9 +2,6 @@ import numpy as np
 import itertools
 from scipy.interpolate import RegularGridInterpolator
 from PIL import Image
-from matplotlib import pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.cm as cm # cololrmap
 import json
 
 
@@ -174,34 +171,6 @@ class ImageRaw:
         except:
             return imgArray, ""
 
-    def ShowClassInfo( self, plotPreview = False ):
-        """
-            Prints class attributes. 
-        """
-        print( " ImageClassInfo: " )
-        print( " path: ", self.path )
-        print( " voxel(micrometres): ", self.voxelSize )
-        print( " image shape: ", self.imArray.shape )
-        if plotPreview == True:  # draw 3 projections of bead
-            figUpsc, figUpscAxs = plt.subplots( 3, 1, sharex=False, figsize=(2, 6) )
-            figUpsc.suptitle( "Image preview" )
-            figUpscAxs[0].pcolormesh(
-                self.imArray[self.imArray.shape[0] // 2, :, :], cmap=cm.jet
-            )
-            figUpscAxs[1].pcolormesh(
-                self.imArray[:, self.imArray.shape[1] // 2, :], cmap=cm.jet
-            )
-            figUpscAxs[2].pcolormesh(
-                self.imArray[:, :, self.imArray.shape[2] // 2], cmap=cm.jet
-            )
-            newWin = Toplevel(self)
-            newWin.geometry( "200x600" )
-            newWin.title( "Image " )
-            cnvFigUpsc = Canvas( newWin, width = 200, height = 600, bg = "white" )
-            cnvFigUpsc.pack( side = TOP, fill = BOTH, expand = True )
-            FigureCanvasTkAgg( figUpsc, cnvFigUpsc ).get_tk_widget().pack(
-                side = TOP, fill = BOTH, expand = True
-            )
     def SetArray(self, newArray: np.ndarray):
         """
         Setting pixel array values
@@ -268,7 +237,16 @@ class ImageRaw:
             return str( self.imArray.shape ) + str(list(self.voxel.values()))
         else:
             return None
-        
+
+    def ShowClassInfo( self ):
+        """
+            Prints class attributes. 
+        """
+        print( " ImageClassInfo: " )
+        print( " path: ", self.path )
+        print( " voxel(micrometres): ", self.voxelSize )
+        print( " image shape: ", self.imArray.shape )
+
     def SaveAsTiff(self, filename="img", outtype="uint8"):
         """
         Save Image as TIFF file
