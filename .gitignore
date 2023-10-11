@@ -30,3 +30,4 @@ src/view/__pycache__/extractor_view.cpython-311.pyc
 src/model/__pycache__/extractor_model.cpython-311.pyc
 src/model/__pycache__/ImageRaw_class.cpython-311.pyc
 src/controller/__pycache__/extractor_controller.cpython-311.pyc
+src/view/todo.txt

@@ -37,17 +37,34 @@ class ExtractorController:
 
     def _bind(self):
         """binding all events"""
+        # menus:
+        # File:
+        self.view.bind("<<LoadImageDialog>>",self.LoadsBeadPhoto)
+        self.view.bind("<<SaveSelectedBeads>>",self.SaveExtractedBeads)
+        self.view.bind("<<SaveAverageBead>>",self.SaveAverageBead)
+        self.view.bind("<<CloseExtractor>>",self.CloseExtractor)
+        # Edit:
+        self.view.bind("<<SetVoxel>>",self.LoadsBeadPhoto)
+        self.view.bind("<<SetBeadSize>>",self.LoadsBeadPhoto)
+        # Selection:
+        self.view.bind("<<SetSelectionSize>>",self.LoadsBeadPhoto)
+        self.view.bind("<<UndoSelect>>",self.UndoMark)
+        self.view.bind("<Control-z>",self.UndoMark)
+        self.view.bind("<<ClearAllBeads>>",self.ClearMarks)
+        # Help:
+        self.view.bind("<<ShowHelp>>",self.LoadsBeadPhoto)
+        self.view.bind("<<ShowAbout>>",self.LoadsBeadPhoto)
         # buttons:
-        self.view.loadBeadsPhoto_btn.config(command=self.LoadsBeadPhoto)
-        self.view.undoMark_btn.config(command=self.UndoMark)
-        self.view.clearMarks_btn.config(command=self.ClearMarks)
-        self.view.saveExtractedBeads_btn.config(command=self.SaveExtractedBeads)
+        # self.view.loadBeadsPhoto_btn.config(command=self.LoadsBeadPhoto)
+        # self.view.undoMark_btn.config(command=self.UndoMark)
+        # self.view.clearMarks_btn.config(command=self.ClearMarks)
+        # self.view.saveExtractedBeads_btn.config(command=self.SaveExtractedBeads)
         self.view.processBeads_btn.config(command=self.ProcessBeads)
-        self.view.saveAverageBead_btn.config(command=self.SaveAverageBead)
+        # self.view.saveAverageBead_btn.config(command=self.SaveAverageBead)
         self.view.averageSeveralBeads_btn.config(command=self.AverageSeveralBeads)
         self.view.viewBead2d_btn.config(command=self.ViewBead2D)
         self.view.viewBead3d_btn.config(command=self.ViewBead3D)
-        self.view.close_btn.config(command=self.CloseExtractor)
+        # self.view.close_btn.config(command=self.CloseExtractor)
         # entries bind at two events:
         self.view.mainPhotoCanvas.bind("<Button-3>", self.BeadMarkOnClick)
         for key in ("Z", "Y", "X"):

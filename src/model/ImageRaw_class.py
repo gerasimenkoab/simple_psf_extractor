@@ -1,17 +1,12 @@
 import numpy as np
 import itertools
 from scipy.interpolate import RegularGridInterpolator
-from scipy.ndimage import zoom
-from tkinter import *
 from PIL import Image
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.cm as cm
+import matplotlib.cm as cm # cololrmap
 import json
 
-# for __main__ testing call
-from tkinter.filedialog import askopenfilenames
-import traceback
 
 class ImageRaw:
     """
@@ -298,20 +293,4 @@ class ImageRaw:
 
 
 if __name__ == "__main__":
-    # testing file loading
-    fileList = askopenfilenames(title="Load Photo")
-    try:
-        testExemplar = ImageRaw(fileList)
-    except ValueError as vE:
-        traceback.print_exc()
-        if vE.args[1] == "voxel_problem":
-            testVoxel = [0.1,0.02,0.05]
-            testExemplar = ImageRaw(fileList,testVoxel)
-        else:
-            print("Not voxel problem")
-            quit()
-    testExemplar.ShowClassInfo()
-    arnew = zoom(testExemplar.imArray,[0.5,1,1])
-    testExemplar.imArray = arnew
-    testExemplar.ShowClassInfo()
-        
+    pass        

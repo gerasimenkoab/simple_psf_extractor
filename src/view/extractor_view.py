@@ -61,29 +61,31 @@ class ExtractorView(tk.Toplevel):
         self.menubar = Menu(self)
         filemenu = Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="File", menu=filemenu)
-        filemenu.add_command(label="Load Image", command = lambda :1)
-        filemenu.add_command(label="Save Selected Beads", command = lambda :1)
-        filemenu.add_command(label="Save Average Bead", command = lambda :1)
+        filemenu.add_command(label="Load Image", underline = 0, accelerator= "Ctrl+o",
+                             command = lambda: self.event_generate("<<LoadImageDialog>>"))
+        filemenu.add_command(label="Save Selected Beads", underline = 0, command = lambda: self.event_generate("<<SaveSelectedBeads>>"))
+        filemenu.add_command(label="Save Average Bead", underline = 1, command = lambda: self.event_generate("<<SaveAverageBead>>"))
         filemenu.add_separator()
-        filemenu.add_command(label="Close", command=self.quit)
+        filemenu.add_command(label="Close", comman = lambda: self.event_generate("<<CloseExtractor>>"))
 
         editMenu = Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Edit", menu=editMenu)
-        editMenu.add_command(label="Set Voxel...", command = lambda :1)
-        editMenu.add_command(label="Set Bead Size...", command = lambda :1)
+        editMenu.add_command(label="Set Voxel...", underline = 4, command = lambda: self.event_generate("<<SetVoxel>>"))
+        editMenu.add_command(label="Set Bead Size...", underline = 4, command = lambda: self.event_generate("<<SetBeadSize>>"))
 
         selectionMenu = Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Selection", menu=selectionMenu)
-        selectionMenu.add_command(label="Set Selection Size...", command = lambda :1)
-        selectionMenu.add_command(label="Undo", command = lambda :1)
-        selectionMenu.add_command(label="Clear All", command = lambda :1)
+        selectionMenu.add_command(label="Set Selection Size...", command = lambda: self.event_generate("<<SetSelectionSize>>"))
+        selectionMenu.add_command(label="Undo", underline = 0, accelerator = "Ctrl+z", command = lambda: self.event_generate("<<UndoSelect>>"))
+        selectionMenu.add_command(label="Clear All", underline = 0, command = lambda: self.event_generate("<<ClearAllBeads>>"))
 
 
         helpMenu = Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Help", menu=helpMenu)
-        helpMenu.add_command(label="Help", command = lambda :1)
-        helpMenu.add_command(label="About", command = lambda :1)
+        helpMenu.add_command(label="Help", command = lambda: self.event_generate("<<ShowHelp>>"))
+        helpMenu.add_command(label="About", command = lambda: self.event_generate("<<ShowAbout>>"))
         self.config(menu=self.menubar)
+
         #--------------------------- Menu Bar ------------------------------
 
 
@@ -101,8 +103,8 @@ class ExtractorView(tk.Toplevel):
 
         f1_1 = Frame(f1)
 
-        self.loadBeadsPhoto_btn = ttk.Button(f1_1, text="Load Beads Photo")
-        self.loadBeadsPhoto_btn.pack(side=LEFT, padx=52, pady=2)
+        # self.loadBeadsPhoto_btn = ttk.Button(f1_1, text="Load Beads Photo")
+        # self.loadBeadsPhoto_btn.pack(side=LEFT, padx=52, pady=2)
         ttk.Button(f1_1, text="-",width=3, command=self.LowerBrightnessToBeadSelectionWidget).pack(
             side=LEFT, padx=2, pady=2
         )
@@ -170,10 +172,10 @@ class ExtractorView(tk.Toplevel):
             offvalue=0,
             width=15,
         ).pack(side=LEFT, padx=5, pady=2, fill=BOTH, expand=1)
-        self.undoMark_btn = ttk.Button(frameMarks, text="Undo mark")
-        self.undoMark_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
-        self.clearMarks_btn = ttk.Button(frameMarks, text="Clear All Marks")
-        self.clearMarks_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
+        # self.undoMark_btn = ttk.Button(frameMarks, text="Undo mark")
+        # self.undoMark_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
+        # self.clearMarks_btn = ttk.Button(frameMarks, text="Clear All Marks")
+        # self.clearMarks_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
         frameMarks.grid(row=1, column=1, sticky="we")
 
         f2.pack(side=TOP)
@@ -185,8 +187,8 @@ class ExtractorView(tk.Toplevel):
             f3, text="3. Save extracted set", font="Helvetica 10 bold"
         ).grid(row=0, column=0, columnspan=2, sticky="w")
 
-        self.saveExtractedBeads_btn = ttk.Button(f3, text="Save Extracted Beads")
-        self.saveExtractedBeads_btn.grid(row=1, column=1, padx=2, pady=2, sticky="we")
+        # self.saveExtractedBeads_btn = ttk.Button(f3, text="Save Extracted Beads")
+        # self.saveExtractedBeads_btn.grid(row=1, column=1, padx=2, pady=2, sticky="we")
 
         self.tiffMenuBitText = ["8 bit", "16 bit", "32 bit"]
         self.tiffMenuBitDict = {
@@ -259,11 +261,11 @@ class ExtractorView(tk.Toplevel):
             text="Process Extracted Beads",
         )
         self.processBeads_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
-        self.saveAverageBead_btn = ttk.Button(
-            frameAvrageBeadsButtons,
-            text="Save Average Bead",
-        )
-        self.saveAverageBead_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
+        # self.saveAverageBead_btn = ttk.Button(
+        #     frameAvrageBeadsButtons,
+        #     text="Save Average Bead",
+        # )
+        # self.saveAverageBead_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
         frameAvrageBeadsButtons.pack(side=TOP)
         frameAvrageBeads.pack(side=TOP)  # grid(row =6,column = 0,sticky='we')
 
@@ -273,11 +275,7 @@ class ExtractorView(tk.Toplevel):
 
         f0.grid(row=1, column=0, sticky="NSWE")
 
-        self.close_btn = Button(f0, text="Close")
-        self.close_btn.pack(side=TOP, padx=2, pady=2)
-
-        f0.grid(row=1, column=0, sticky="NSWE")
-
+ 
         # ---------------- Bead Photo Frame -----------------------------
         canvasFrame = Frame(self)
         self.mainPhotoCanvas = Canvas(
@@ -309,11 +307,15 @@ class ExtractorView(tk.Toplevel):
         self.beadPrevHeaderVar.set( str(self._beadMarksCounter) )
         beadPrevHeaderFrame.pack(side=TOP, padx=2, pady=2)
         
-        self.beadListBox = tk.Listbox(beadPreviewFrame)
-        self.beadListBox.pack(side=TOP, padx=5, pady=2, fill=BOTH, expand=True)
+        beadListboxFrame = tk.Frame(beadPreviewFrame)
+        self.beadListBox = tk.Listbox(beadListboxFrame)
+        self.beadListBox.pack(side=LEFT, fill = Y)
+        s = ttk.Scrollbar(beadListboxFrame, orient=VERTICAL, command =self.beadListBox.yview)
+        s.pack(side = LEFT,fill = Y)
+        beadListboxFrame.pack(side=TOP, padx=5, pady=2, fill=BOTH, expand=True)
+
         beadPreviewMenuFrame = ttk.Frame(beadPreviewFrame)
-        # self.beadPrevNum = ttk.Entry(beadPreviewMenuFrame, width=5)
-        # self.beadPrevNum.pack(side=LEFT)
+
         self.viewBead2d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 2D")
         self.viewBead2d_btn.pack(side=LEFT)
         self.viewBead3d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 3D")

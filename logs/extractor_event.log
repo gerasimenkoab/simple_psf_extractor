@@ -1,6 +1,5 @@
-2023-10-10 22:34:31,035 __main__ INFO: Main Utilites Launcher started.
-2023-10-10 22:34:34,091 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
-2023-10-10 22:34:34,092 __main__.model.extractor_model INFO: Extractor object created
-2023-10-10 22:42:04,639 __main__.model.decon_psf_model INFO: Decon PSF object created
-2023-10-10 22:42:04,642 __main__.model.decon_image_model INFO: Decon Image object created
-2023-10-10 22:42:04,673 __main__.view.decon_view INFO: Decon PSF view loaded
+2023-10-11 22:42:23,380 __main__ INFO: Main Utilites Launcher started.
+2023-10-11 22:42:25,327 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
+2023-10-11 22:42:25,327 __main__.model.extractor_model INFO: Extractor object created
+2023-10-11 22:44:04,979 __main__.controller.extractor_controller INFO: File(s) load success. 
+2023-10-11 22:45:30,940 __main__.controller.extractor_controller INFO: Bead Extractor Closed.
