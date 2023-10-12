@@ -6,7 +6,7 @@ import os
 import logging
 
 from model.extractor_model import ExtractorModel
-from view.extractor_view import ExtractorView
+from view.extractor_view_old import ExtractorView
 
 
 class ExtractorController:
@@ -38,6 +38,7 @@ class ExtractorController:
         self.view.bind("<<LoadImageDialog>>",self.LoadsBeadPhoto)
         self.view.bind("<<SaveSelectedBeads>>",self.SaveExtractedBeads)
         self.view.bind("<<SaveAverageBead>>",self.SaveAverageBead)
+        self.view.bind("<<AverageSeveralBeads>>",self.AverageSeveralBeads)
         self.view.bind("<<CloseExtractor>>",self.CloseExtractor)
         # Edit:
         self.view.bind("<<SetVoxel>>",self.LoadsBeadPhoto)
@@ -57,7 +58,7 @@ class ExtractorController:
         # self.view.saveExtractedBeads_btn.config(command=self.SaveExtractedBeads)
         self.view.processBeads_btn.config(command=self.ProcessBeads)
         # self.view.saveAverageBead_btn.config(command=self.SaveAverageBead)
-        self.view.averageSeveralBeads_btn.config(command=self.AverageSeveralBeads)
+        # self.view.averageSeveralBeads_btn.config(command=self.AverageSeveralBeads)
         self.view.viewBead2d_btn.config(command=self.ViewBead2D)
         self.view.viewBead3d_btn.config(command=self.ViewBead3D)
         # self.view.close_btn.config(command=self.CloseExtractor)

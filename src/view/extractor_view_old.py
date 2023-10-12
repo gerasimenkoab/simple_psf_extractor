@@ -235,6 +235,14 @@ class ExtractorView(tk.Toplevel):
         )
         blurTypeSelect.current(0)
         blurTypeSelect.pack(side=LEFT)
+        # self.doRescaleOverZ = IntVar(value=0)
+        # ttk.Checkbutton(
+        #     frameBlurTypeSelect,
+        #     variable=self.doRescaleOverZ,
+        #     text=" equal XYZ scale",
+        #     onvalue=1,
+        #     offvalue=0,
+        # ).pack(side=LEFT, padx=2, pady=2)
         self.precessBeadPrev = IntVar(value=0)
         ttk.Checkbutton(
             frameBlurTypeSelect,
@@ -252,6 +260,11 @@ class ExtractorView(tk.Toplevel):
             text="Process Extracted Beads",
         )
         self.processBeads_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
+        # self.saveAverageBead_btn = ttk.Button(
+        #     frameAvrageBeadsButtons,
+        #     text="Save Average Bead",
+        # )
+        # self.saveAverageBead_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
         frameAvrageBeadsButtons.pack(side=TOP)
         frameAvrageBeads.pack(side=TOP)  # grid(row =6,column = 0,sticky='we')
 
@@ -264,7 +277,6 @@ class ExtractorView(tk.Toplevel):
  
         # ---------------- Bead Photo Frame -----------------------------
         canvasFrame = Frame(self)
-
         self.mainPhotoCanvas = Canvas(
             canvasFrame, width=wwidth, height=wheight, bg="white"
         )
@@ -278,12 +290,15 @@ class ExtractorView(tk.Toplevel):
         self.mainPhotoCanvas.config(xscrollcommand=self.hScroll.set)
         self.vScroll.config(command=self.mainPhotoCanvas.yview)
         self.mainPhotoCanvas.config(yscrollcommand=self.vScroll.set)
-
         canvasFrame.grid(row=1, column=1, sticky="WENS")
 
         # -------------- Bead Preview Frame -----------------------------
         beadPreviewFrame = Frame(self)
 
+        # test bead display canvas. May be removed. if implemented separate window.
+        # ttk.Label(beadPreviewFrame, text="Bead Preview").pack(side=TOP, padx=2, pady=2)
+        # self.cnvImg = Canvas(beadPreviewFrame, width=190, height=570, bg="white")
+        # self.cnvImg.pack(side=TOP, padx=2, pady=2)
         beadPrevHeaderFrame = tk.Frame(beadPreviewFrame)
         ttk.Label(beadPrevHeaderFrame, text="Extracted Beads:").pack(side=LEFT, padx=2, pady=2)
         self.beadPrevHeaderVar = StringVar()
@@ -305,12 +320,8 @@ class ExtractorView(tk.Toplevel):
         self.viewBead3d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 3D")
         self.viewBead3d_btn.pack(side=LEFT)
         beadPreviewMenuFrame.pack(side=TOP, padx=2, pady=2)
-
         beadPreviewFrame.grid(row=1, column=2, sticky="NSWE")
-        # ---------------------- end __init__  ---------------------------------
 
-
-        
     def UpdateBeadSelectionWidgetImage(self):
         """
         Preparing image for canvas from desired frame with setted parameters.

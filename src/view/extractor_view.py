@@ -49,13 +49,8 @@ class ExtractorView(tk.Toplevel):
         self.entry_dict = {}  # according to list of names {id_name : widget}
         self.label_dict = {}  # label {id_name : string}
         # new window widgets
-        self.title("Bead extraction")
+        self.title("Bead extractor")
         self.resizable(False, False)
-        ttk.Label(
-            self,
-            text="Extract Beads Set from the Microscope Image",
-            font="Helvetica 14 bold",
-        ).grid(row=0, column=0, columnspan=2)
 
         #----------------------------- Menu Bar ----------------------------
         self.menubar = Menu(self)
@@ -65,6 +60,8 @@ class ExtractorView(tk.Toplevel):
                              command = lambda: self.event_generate("<<LoadImageDialog>>"))
         filemenu.add_command(label="Save Selected Beads", underline = 0, command = lambda: self.event_generate("<<SaveSelectedBeads>>"))
         filemenu.add_command(label="Save Average Bead", underline = 1, command = lambda: self.event_generate("<<SaveAverageBead>>"))
+        filemenu.add_separator()
+        filemenu.add_command(label="Average Several Beads", underline = 1, command = lambda: self.event_generate("<<AverageSeveralBeads>>"))
         filemenu.add_separator()
         filemenu.add_command(label="Close", comman = lambda: self.event_generate("<<CloseExtractor>>"))
 
@@ -88,69 +85,85 @@ class ExtractorView(tk.Toplevel):
 
         #--------------------------- Menu Bar ------------------------------
 
+        
 
-
-        f0 = Frame(self)
+        parametersFrame = ttk.Frame(self)
 
         # -------------- image and canvas frame --------------------------
-        f1 = Frame(f0)
+        imageParamFrame= Frame(parametersFrame)
         ttk.Label(
-            f1,
-            text="1. Load beads photos from the microscope and enter bead size and voxel parameters",
+            imageParamFrame,
+            text="Image",
             font="Helvetica 10 bold",
-        ).grid(row=0, column=0, columnspan=2, sticky="w")
+        ).grid(row=0, column=0, sticky="n")
 
-        f1_1 = Frame(f1)
+        self.imageInfoStr = tk.StringVar(value='No Image Loaded')
+        self.imageInfo_lbl = ttk.Label(imageParamFrame, textvariable=self.imageInfoStr )
+        self.imageInfo_lbl.grid(row=1, column=0, sticky="n")
 
-        # self.loadBeadsPhoto_btn = ttk.Button(f1_1, text="Load Beads Photo")
-        # self.loadBeadsPhoto_btn.pack(side=LEFT, padx=52, pady=2)
-        ttk.Button(f1_1, text="-",width=3, command=self.LowerBrightnessToBeadSelectionWidget).pack(
+        tiffTypeSelectFrame = Frame(imageParamFrame)
+        self.tiffMenuBitText = ["8 bit", "16 bit", "32 bit"]
+        self.tiffMenuBitDict = {
+            "8 bit": "uint8",
+            "16 bit": "uint16",
+            "32 bit": "uint32",
+        }
+        self.tiffSaveBitType = StringVar()
+        self.tiffSaveBitType.set(self.tiffMenuBitText[0])
+        ttk.Label(tiffTypeSelectFrame, width=10, text="Tiff type ").pack( side=LEFT, padx=2, pady=2 )
+        self.tiffType_menu = ttk.OptionMenu(tiffTypeSelectFrame, self.tiffSaveBitType, *self.tiffMenuBitText)
+        self.tiffType_menu.pack(side=LEFT, padx=2, pady=2)
+        tiffTypeSelectFrame.grid(row=2, column=0, sticky="n")
+
+        brightnessFrame = Frame(imageParamFrame)
+        ttk.Button(brightnessFrame, text="-",width=3, command=self.LowerBrightnessToBeadSelectionWidget).pack(
             side=LEFT, padx=2, pady=2
         )
-        ttk.Label(f1_1, text="Brightness").pack(side=LEFT, padx=2, pady=2)
-        ttk.Button(f1_1, text="+", width=3,command=self.AddBrightnessToBeadSelectionWidget).pack(
+        ttk.Label(brightnessFrame, text="Brightness").pack(side=LEFT, padx=2, pady=2)
+        ttk.Button(brightnessFrame, text="+", width=3,command=self.AddBrightnessToBeadSelectionWidget).pack(
             side=LEFT, padx=2, pady=2
         )
-        ttk.Label(f1_1, text=" Layer:").pack(side=LEFT, padx=2, pady=2)
-        ttk.Button(f1_1, text="-",width=3, command=self.ShowPrevLayer).pack(
-            side=LEFT, padx=2, pady=2
-        )
-        self.label_beadsPhotoLayerID = ttk.Label(f1_1, text=str(self.beadsPhotoLayerID))
+        brightnessFrame.grid(row=3, column=0, sticky="n")
+
+        layerFrame = Frame(imageParamFrame)
+        ttk.Label(layerFrame, text=" Layer:").pack(side=LEFT, padx=2, pady=2)
+        ttk.Button(layerFrame, text="-",width=3, command=self.ShowPrevLayer).pack( side=LEFT, padx=2, pady=2 )
+        self.label_beadsPhotoLayerID = ttk.Label(layerFrame, text=str(self.beadsPhotoLayerID))
         self.label_beadsPhotoLayerID.pack(side=LEFT, padx=2, pady=2)
-        ttk.Button(f1_1, text="+",width=3, command=self.ShowNextLayer).pack(
-            side=LEFT, padx=2, pady=2
-        )
-        f1_1.grid(row=1, column=0, columnspan=2)
-        frameBeadSize = Frame(f1)
-        ttk.Label(frameBeadSize, width=20, text="Actual bead Size:", anchor="w").pack(
-            side=LEFT, padx=2, pady=2
-        )
+        ttk.Button(layerFrame, text="+",width=3, command=self.ShowNextLayer).pack( side=LEFT, padx=2, pady=2 )
+        layerFrame.grid(row=4, column=0, sticky="n")
+
+        voxSizeFrame = Frame(imageParamFrame)
+        ttk.Label(voxSizeFrame, text="Voxel size (\u03BCm): ", anchor="w").pack( side=TOP, padx=2, pady=2 )
+        voxSizeFrame_low = Frame(voxSizeFrame)
+        for key in ("Z", "Y", "X"):
+            ttk.Label(voxSizeFrame_low, text=key + "= ").pack(side=LEFT, padx=2, pady=2)
+            self.voxelSizeEntries[key] = ttk.Entry(
+                voxSizeFrame_low, width=5            )
+            self.voxelSizeEntries[key].pack(side=LEFT, padx=2, pady=2)
+        voxSizeFrame_low.pack( side=TOP, padx=2, pady=2 )
+        voxSizeFrame.grid(row=5, column=0, sticky="n")
+
+        frameBeadSize = Frame(imageParamFrame)
+        ttk.Label(frameBeadSize, width=20, text="Actual bead Size:", anchor="w").pack( side=LEFT, padx=2, pady=2 )
         self.beadSizeEntry = ttk.Entry(frameBeadSize, width=5)
         self.beadSizeEntry.pack(side=LEFT, padx=2, pady=2)
-        ttk.Label(frameBeadSize, text="\u03BCm ").pack(
-            side=LEFT
-        )  # mu simbol encoding - \u03BC
-        frameBeadSize.grid(row=2, column=1, padx=2, pady=2, sticky="we")
-        voxSizeFrame = Frame(f1)
-        ttk.Label(voxSizeFrame, text="Voxel size (\u03BCm): ", anchor="w").pack(
-            side=LEFT, padx=2, pady=2
-        )
-        for key in ("Z", "Y", "X"):
-            ttk.Label(voxSizeFrame, text=key + "= ").pack(side=LEFT, padx=2, pady=2)
-            self.voxelSizeEntries[key] = ttk.Entry(
-                voxSizeFrame, width=5            )
-            self.voxelSizeEntries[key].pack(side=LEFT, padx=2, pady=2)
-        voxSizeFrame.grid(row=2, column=0, sticky="we")
-        f1.pack(side=TOP)
-        ttk.Separator(f0, orient="horizontal").pack(ipadx=200, pady=10)
+        ttk.Label(frameBeadSize, text="\u03BCm ").pack( side=LEFT )  # mu simbol encoding - \u03BC
+        frameBeadSize.grid(row=6, column=0, sticky="n")
+
+
+        imageParamFrame.pack(side=TOP)
+
+        ttk.Separator(parametersFrame, orient="horizontal").pack(ipadx=100, pady=10)
+
         # ---------------------- Mark Beads Frame --------------------
 
-        f2 = Frame(f0)
+        f2 = Frame(parametersFrame)
         ttk.Label(
             f2,
-            text="2.Mark beads by right click on the window",
+            text="Selection",
             font="Helvetica 10 bold",
-        ).grid(row=0, column=0, columnspan=2, sticky="w")
+        ).grid(row=0, column=0,sticky="n")
 
         selectSizeFrame = Frame(f2)
         ttk.Label(selectSizeFrame, width=14, text="Selection Size: ", anchor="w").pack(
@@ -159,7 +172,7 @@ class ExtractorView(tk.Toplevel):
         self.selectSizeEntry = ttk.Entry(selectSizeFrame, width=5)
         self.selectSizeEntry.pack(side=LEFT, padx=2, pady=2)
         ttk.Label(selectSizeFrame, text="px").pack(side=LEFT, padx=2, pady=2)
-        selectSizeFrame.grid(row=1, column=0, sticky="we")
+        selectSizeFrame.grid(row=1, column=0, sticky="n")
 
         frameMarks = Frame(f2)
         self.autocorrectSelection = IntVar(value=1)
@@ -171,51 +184,17 @@ class ExtractorView(tk.Toplevel):
             offvalue=0,
             width=15,
         ).pack(side=LEFT, padx=5, pady=2, fill=BOTH, expand=1)
-        # self.undoMark_btn = ttk.Button(frameMarks, text="Undo mark")
-        # self.undoMark_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
-        # self.clearMarks_btn = ttk.Button(frameMarks, text="Clear All Marks")
-        # self.clearMarks_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
-        frameMarks.grid(row=1, column=1, sticky="we")
+        frameMarks.grid(row=2, column=0, sticky="n")
 
         f2.pack(side=TOP)
-        ttk.Separator(f0, orient="horizontal").pack(ipadx=200, pady=10)
+        ttk.Separator(parametersFrame, orient="horizontal").pack(ipadx=100, pady=10)
 
-        # ------------------- Extract Beads Frame ------------------------
-        f3 = Frame(f0)
-        ttk.Label(
-            f3, text="3. Save extracted set", font="Helvetica 10 bold"
-        ).grid(row=0, column=0, columnspan=2, sticky="w")
-
-        # self.saveExtractedBeads_btn = ttk.Button(f3, text="Save Extracted Beads")
-        # self.saveExtractedBeads_btn.grid(row=1, column=1, padx=2, pady=2, sticky="we")
-
-        self.tiffMenuBitText = ["8 bit", "16 bit", "32 bit"]
-        self.tiffMenuBitDict = {
-            "8 bit": "uint8",
-            "16 bit": "uint16",
-            "32 bit": "uint32",
-        }
-        self.tiffSaveBitType = StringVar()
-        self.tiffSaveBitType.set(self.tiffMenuBitText[0])
-
-        frameTiffTypeSelect = Frame(f3)
-        ttk.Label(frameTiffTypeSelect, width=10, text="Tiff type ").pack(
-            side=LEFT, padx=2, pady=2
-        )
-        self.tiffType_menu = ttk.OptionMenu(
-            frameTiffTypeSelect, self.tiffSaveBitType, *self.tiffMenuBitText
-        )
-        self.tiffType_menu.pack(side=LEFT, padx=2, pady=2)
-        frameTiffTypeSelect.grid(row=1, column=2, padx=2, pady=2, sticky="we")
-
-        f3.pack(side=TOP)
-        ttk.Separator(f0, orient="horizontal").pack(ipadx=200, pady=10)
 
         # --------------- Average Beads Frame --------------------------
-        frameAvrageBeads = Frame(f0)
+        frameAvrageBeads = Frame(parametersFrame)
         ttk.Label(
             frameAvrageBeads,
-            text="4. Calculate averaged bead with desired blur type and save it.",
+            text="Averaging",
             font="Helvetica 10 bold",
         ).pack(side=TOP)
 
@@ -235,24 +214,16 @@ class ExtractorView(tk.Toplevel):
         )
         blurTypeSelect.current(0)
         blurTypeSelect.pack(side=LEFT)
-        # self.doRescaleOverZ = IntVar(value=0)
-        # ttk.Checkbutton(
-        #     frameBlurTypeSelect,
-        #     variable=self.doRescaleOverZ,
-        #     text=" equal XYZ scale",
-        #     onvalue=1,
-        #     offvalue=0,
-        # ).pack(side=LEFT, padx=2, pady=2)
+        frameBlurTypeSelect.pack(side=TOP, padx=2, pady=2)
         self.precessBeadPrev = IntVar(value=0)
         ttk.Checkbutton(
-            frameBlurTypeSelect,
+            frameAvrageBeads,
             variable=self.precessBeadPrev,
-            text=" preview bead",
+            text=" Preview processed bead ",
             onvalue=1,
             offvalue=0,
-        ).pack(side=LEFT, padx=2, pady=2)
+        ).pack(side=TOP, padx=2, pady=2)
 
-        frameBlurTypeSelect.pack(side=TOP, padx=2, pady=2)
 
         frameAvrageBeadsButtons = Frame(frameAvrageBeads)
         self.processBeads_btn = ttk.Button(
@@ -260,23 +231,16 @@ class ExtractorView(tk.Toplevel):
             text="Process Extracted Beads",
         )
         self.processBeads_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
-        # self.saveAverageBead_btn = ttk.Button(
-        #     frameAvrageBeadsButtons,
-        #     text="Save Average Bead",
-        # )
-        # self.saveAverageBead_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
         frameAvrageBeadsButtons.pack(side=TOP)
-        frameAvrageBeads.pack(side=TOP)  # grid(row =6,column = 0,sticky='we')
+        frameAvrageBeads.pack(side=TOP) 
 
-        ttk.Separator(f0, orient="horizontal").pack(ipadx=200, pady=10)
-        self.averageSeveralBeads_btn = ttk.Button(f0, text="Average Several Beads")
-        self.averageSeveralBeads_btn.pack(side=TOP, padx=2, pady=2)
+        parametersFrame.grid(row=1, column=0, sticky="NSWE")
+        # ---------------- End of parameters frame description -----------------
+        # ttk.Separator(self, orient="vertical").grid(column = 1, ipadx=10, pady=100)
 
-        f0.grid(row=1, column=0, sticky="NSWE")
-
- 
-        # ---------------- Bead Photo Frame -----------------------------
+        # ----------------------- Bead Photo Frame -----------------------------
         canvasFrame = Frame(self)
+
         self.mainPhotoCanvas = Canvas(
             canvasFrame, width=wwidth, height=wheight, bg="white"
         )
@@ -290,15 +254,12 @@ class ExtractorView(tk.Toplevel):
         self.mainPhotoCanvas.config(xscrollcommand=self.hScroll.set)
         self.vScroll.config(command=self.mainPhotoCanvas.yview)
         self.mainPhotoCanvas.config(yscrollcommand=self.vScroll.set)
-        canvasFrame.grid(row=1, column=1, sticky="WENS")
+
+        canvasFrame.grid(row=1, column=2, sticky="WENS")
 
         # -------------- Bead Preview Frame -----------------------------
         beadPreviewFrame = Frame(self)
 
-        # test bead display canvas. May be removed. if implemented separate window.
-        # ttk.Label(beadPreviewFrame, text="Bead Preview").pack(side=TOP, padx=2, pady=2)
-        # self.cnvImg = Canvas(beadPreviewFrame, width=190, height=570, bg="white")
-        # self.cnvImg.pack(side=TOP, padx=2, pady=2)
         beadPrevHeaderFrame = tk.Frame(beadPreviewFrame)
         ttk.Label(beadPrevHeaderFrame, text="Extracted Beads:").pack(side=LEFT, padx=2, pady=2)
         self.beadPrevHeaderVar = StringVar()
@@ -320,7 +281,13 @@ class ExtractorView(tk.Toplevel):
         self.viewBead3d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 3D")
         self.viewBead3d_btn.pack(side=LEFT)
         beadPreviewMenuFrame.pack(side=TOP, padx=2, pady=2)
-        beadPreviewFrame.grid(row=1, column=2, sticky="NSWE")
+
+        beadPreviewFrame.grid(row=1, column=4, sticky="NSWE")
+
+
+        # ---------------------- end __init__  ---------------------------------
+
+
 
     def UpdateBeadSelectionWidgetImage(self):
         """
