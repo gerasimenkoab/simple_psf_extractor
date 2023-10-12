@@ -222,16 +222,14 @@ class ImageRaw:
         self.imArray = beadInterp
         self.voxelSize[0] = newZVoxelSize
 
-    def GetImageInfoStr(self, output = "full"):
+    def GetImageInfoStr(self, output = None):
         """
             Return string with array and voxel parameters.
         """
         if output == "full":
             return "Image size(z,y,x)px: " + str(self.imArray.shape) + "  Voxel(\u03BCm): " + str(list(self.voxel.values()))
-        elif output == "dimensions":
-            return str( self.imArray.shape ) + str(list(self.voxel.values()))
         else:
-            return None
+            return str( self.imArray.shape ) + str(list(self.voxel.values()))
 
     def ShowClassInfo( self ):
         """

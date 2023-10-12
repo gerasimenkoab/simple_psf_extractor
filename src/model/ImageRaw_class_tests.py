@@ -4,10 +4,6 @@ import numpy as np
 from  ImageRaw_class import ImageRaw
 
 
-# for __main__ testing call
-from tkinter import *
-from tkinter.filedialog import askopenfilenames
-import traceback
 
 
 class ImageRawClassTests(unittest.TestCase):
@@ -72,7 +68,11 @@ class ImageRawClassTests(unittest.TestCase):
         np.testing.assert_array_equal(img.imArray,newArray,'create from array error')
 
     def test_GetImageInfoStr(self):
-        pass
+        img = ImageRaw(voxelSizeIn=self.testVoxel, imArrayIn = self.testArray)
+        tStr = "Image size(z,y,x)px: " + str(self.testArray.shape) + "  Voxel(\u03BCm): " + str(self.testVoxel)
+        self.assertEqual( img.GetImageInfoStr(output = "full"), tStr, 'wrong full output' )
+        tStr = str( self.testArray.shape ) + str(self.testVoxel)
+        self.assertEqual( img.GetImageInfoStr(), tStr, 'wrong default output' )
 
         
 def RunTests() -> None:
@@ -83,16 +83,3 @@ def RunTests() -> None:
 
 if __name__=="__main__":
     RunTests()
-
-    fileList = askopenfilenames(title="Load Photo")
-
-    try:
-        testExemplar = ImageRaw(fileList)
-    except ValueError as vE:
-        traceback.print_exc()
-        if vE.args[1] == "voxel_problem":
-            testVoxel = [0.1,0.02,0.05]
-            testExemplar = ImageRaw(fileList,testVoxel)
-        else:
-            print("Not voxel problem")
-            quit()
