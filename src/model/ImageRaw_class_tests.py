@@ -1,4 +1,5 @@
 import unittest
+import os
 import numpy as np
 from  ImageRaw_class import ImageRaw
 
@@ -14,11 +15,25 @@ class ImageRawClassTests(unittest.TestCase):
     def setUp(self):
         self.testVoxel = [0.1,0.02,0.02]
         self.testArray = np.random.randint(0, 100, size=(5, 10, 10))
+        
 
     def test_ConstructorFromFile(self):
+        folderPath = os.getcwd()+'\\data\\image_array\\'
         self.filelist = []
-        self.assertEqual(1,1)
-        pass
+        self.filelist = [folderPath+name for name in os.listdir(path = folderPath)]
+        print(self.filelist)
+        img = ImageRaw(fpath = self.filelist, voxelSizeIn=self.testVoxel)
+        # white layer test
+        self.testArray = np.zeros((36,36))
+        np.testing.assert_array_equal(img.imArray[0,:,:], self.testArray, 'create from file 0 error')
+        #black layer test
+        self.testArray = np.ones((36,36)) * 255
+        np.testing.assert_array_equal(img.imArray[1,:,:], self.testArray, 'create from file 255 error')
+        #halfblack
+        self.testArray[:,18:]=self.testArray[:,18:] * 0
+        np.testing.assert_array_equal(img.imArray[3,:,:], self.testArray, 'create from file 255 error')
+
+
 
     def test_ConstructorFromArray(self):
         img = ImageRaw(voxelSizeIn=self.testVoxel, imArrayIn = self.testArray)
@@ -70,6 +85,7 @@ if __name__=="__main__":
     RunTests()
 
     fileList = askopenfilenames(title="Load Photo")
+
     try:
         testExemplar = ImageRaw(fileList)
     except ValueError as vE:

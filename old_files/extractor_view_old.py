@@ -5,7 +5,7 @@ from tkinter import ttk
 from tkinter.messagebox import showerror
 from PIL import ImageTk, Image, ImageEnhance
 try: 
-    from .AuxTkPlot_class import AuxCanvasPlot
+    from ..src.view.AuxTkPlot_class import AuxCanvasPlot
 except:
     from AuxTkPlot_class import AuxCanvasPlot
 

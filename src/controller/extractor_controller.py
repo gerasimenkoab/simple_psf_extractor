@@ -6,7 +6,7 @@ import os
 import logging
 
 from model.extractor_model import ExtractorModel
-from view.extractor_view_old import ExtractorView
+from view.extractor_view import ExtractorView
 
 
 class ExtractorController:
