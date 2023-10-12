@@ -23,7 +23,6 @@ class ExtractorController:
         self._master = master
         self.model = ExtractorModel()
         self.view = ExtractorView(self._master)
-        self._beadPrevNum = 0
 
         self.view.SetVoxelValues(self.model.mainImage.voxel)
         self.view.SetBeadSize(self.model.beadDiameter)
@@ -31,9 +30,6 @@ class ExtractorController:
         # binding buttons and entries events
         self._bind()
 
-    # TODO : remove clicker test
-    def buttonClickTest(self):
-        print("clicked")
 
     def _bind(self):
         """binding all events"""
@@ -78,8 +74,6 @@ class ExtractorController:
         self.view.beadSizeEntry.bind("<Return>", self.UpdateBeadSizeValue)
         self.view.selectSizeEntry.bind("<FocusOut>", self.UpdateSelectionSizeEntry)
         self.view.selectSizeEntry.bind("<Return>", self.UpdateSelectionSizeEntry)
-        self.view.beadPrevNum.bind("<FocusOut>", self.SetBeadPrevNum)
-        self.view.beadPrevNum.bind("<Return>", self.SetBeadPrevNum)
         self.logger.info("_bind: Binding buttons and entries is done.")
 
     def GetVoxelDialog(self, text=""):
@@ -241,5 +235,3 @@ class ExtractorController:
         except:
             self.logger.debug("Wrong selection size value.")
 
-    def SetBeadPrevNum(self, event=None):
-        self._beadPrevNum = int(self.view.beadPrevNum.get())

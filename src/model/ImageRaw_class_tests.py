@@ -80,7 +80,3 @@ if __name__=="__main__":
         else:
             print("Not voxel problem")
             quit()
-    testExemplar.ShowClassInfo()
-    arnew = zoom(testExemplar.imArray,[0.5,1,1])
-    testExemplar.imArray = arnew
-    testExemplar.ShowClassInfo()
