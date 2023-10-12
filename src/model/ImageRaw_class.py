@@ -83,6 +83,13 @@ class ImageRaw:
 
 
     # methods
+    # context manager support.........
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        return None
+    #---------------------------------
 
     def LoadImageFile(self, fileNameList: tuple, tagID = 270):
         """

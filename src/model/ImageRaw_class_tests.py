@@ -17,17 +17,16 @@ class ImageRawClassTests(unittest.TestCase):
         folderPath = os.getcwd()+'\\data\\image_array\\'
         self.filelist = []
         self.filelist = [folderPath+name for name in os.listdir(path = folderPath)]
-        print(self.filelist)
-        img = ImageRaw(fpath = self.filelist, voxelSizeIn=self.testVoxel)
-        # white layer test
-        self.testArray = np.zeros((36,36))
-        np.testing.assert_array_equal(img.imArray[0,:,:], self.testArray, 'create from file 0 error')
-        #black layer test
-        self.testArray = np.ones((36,36)) * 255
-        np.testing.assert_array_equal(img.imArray[1,:,:], self.testArray, 'create from file 255 error')
-        #halfblack
-        self.testArray[:,18:]=self.testArray[:,18:] * 0
-        np.testing.assert_array_equal(img.imArray[3,:,:], self.testArray, 'create from file 255 error')
+        with ImageRaw(fpath = self.filelist, voxelSizeIn=self.testVoxel) as img:
+            # white layer test
+            self.testArray = np.zeros((36,36))
+            np.testing.assert_array_equal(img.imArray[0,:,:], self.testArray, 'create from file 0 error')
+            #black layer test
+            self.testArray = np.ones((36,36)) * 255
+            np.testing.assert_array_equal(img.imArray[1,:,:], self.testArray, 'create from file 255 error')
+            #halfblack
+            self.testArray[:,18:]=self.testArray[:,18:] * 0
+            np.testing.assert_array_equal(img.imArray[3,:,:], self.testArray, 'create from file 255 error')
 
 
 
