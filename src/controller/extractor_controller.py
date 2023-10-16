@@ -7,6 +7,7 @@ import logging
 
 from model.extractor_model import ExtractorModel
 from view.extractor_view import ExtractorView
+from view.extractor_beadpreview_view import ExtractorBeadPreviewWidget
 
 
 class ExtractorController:
@@ -40,17 +41,15 @@ class ExtractorController:
         self.view.bind("<<SaveAverageBead>>",self.SaveAverageBead)
         self.view.bind("<<AverageSeveralBeads>>",self.AverageSeveralBeads)
         self.view.bind("<<CloseExtractor>>",self.CloseExtractor)
-        # Edit:
-        self.view.bind("<<SetVoxel>>",self.LoadsBeadPhoto)
-        self.view.bind("<<SetBeadSize>>",self.LoadsBeadPhoto)
         # Selection:
-        self.view.bind("<<SetSelectionSize>>",self.LoadsBeadPhoto)
+
         self.view.bind("<<UndoSelect>>",self.UndoMark)
         self.view.bind("<Control-z>",self.UndoMark)
         self.view.bind("<<ClearAllBeads>>",self.ClearMarks)
+        self.view.bind("<<PreviewBeads>>",self.PreviewBeads)
+
         # Help:
-        self.view.bind("<<ShowHelp>>",self.LoadsBeadPhoto)
-        self.view.bind("<<ShowAbout>>",self.LoadsBeadPhoto)
+        self.view.bind("<<ShowHelp>>",self.ShowExtractorHelp)
         # buttons:
         # self.view.loadBeadsPhoto_btn.config(command=self.LoadsBeadPhoto)
         # self.view.undoMark_btn.config(command=self.UndoMark)
@@ -76,6 +75,11 @@ class ExtractorController:
         self.view.selectSizeEntry.bind("<FocusOut>", self.UpdateSelectionSizeEntry)
         self.view.selectSizeEntry.bind("<Return>", self.UpdateSelectionSizeEntry)
         self.logger.info("_bind: Binding buttons and entries is done.")
+
+    def ShowExtractorHelp(self):
+        pass
+
+    
 
     def GetVoxelDialog(self, text=""):
         """
@@ -235,4 +239,7 @@ class ExtractorController:
             self.model.selectionFrameHalf = int(self.view.selectSizeEntry.get()) // 2
         except:
             self.logger.debug("Wrong selection size value.")
+
+    def PreviewBeads(self, event=None):
+        ExtractorBeadPreviewWidget(self.view)
 

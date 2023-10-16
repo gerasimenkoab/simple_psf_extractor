@@ -25,8 +25,8 @@ class ExtractorView(tk.Toplevel):
         self.beadMarks = []  # rectangle pics on the canvas
         self._beadMarksCounter = 0
         self.beadCoords = []
-        self.intensityFactor = 1.0  # intensity factor for beads selection widget
         self.beadsPhotoLayerID = 0  # default index of beads microscope photo
+        self.imgBeadsRaw = None
 
         self.voxelFields = "Z", "X", "Y"
         self.voxelSizeEntries = {}
@@ -84,25 +84,9 @@ class ExtractorView(tk.Toplevel):
             label="Close", comman=lambda: self.event_generate("<<CloseExtractor>>")
         )
 
-        editMenu = Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Edit", menu=editMenu)
-        editMenu.add_command(
-            label="Set Voxel...",
-            underline=4,
-            command=lambda: self.event_generate("<<SetVoxel>>"),
-        )
-        editMenu.add_command(
-            label="Set Bead Size...",
-            underline=4,
-            command=lambda: self.event_generate("<<SetBeadSize>>"),
-        )
 
         selectionMenu = Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Selection", menu=selectionMenu)
-        selectionMenu.add_command(
-            label="Set Selection Size...",
-            command=lambda: self.event_generate("<<SetSelectionSize>>"),
-        )
         selectionMenu.add_command(
             label="Undo",
             underline=0,
@@ -114,18 +98,21 @@ class ExtractorView(tk.Toplevel):
             underline=0,
             command=lambda: self.event_generate("<<ClearAllBeads>>"),
         )
+        selectionMenu.add_separator()
+        selectionMenu.add_command(
+            label="Bead Previewer",
+            underline=0,
+            command=lambda: self.event_generate("<<PreviewBeads>>"),
+        )
 
         helpMenu = Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Help", menu=helpMenu)
         helpMenu.add_command(
             label="Help", command=lambda: self.event_generate("<<ShowHelp>>")
         )
-        helpMenu.add_command(
-            label="About", command=lambda: self.event_generate("<<ShowAbout>>")
-        )
         self.config(menu=self.menubar)
 
-        # --------------------------- Menu Bar ------------------------------
+        # --------------------------- End Menu Bar ------------------------------
 
         parametersFrame = ttk.Frame(self)
 
@@ -160,22 +147,24 @@ class ExtractorView(tk.Toplevel):
         tiffTypeSelectFrame.grid(row=2, column=0, sticky="n")
 
         brightnessFrame = Frame(imageParamFrame)
-        ttk.Button(
-            brightnessFrame,
-            text="-",
-            width=3,
-            command=self.LowerBrightnessToBeadSelectionWidget,
-        ).pack(side=LEFT, padx=2, pady=2)
-        ttk.Label(brightnessFrame, text="Brightness").pack(side=LEFT, padx=2, pady=2)
-        ttk.Button(
-            brightnessFrame,
-            text="+",
-            width=3,
-            command=self.AddBrightnessToBeadSelectionWidget,
-        ).pack(side=LEFT, padx=2, pady=2)
+        ttk.Label(brightnessFrame, text="Brightness").pack(side=tk.TOP, padx=2, pady=2)
+        self.brightnessScaleVar = DoubleVar()
+        self.brightnessScale = ttk.Scale(brightnessFrame, orient='horizontal', from_=-8, to_=8,
+                                         variable = self.brightnessScaleVar)
+        self.brightnessScale.set(1)
+        self.brightnessScale.configure( command= self.AdjustBrightness )
+        self.brightnessScale.pack(side=tk.TOP)
+        ttk.Label(brightnessFrame, text="Contrast").pack(side=tk.TOP, padx=2, pady=2)
+        self.contrastScale = ttk.Scale(brightnessFrame, orient='horizontal', from_=-8, to_=8)
+        self.contrastScale.set(1)
+        self.contrastScale.configure( command= self.AdjustContrast )
+        self.contrastScale.pack(side=tk.TOP)
+
         brightnessFrame.grid(row=3, column=0, sticky="n")
 
+
         layerFrame = Frame(imageParamFrame)
+
         ttk.Label(layerFrame, text=" Layer:").pack(side=LEFT, padx=2, pady=2)
         ttk.Button(layerFrame, text="-", width=3, command=self.ShowPrevLayer).pack(
             side=LEFT, padx=2, pady=2
@@ -253,7 +242,7 @@ class ExtractorView(tk.Toplevel):
         frameAvrageBeads = Frame(parametersFrame)
         ttk.Label(
             frameAvrageBeads,
-            text="Averaging",
+            text="Processing",
             font="Helvetica 10 bold",
         ).pack(side=TOP)
 
@@ -350,29 +339,38 @@ class ExtractorView(tk.Toplevel):
 
         # ---------------------- end __init__  ---------------------------------
 
-    def UpdateBeadSelectionWidgetImage(self):
+    def AdjustBrightness(self,scalerValue):
         """
         Preparing image for canvas from desired frame with setted parameters.
         """
+        if self.imgBeadsRaw is None:
+            return
         # brightness adjust
-        enhancer = ImageEnhance.Brightness(self.imgBeadsRaw)
-        imgCanvEnhaced = enhancer.enhance(self.intensityFactor)
-
+        enhancerBrightness = ImageEnhance.Brightness(self.imgBeadsRaw)
+        brightnessValue = pow(2,float(scalerValue))
+        imgCanvEnhaced = enhancerBrightness.enhance( brightnessValue )
         self.imgCnv = ImageTk.PhotoImage(imgCanvEnhaced)
         self.mainPhotoCanvas.create_image(0, 0, image=self.imgCnv, anchor=NW)
         # updating scrollers
         self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
         self.DrawAllMarks()
 
-    def AddBrightnessToBeadSelectionWidget(self):
-        """Funcion increase intensity"""
-        self.intensityFactor *= 1.1
-        self.UpdateBeadSelectionWidgetImage()
+    def AdjustContrast(self, scalerValue):
+        """
+        Preparing image for canvas from desired frame with setted parameters.
+        """
+        if self.imgBeadsRaw is None:
+            return
+        # brightness adjust
+        enhancerContrast = ImageEnhance.Contrast(self.imgBeadsRaw)
+        contrastValue = pow(2,float(scalerValue))
+        imgCanvEnhaced =  enhancerContrast.enhance( contrastValue )
+        self.imgCnv = ImageTk.PhotoImage(imgCanvEnhaced)
+        self.mainPhotoCanvas.create_image(0, 0, image=self.imgCnv, anchor=NW)
+        # updating scrollers
+        self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
+        self.DrawAllMarks()
 
-    def LowerBrightnessToBeadSelectionWidget(self):
-        """Funcion decrease intensity"""
-        self.intensityFactor *= 0.9
-        self.UpdateBeadSelectionWidgetImage()
 
     def ShowNextLayer(self):
         """Change visible layer"""
