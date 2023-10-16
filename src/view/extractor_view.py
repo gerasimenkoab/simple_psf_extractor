@@ -27,6 +27,9 @@ class ExtractorView(tk.Toplevel):
         self.beadCoords = []
         self.beadsPhotoLayerID = 0  # default index of beads microscope photo
         self.imgBeadsRaw = None
+        self.brightnessValue = 1
+        self.contrastValue = 1
+        
 
         self.voxelFields = "Z", "X", "Y"
         self.voxelSizeEntries = {}
@@ -346,14 +349,15 @@ class ExtractorView(tk.Toplevel):
         if self.imgBeadsRaw is None:
             return
         # brightness adjust
-        enhancerBrightness = ImageEnhance.Brightness(self.imgBeadsRaw)
-        brightnessValue = pow(2,float(scalerValue))
-        imgCanvEnhaced = enhancerBrightness.enhance( brightnessValue )
-        self.imgCnv = ImageTk.PhotoImage(imgCanvEnhaced)
-        self.mainPhotoCanvas.create_image(0, 0, image=self.imgCnv, anchor=NW)
-        # updating scrollers
-        self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
-        self.DrawAllMarks()
+        self.brightnessValue = pow(2,float(scalerValue))
+        self.AdjustImageBrightnessContrast()
+        # enhancerBrightness = ImageEnhance.Brightness(self.imgBeadsRaw)
+        # imgCanvEnhaced = enhancerBrightness.enhance( self.brightnessValue )
+        # self.imgCnv = ImageTk.PhotoImage(imgCanvEnhaced)
+        # self.mainPhotoCanvas.create_image(0, 0, image=self.imgCnv, anchor=NW)
+        # # updating scrollers
+        # self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
+        # self.DrawAllMarks()
 
     def AdjustContrast(self, scalerValue):
         """
@@ -362,9 +366,26 @@ class ExtractorView(tk.Toplevel):
         if self.imgBeadsRaw is None:
             return
         # brightness adjust
-        enhancerContrast = ImageEnhance.Contrast(self.imgBeadsRaw)
-        contrastValue = pow(2,float(scalerValue))
-        imgCanvEnhaced =  enhancerContrast.enhance( contrastValue )
+        self.contrastValue = pow(2,float(scalerValue))
+        self.AdjustImageBrightnessContrast()
+        # enhancerContrast = ImageEnhance.Contrast(self.imgBeadsRaw)
+        # imgCanvEnhaced =  enhancerContrast.enhance( self.contrastValue )
+        # self.imgCnv = ImageTk.PhotoImage(imgCanvEnhaced)
+        # self.mainPhotoCanvas.create_image(0, 0, image=self.imgCnv, anchor=NW)
+        # # updating scrollers
+        # self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
+        # self.DrawAllMarks()
+
+    def AdjustImageBrightnessContrast(self):
+        # a = self.brightnessScaleVar.get()
+        # b = self.contrastScale.get()
+        # print(f'brightness {a} contrast {b}')
+        # self.AdjustContrast( b )
+        # self.AdjustBrightness( a )
+        enhancerBrightness = ImageEnhance.Brightness(self.imgBeadsRaw)
+        imgCanvEnhaced = enhancerBrightness.enhance( self.brightnessValue )
+        enhancerContrast = ImageEnhance.Contrast(imgCanvEnhaced)
+        imgCanvEnhaced = enhancerContrast.enhance( self.contrastValue )
         self.imgCnv = ImageTk.PhotoImage(imgCanvEnhaced)
         self.mainPhotoCanvas.create_image(0, 0, image=self.imgCnv, anchor=NW)
         # updating scrollers
@@ -380,7 +401,7 @@ class ExtractorView(tk.Toplevel):
         # updating label on interface
         self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
         self.imgBeadsRaw.seek(self.beadsPhotoLayerID)
-        self.UpdateBeadSelectionWidgetImage()
+        self.AdjustImageBrightnessContrast()
 
     def ShowPrevLayer(self):
         """Change visible layer"""
@@ -390,7 +411,7 @@ class ExtractorView(tk.Toplevel):
         # updating label on interface
         self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
         self.imgBeadsRaw.seek(self.beadsPhotoLayerID)
-        self.UpdateBeadSelectionWidgetImage()
+        self.AdjustImageBrightnessContrast()
 
     def CloseMainPhotoFile(self):
         fileName = self.imgBeadsRaw.filename
