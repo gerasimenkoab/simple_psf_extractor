@@ -7,7 +7,7 @@ import logging
 
 from model.extractor_model import ExtractorModel
 from view.extractor_view import ExtractorView
-from view.extractor_beadpreview_view import ExtractorBeadPreviewWidget
+from controller.extractor_bead_prev_controller import ExtractorBeadPreviewController
 
 
 class ExtractorController:
@@ -122,25 +122,16 @@ class ExtractorController:
 
         # visualization:
         try:
-            os.remove(self.view.CloseMainPhotoFile())
-        except:
-            self.logger.debug("tmp.tiff cant be remove or not exist")            
-        try:
-            self.model.mainImage.SaveAsTiff(filename="tmp.tiff")
+            self.view.SetMainPhotoImageArray(self.model.mainImage.imArray)
         except Exception as e:
-            self.logger.error("LoadsBeadPhoto: can't create tmp.tiff " + str(e))
-            raise IOError("Cant update GUI properly")
-        try:
-            self.view.SetMainPhotoImage("tmp.tiff")
-        except Exception as e:
-            self.logger.error("LoadsBeadPhoto: can't show tmp.tiff  " + str(e))
+            self.logger.error("LoadsBeadPhoto: can't array  " + str(e))
             raise IOError("Cant update GUI properly")
         try:
             self.view.SetVoxelValues(self.model.mainImage.voxel)
         except Exception as e:
             self.logger.error("LoadsBeadPhoto: can't set voxel values " + str(e))
             raise IOError("Cant update GUI properly")
-        self.logger.debug("LoadsBeadPhoto: tmp.tiff created ")
+        self.view.SetFileInfo(self.model.mainImage.GetImageInfoStr(output = "full"))
 
     def ClearMarks(self, event=None):
         """Clear bead marks"""
@@ -241,5 +232,5 @@ class ExtractorController:
             self.logger.debug("Wrong selection size value.")
 
     def PreviewBeads(self, event=None):
-        ExtractorBeadPreviewWidget(self.view)
+        ExtractorBeadPreviewController(self._master, self.model)
 

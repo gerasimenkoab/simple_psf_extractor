@@ -3,7 +3,7 @@ from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showerror
-from PIL import ImageTk, Image, ImageEnhance
+from PIL import ImageTk, Image, ImageEnhance, ImageOps
 
 try:
     from .AuxTkPlot_class import AuxCanvasPlot
@@ -29,6 +29,8 @@ class ExtractorView(tk.Toplevel):
         self.imgBeadsRaw = None
         self.brightnessValue = 1
         self.contrastValue = 1
+        self.mainImageColor = "green" #"red"
+
         
 
         self.voxelFields = "Z", "X", "Y"
@@ -344,44 +346,28 @@ class ExtractorView(tk.Toplevel):
 
     def AdjustBrightness(self,scalerValue):
         """
-        Preparing image for canvas from desired frame with setted parameters.
+        Callback for Redraw canvas with current  brightness scaler value.
         """
         if self.imgBeadsRaw is None:
             return
         # brightness adjust
         self.brightnessValue = pow(2,float(scalerValue))
         self.AdjustImageBrightnessContrast()
-        # enhancerBrightness = ImageEnhance.Brightness(self.imgBeadsRaw)
-        # imgCanvEnhaced = enhancerBrightness.enhance( self.brightnessValue )
-        # self.imgCnv = ImageTk.PhotoImage(imgCanvEnhaced)
-        # self.mainPhotoCanvas.create_image(0, 0, image=self.imgCnv, anchor=NW)
-        # # updating scrollers
-        # self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
-        # self.DrawAllMarks()
 
     def AdjustContrast(self, scalerValue):
         """
-        Preparing image for canvas from desired frame with setted parameters.
+        Callback for Redraw canvas with current  contrast scaler value.
         """
         if self.imgBeadsRaw is None:
             return
-        # brightness adjust
+        # contrast adjust
         self.contrastValue = pow(2,float(scalerValue))
         self.AdjustImageBrightnessContrast()
-        # enhancerContrast = ImageEnhance.Contrast(self.imgBeadsRaw)
-        # imgCanvEnhaced =  enhancerContrast.enhance( self.contrastValue )
-        # self.imgCnv = ImageTk.PhotoImage(imgCanvEnhaced)
-        # self.mainPhotoCanvas.create_image(0, 0, image=self.imgCnv, anchor=NW)
-        # # updating scrollers
-        # self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
-        # self.DrawAllMarks()
 
     def AdjustImageBrightnessContrast(self):
-        # a = self.brightnessScaleVar.get()
-        # b = self.contrastScale.get()
-        # print(f'brightness {a} contrast {b}')
-        # self.AdjustContrast( b )
-        # self.AdjustBrightness( a )
+        """
+        Redraw canvas with current brightness and contrast scalers values.
+        """
         enhancerBrightness = ImageEnhance.Brightness(self.imgBeadsRaw)
         imgCanvEnhaced = enhancerBrightness.enhance( self.brightnessValue )
         enhancerContrast = ImageEnhance.Contrast(imgCanvEnhaced)
@@ -396,11 +382,11 @@ class ExtractorView(tk.Toplevel):
     def ShowNextLayer(self):
         """Change visible layer"""
         self.beadsPhotoLayerID += 1
-        if self.beadsPhotoLayerID > self.imgBeadsRaw.n_frames - 1:
-            self.beadsPhotoLayerID = self.imgBeadsRaw.n_frames - 1
+        if self.beadsPhotoLayerID > len(self.imgBeadsRawList) - 1:
+            self.beadsPhotoLayerID = len(self.imgBeadsRawList) - 1
         # updating label on interface
         self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
-        self.imgBeadsRaw.seek(self.beadsPhotoLayerID)
+        self.imgBeadsRaw = self.imgBeadsRawList[self.beadsPhotoLayerID]
         self.AdjustImageBrightnessContrast()
 
     def ShowPrevLayer(self):
@@ -410,30 +396,31 @@ class ExtractorView(tk.Toplevel):
             self.beadsPhotoLayerID = 0
         # updating label on interface
         self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
-        self.imgBeadsRaw.seek(self.beadsPhotoLayerID)
+        self.imgBeadsRaw = self.imgBeadsRawList[self.beadsPhotoLayerID]
         self.AdjustImageBrightnessContrast()
 
-    def CloseMainPhotoFile(self):
-        fileName = self.imgBeadsRaw.filename
-        self.imgBeadsRaw.close()
-        return fileName
-
-    def SetMainPhotoImage(self, tmpFilePath=None):
+    def SetMainPhotoImageArray(self, ArrayIn = None):
         """Loading raw beads photo from file"""
-        if tmpFilePath is None:
-            raise FileNotFoundError("No file name provided", "no_file_path")
+        if ArrayIn is None:
+            raise ValueError("No array provided", "no_file_path")
         try:
-            try:
-                self.imgBeadsRaw.close()
-            except:
-                pass
-            self.imgBeadsRaw = Image.open(tmpFilePath)
+            self.imgBeadsRawList=[]
+            for i in range(ArrayIn.shape[0]):
+                tmpArray = ArrayIn[i,:,:].reshape((ArrayIn.shape[1],ArrayIn.shape[2]))
+                # use .convert('L') when make array from numpyArray to avoid problem with F mode   
+                # !caution! fromarray(tmpArray, mode="L") does not work as intended, so use convert('L').
+                tmp = ImageOps.colorize(Image.fromarray(tmpArray).convert('L'),
+                                        black="black",
+                                        white="white",
+                                        mid = self.mainImageColor)
+                self.imgBeadsRawList.append(tmp)
+                # ImageOps.colorize(self.imgBeadsRawList[i], black="green", white="white")
         except:
-            raise FileNotFoundError(
-                "Cant set canvas image with beads photo.", "cant_read_file"
+            raise ValueError(
+                "Cant set canvas image with beads photo."
             )
-        self.beadsPhotoLayerID = int((self.imgBeadsRaw.n_frames + 1) / 2)
-        self.imgBeadsRaw.seek(self.beadsPhotoLayerID)
+        self.beadsPhotoLayerID = int((len(self.imgBeadsRawList) + 1) / 2)
+        self.imgBeadsRaw = self.imgBeadsRawList[self.beadsPhotoLayerID]
         self.BeadMarksClear()
         # updating label on interface
         self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
@@ -447,6 +434,9 @@ class ExtractorView(tk.Toplevel):
         )
         # updating scrollers
         self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
+
+    def SetFileInfo(self, infoStr: str):
+        self.imageInfoStr.set(infoStr)
 
     def SetVoxelValues(self, voxelInDict):
         """Bead voxel size change"""
