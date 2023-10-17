@@ -1,5 +1,6 @@
-2023-10-16 21:56:56,029 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
-2023-10-16 21:56:56,029 __main__.model.extractor_model INFO: Extractor object created
-2023-10-16 21:56:56,058 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
-2023-10-16 21:57:12,570 __main__.controller.extractor_controller INFO: File(s) load success. 
-2023-10-16 21:57:53,699 __main__.controller.extractor_controller INFO: Bead Extractor Closed.
+2023-10-17 23:26:09,717 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
+2023-10-17 23:26:09,718 __main__.model.extractor_model INFO: Extractor object created
+2023-10-17 23:26:09,746 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
+2023-10-17 23:26:23,656 __main__.controller.extractor_controller INFO: File(s) load success. 
+2023-10-17 23:27:03,393 __main__.controller.extractor_bead_prev_controller INFO: Initializing Extractor Bead Preview module.
+2023-10-17 23:27:13,423 __main__.controller.extractor_controller INFO: Bead Extractor Closed.
