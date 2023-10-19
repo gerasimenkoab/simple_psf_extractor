@@ -18,14 +18,27 @@ class ExtractorBeadPreviewController():
         self._bindEvents()
 
     def _bindEvents(self):
+        self._view.deleteBeadBtn.config(command = self.DeleteSelectedBead)
         self._view.previewCloseBtn.config(command=self.CloseBeadPreview)
         self._view.beadsList.bind('<<ListboxSelect>>', self.ViewBead2D)
         self._view.preview3DBtn.config(command=self.ViewBead3D)
     
+    def DeleteSelectedBead(self,event= None):
+        try:
+            id = self._view.beadListViewGet()
+        except:
+            return
+        pass
+        self._master.BeadMarksRemoveId(id) 
+        self._model.BeadCoordsRemoveId(id)
+        self._view.SetBeadList(self._model.beadCoords)
+        self.ViewBead2D()   
+
     def ViewBead2D(self, event=None):
         try:
             id = self._view.beadListViewGet()
         except:
+            self._view.PlotBeadPreview2D()
             return
         self._view.PlotBeadPreview2D(self._model._extractedBeads[id].imArray)
 

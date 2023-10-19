@@ -232,5 +232,6 @@ class ExtractorController:
             self.logger.debug("Wrong selection size value.")
 
     def PreviewBeads(self, event=None):
-        ExtractorBeadPreviewController(self._master, self.model)
+        # ExtractorBeadPreviewController(self._master, self.model)
+        ExtractorBeadPreviewController(self.view, self.model)
 

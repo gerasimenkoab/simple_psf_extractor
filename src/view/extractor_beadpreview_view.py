@@ -134,7 +134,9 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
     def beadListViewGet(self):
         return self.beadsList.curselection()[0]
 
-    def PlotBeadPreview2D(self, arrayIn):
+    def PlotBeadPreview2D(self, arrayIn = None):
+        if arrayIn is None:
+            arrayIn = np.zeros((10,10,10))
         centerX = arrayIn.shape[2] // 2 
         centerY = arrayIn.shape[1] // 2
         centerZ = arrayIn.shape[0] // 2

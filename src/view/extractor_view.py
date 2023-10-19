@@ -507,6 +507,20 @@ class ExtractorView(tk.Toplevel):
         self._beadMarksCounter += 1
         self.SetMarkedBeadList()
 
+    def BeadMarksRemoveId(self,Id):
+        """Removes the last bead in the list"""
+        if self.beadMarks == []:
+            return
+        try:
+            self.mainPhotoCanvas.delete(self.beadMarks[Id])
+            self.beadMarks.pop(Id)
+            self.beadCoords.pop(Id)
+        except:
+            ValueError("Cant delete mark.")
+        self._beadMarksCounter -= 1
+        self.SetMarkedBeadList()
+
+
     def BeadMarksRemoveLast(self):
         """Removes the last bead in the list"""
         if self.beadMarks == []:

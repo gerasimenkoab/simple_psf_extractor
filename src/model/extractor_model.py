@@ -83,6 +83,16 @@ class ExtractorModel:
         self._beadCoords.append(beadMarkCoords)
         self.MarkedBeadExtract( beadMarkCoords)
 
+    def BeadCoordsRemoveId(self,Id):
+        """Removes the last bead in the list"""
+        try:
+            self._beadCoords.pop(Id)
+            self._extractedBeads.pop(Id)
+        except:
+            pass
+            # raise ValueError("No coordinates to remove in the list", "list_empty")
+
+
     def BeadCoordsRemoveLast(self):
         """Removes the last bead in the list"""
         try:
