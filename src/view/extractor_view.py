@@ -334,10 +334,10 @@ class ExtractorView(tk.Toplevel):
 
         beadPreviewMenuFrame = ttk.Frame(beadPreviewFrame)
 
-        self.viewBead2d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 2D")
-        self.viewBead2d_btn.pack(side=LEFT)
-        self.viewBead3d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 3D")
-        self.viewBead3d_btn.pack(side=LEFT)
+        # self.viewBead2d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 2D")
+        # self.viewBead2d_btn.pack(side=LEFT)
+        # self.viewBead3d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 3D")
+        # self.viewBead3d_btn.pack(side=LEFT)
         beadPreviewMenuFrame.pack(side=TOP, padx=2, pady=2)
 
         beadPreviewFrame.grid(row=1, column=4, sticky="NSWE")
