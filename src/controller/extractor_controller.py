@@ -59,9 +59,9 @@ class ExtractorController:
         self.view.processBeads_btn.config(command=self.ProcessBeads)
         # self.view.saveAverageBead_btn.config(command=self.SaveAverageBead)
         # self.view.averageSeveralBeads_btn.config(command=self.AverageSeveralBeads)
-        self.view.viewBead2d_btn.config(command=self.ViewBead2D)
-        self.view.viewBead3d_btn.config(command=self.ViewBead3D)
-        # self.view.close_btn.config(command=self.CloseExtractor)
+        # self.view.viewBead2d_btn.config(command=self.ViewBead2D)
+        # self.view.viewBead3d_btn.config(command=self.ViewBead3D)
+        # # self.view.close_btn.config(command=self.CloseExtractor)
         # entries bind at two events:
         self.view.mainPhotoCanvas.bind("<Button-3>", self.BeadMarkOnClick)
         for key in ("Z", "Y", "X"):
@@ -169,19 +169,19 @@ class ExtractorController:
         )
         pass
 
-    def ViewBead2D(self, event=None):
-        try:
-            id = self.view.beadListViewGet()
-        except:
-            return
-        self.view.PlotBeadPreview2D(self.model._extractedBeads[id].imArray, '2D Bead plot '+ str(self.model._beadCoords[id]))
+    # def ViewBead2D(self, event=None):
+    #     try:
+    #         id = self.view.beadListViewGet()
+    #     except:
+    #         return
+    #     self.view.PlotBeadPreview2D(self.model._extractedBeads[id].imArray, '2D Bead plot '+ str(self.model._beadCoords[id]))
 
-    def ViewBead3D(self, event=None):
-        try:
-            id = self.view.beadListViewGet()
-        except:
-            return
-        self.view.PlotBeadPreview3D(self.model._extractedBeads[id].imArray, '3D Bead plot '+ str(self.model._beadCoords[id]))
+    # def ViewBead3D(self, event=None):
+    #     try:
+    #         id = self.view.beadListViewGet()
+    #     except:
+    #         return
+    #     self.view.PlotBeadPreview3D(self.model._extractedBeads[id].imArray, '3D Bead plot '+ str(self.model._beadCoords[id]))
 
     def CloseExtractor(self, event=None):
         """Closing window and clear tmp files"""
