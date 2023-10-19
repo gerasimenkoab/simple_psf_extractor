@@ -14,7 +14,7 @@ class ExtractorBeadPreviewController():
         self._view = ExtractorBeadPreviewWidget(self._master)
         # upload bead list
         self._view.SetBeadList(self._model.beadCoords)
-
+        self.ViewBead2D()
         self._bindEvents()
 
     def _bindEvents(self):
