@@ -136,7 +136,8 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
 
     def PlotBeadPreview2D(self, arrayIn = None):
         if arrayIn is None:
-            arrayIn = np.zeros((10,10,10))
+            self.ClearPlots()
+            return
         centerX = arrayIn.shape[2] // 2 
         centerY = arrayIn.shape[1] // 2
         centerZ = arrayIn.shape[0] // 2
@@ -168,6 +169,20 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
         self.plotArrayLine(
             self.axisLYZ, self.linePlotYZ, x3, y3, xlabel="n(px)", ylabel="Intensity Z"
         )
+
+    def ClearPlots(self):
+        self.axisXY.clear()
+        self.axisXZ.clear()
+        self.axisYZ.clear()
+        self.axisLXY.clear()
+        self.axisLXZ.clear()
+        self.axisLYZ.clear()
+        self.colorPlotXY.draw()
+        self.colorPlotXZ.draw()
+        self.colorPlotYZ.draw()
+        self.linePlotXY.draw()
+        self.linePlotXZ.draw()
+        self.linePlotYZ.draw()
 
     def PlotBeadPreview3D(self, beadArray, winTitle="3D Plot"):
         """ "Plots three bead in 3D pointplot"""
