@@ -37,6 +37,7 @@ class ExtractorController:
         # menus:
         # File:
         self.view.bind("<<LoadImageDialog>>",self.LoadsBeadPhoto)
+        self.view.bind("<Control-o>",self.LoadsBeadPhoto)
         self.view.bind("<<SaveSelectedBeads>>",self.SaveExtractedBeads)
         self.view.bind("<<SaveAverageBead>>",self.SaveAverageBead)
         self.view.bind("<<AverageSeveralBeads>>",self.AverageSeveralBeads)
