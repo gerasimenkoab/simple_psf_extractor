@@ -13,4 +13,31 @@ class ExtractorBeadPreviewController():
         self._model = modelIn
         self._view = ExtractorBeadPreviewWidget(self._master)
         # upload bead list
+        self._view.SetBeadList(self._model.beadCoords)
+
+        self._bindEvents()
+
+    def _bindEvents(self):
+        self._view.previewCloseBtn.config(command=self.CloseBeadPreview)
+        self._view.beadsList.bind('<<ListboxSelect>>', self.ViewBead2D)
+        self._view.preview3DBtn.config(command=self.ViewBead3D)
+    
+    def ViewBead2D(self, event=None):
+        try:
+            id = self._view.beadListViewGet()
+        except:
+            return
+        self._view.PlotBeadPreview2D(self._model._extractedBeads[id].imArray)
+
+    def ViewBead3D(self, event=None):
+        try:
+            id = self._view.beadListViewGet()
+        except:
+            return
+        self._view.PlotBeadPreview3D(self._model._extractedBeads[id].imArray, '3D Bead plot '+ str(self._model.beadCoords[id]))
+
+    def CloseBeadPreview(self, event=None):
+        """Closing window and clear tmp files"""
+        self._view.destroy()
+
 

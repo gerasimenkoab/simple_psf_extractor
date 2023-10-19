@@ -186,15 +186,15 @@ class ExtractorController:
         """Closing window and clear tmp files"""
         # Checking existance of self.imgBeadsRaw.close()
         if askokcancel("Close", "Close Bead Extractor Widget?"):
-            try:
-                self.view.imgBeadsRaw.close()
-            except:
-                pass
-            tmppath = os.getcwd() + "\\tmp.tiff"
-            try:
-                os.remove(tmppath)
-            except:
-                pass
+            # try:
+            #     self.view.imgBeadsRaw.close()
+            # except:
+            #     pass
+            # # tmppath = os.getcwd() + "\\tmp.tiff"
+            # try:
+            #     # os.remove(tmppath)
+            # except:
+            #     pass
             self.view.destroy()
             self.logger.info("Bead Extractor Closed.")
 

@@ -19,7 +19,6 @@ class ExtractorModel:
         self._beadDiameter = 0.2
         self._selectionFrameHalf = 18
 
-        self._beadCoords = []
         self._extractedBeads = []
 
     @property
@@ -42,6 +41,10 @@ class ExtractorModel:
     @property
     def beadCoords(self):
         return self._beadCoords
+
+    @property
+    def extractedBeads(self):
+        return self._extractedBeads
 
     @beadCoords.setter
     def beadCoords(self, coordsList):
@@ -75,6 +78,8 @@ class ExtractorModel:
 
     def beadMarkAdd(self, beadMarkCoords: list):
         """Append mouse event coordinates to global list. Center is adjusted according to max intensity."""
+        if self._beadCoords is None:
+            self._beadCoords = []
         self._beadCoords.append(beadMarkCoords)
         self.MarkedBeadExtract( beadMarkCoords)
 
@@ -84,7 +89,8 @@ class ExtractorModel:
             self._beadCoords.pop()
             self._extractedBeads.pop()
         except:
-            raise ValueError("No coordinates to remove in the list", "list_empty")
+            pass
+            # raise ValueError("No coordinates to remove in the list", "list_empty")
 
     def BeadCoordsClear(self):
         """Clears all bead marks"""
@@ -92,6 +98,7 @@ class ExtractorModel:
             return
         self._beadCoords = []
         self._extractedBeads = []
+
     def LocateFrameMaxIntensity3D(self, xi, yi):
         """Locate point with maximum intensity in current 3d array.
         In:

@@ -39,7 +39,7 @@ class AuxCanvasPlot():
             fig.suptitle(plotName)
         dN = arr2D.shape[0]
         ax.pcolormesh(arr2D, cmap=cm.jet)
-        return FigureCanvasTkAgg(fig, cnv).get_tk_widget()
+        return FigureCanvasTkAgg(fig, cnv)#.get_tk_widget()
         # .pack( side=TOP, fill=BOTH, expand=True )
 
     def FigureCanvasTkFrom3DArray(arr3D: np.ndarray, cnv:Canvas, plotName="Plot", widthPt=100, heightPt = 300, dpiIn = 100):

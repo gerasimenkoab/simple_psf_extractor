@@ -8,6 +8,7 @@ from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
 import matplotlib.cm as cm
 
+
 try:
     from .AuxTkPlot_class import AuxCanvasPlot
 except:
@@ -109,12 +110,12 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
         self.deleteBeadBtn = ttk.Button(self.controlFrame)
         self.deleteBeadBtn.configure(text="Delete", underline=0)
         self.deleteBeadBtn.pack(fill="x", padx=2, pady=2, side="top")
-        self.preview2DBtn = ttk.Button(self.controlFrame)
-        self.preview2DBtn.configure(text="Preview 2D")
-        self.preview2DBtn.pack(fill="x", padx=2, pady=2, side="top")
         self.preview3DBtn = ttk.Button(self.controlFrame)
         self.preview3DBtn.configure(text="Preview 3D")
         self.preview3DBtn.pack(fill="x", padx=2, pady=2, side="top")
+        self.previewCloseBtn = ttk.Button(self.controlFrame)
+        self.previewCloseBtn.configure(text="Close")
+        self.previewCloseBtn.pack(fill="x", padx=2, pady=2, side="top")
         self.controlFrame.grid(column=4, padx=2, pady=5, row=0, sticky="ns")
         self.mainFrame.pack(expand=True, fill="both", side="top")
         self.mainFrame.rowconfigure(0, weight=10)
@@ -128,24 +129,43 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
         self.beadsList.delete(0, tk.END)
         self._beadCoords = beadCoords
         self.beadsList.insert(0, *self._beadCoords)
+        self.beadsList.selection_set(0)
 
     def beadListViewGet(self):
         return self.beadsList.curselection()[0]
 
-    def PlotBeadPreview2D(self, beadArray, winTitle="2D Plot"):
-        """ "Plots three bead in XYZ planes"""
-        child_tmp = tk.Toplevel(self)
-        child_tmp.title(winTitle)
-        cnvPlot = tk.Canvas(child_tmp, width=400, height=600)
-        cnvPlot.pack(side="top", fill=tk.BOTH)
-        try:
-            cnvTmp = AuxCanvasPlot.FigureCanvasTkFrom3DArray(
-                beadArray, cnvPlot, " ", 300, 700
-            )
-            cnvTmp.get_tk_widget().pack(side="top", fill=tk.BOTH)
-        except Exception as e:
-            raise RuntimeError("Bead 2D plot failed" + str(e))
-        ttk.Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side="top")
+    def PlotBeadPreview2D(self, arrayIn):
+        centerX = arrayIn.shape[2] // 2 
+        centerY = arrayIn.shape[1] // 2
+        centerZ = arrayIn.shape[0] // 2
+        arrXY = arrayIn[centerZ,:,:].reshape((arrayIn.shape[1],arrayIn.shape[2]))
+        arrXZ = arrayIn[:,centerY,:].reshape((arrayIn.shape[0],arrayIn.shape[2]))
+        arrYZ = arrayIn[:,:,centerX].reshape((arrayIn.shape[0],arrayIn.shape[1]))
+        y1 = arrayIn[centerZ,centerY,:].reshape((arrayIn.shape[2]))
+        x1 = range(len(y1))
+        y2 = arrayIn[centerZ,:,centerX].reshape((arrayIn.shape[1]))
+        x2 = range(len(y2))
+        y3 = arrayIn[:,centerY,centerX].reshape((arrayIn.shape[0]))
+        x3 = range(len(y3))
+
+        self.plotNumpyArrayColormesh2D(
+            self.axisXY, self.colorPlotXY, arrXY, xlabel="X(px)", ylabel="Y(px)"
+        )
+        self.plotNumpyArrayColormesh2D(
+            self.axisXZ, self.colorPlotXZ, arrXZ, xlabel="X(px)", ylabel="Z(px)"
+        )
+        self.plotNumpyArrayColormesh2D(
+            self.axisYZ, self.colorPlotYZ, arrYZ, xlabel="Y(px)", ylabel="Z(px)"
+        )
+        self.plotArrayLine(
+            self.axisLXY, self.linePlotXY, x1, y1, xlabel="n(px)", ylabel="Intensity X"
+        )
+        self.plotArrayLine(
+            self.axisLXZ, self.linePlotXZ, x2, y2, xlabel="n(px)", ylabel="Intensity Y"
+        )
+        self.plotArrayLine(
+            self.axisLYZ, self.linePlotYZ, x3, y3, xlabel="n(px)", ylabel="Intensity Z"
+        )
 
     def PlotBeadPreview3D(self, beadArray, winTitle="3D Plot"):
         """ "Plots three bead in 3D pointplot"""
@@ -174,7 +194,7 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
         ax.set_xlabel("x(pt)", fontsize=8)
         ax.set_ylabel("y(pt)", fontsize=8)
         ax.tick_params(axis="both", which="major", labelsize=8)
-        ax.set_box_aspect(1)
+        # ax.set_box_aspect(1)
         canvas = FigureCanvasTkAgg(fig, master=masterFrame)
         return canvas, ax
 
@@ -183,7 +203,7 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
         ax.clear()
         ax.plot(x, y)
         ax.set_xlim(0, y.shape[0])
-        ax.set_ylim(0, 255)
+        ax.set_ylim(0, np.max(y))
         ax.set_xlabel(xlabel, fontsize=8)
         ax.set_ylabel(ylabel, fontsize=8)
         ax.legend()
@@ -198,41 +218,9 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
         ax.set_ylim(0, data.shape[0])
         ax.set_xlabel(xlabel, fontsize=8)
         ax.set_ylabel(ylabel, fontsize=8)
-        ax.imshow(data, cmap=cm.jet)
+        im = ax.imshow(data, cmap=cm.jet)
         canvas.draw()
 
-    def PlotColorGraphs(self, array3DIn=None):
-        # arrXY = array3DIn[35,:,:]
-        # arrXZ = array3DIn[:,35,:]
-        # arrYZ = array3DIn[:,:,35]
-        arrXY = np.random.randint(0, 255, (10, 10))
-        arrXZ = np.random.randint(0, 255, (10, 10))
-        arrYZ = np.random.randint(0, 255, (10, 10))
-        y1 = np.random.randint(0, 255, (10))
-        x1 = range(len(y1))
-        y2 = np.random.randint(0, 255, (10))
-        x2 = range(len(y2))
-        y3 = np.random.randint(0, 255, (10))
-        x3 = range(len(y3))
-
-        self.plotNumpyArrayColormesh2D(
-            self.axisXY, self.colorPlotXY, arrXY, xlabel="X(px)", ylabel="Y(px)"
-        )
-        self.plotNumpyArrayColormesh2D(
-            self.axisXZ, self.colorPlotXZ, arrXZ, xlabel="X(px)", ylabel="Z(px)"
-        )
-        self.plotNumpyArrayColormesh2D(
-            self.axisYZ, self.colorPlotYZ, arrYZ, xlabel="Y(px)", ylabel="Z(px)"
-        )
-        self.plotArrayLine(
-            self.axisLXY, self.linePlotXY, x1, y1, xlabel="n(px)", ylabel="Intensity X"
-        )
-        self.plotArrayLine(
-            self.axisLXZ, self.linePlotXZ, x2, y2, xlabel="n(px)", ylabel="Intensity Y"
-        )
-        self.plotArrayLine(
-            self.axisLYZ, self.linePlotYZ, x3, y3, xlabel="n(px)", ylabel="Intensity Z"
-        )
 
 
 if __name__ == "__main__":
