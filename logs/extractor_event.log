@@ -1,6 +1,8 @@
-2023-10-19 23:47:57,467 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
-2023-10-19 23:47:57,467 __main__.model.extractor_model INFO: Extractor object created
-2023-10-19 23:47:57,499 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
-2023-10-19 23:48:15,176 __main__.controller.extractor_controller INFO: File(s) load success. 
-2023-10-19 23:48:26,703 __main__.controller.extractor_bead_prev_controller INFO: Initializing Extractor Bead Preview module.
-2023-10-19 23:48:46,265 __main__.controller.extractor_controller INFO: Bead Extractor Closed.
+2023-10-20 19:37:07,824 __main__.model.decon_psf_model INFO: Decon PSF object created
+2023-10-20 19:37:07,827 __main__.model.decon_image_model INFO: Decon Image object created
+2023-10-20 19:37:07,856 __main__.view.decon_view INFO: Decon PSF view loaded
+2023-10-20 19:37:17,300 __main__.controller.decon_controller INFO: Bead File Loaded: D:/tmp/Psf-and-neuron/17-1.tif
+2023-10-20 19:37:19,986 __main__.controller.decon_controller INFO: PSF File Loaded: D:/tmp/Psf-and-neuron/psf.tif
+2023-10-20 19:37:31,151 __main__.controller.decon_controller INFO: Starting image deconvolution. Method code: RLTMR
+2023-10-20 19:38:15,957 __main__.model.decon_image_model INFO: Deconvolution time: 44.78338050842285 seconds 
+2023-10-20 19:38:16,010 __main__.controller.decon_controller INFO: Image deconvolution finished.

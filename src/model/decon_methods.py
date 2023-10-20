@@ -105,7 +105,7 @@ def DeconImage(
         else:
             iEnd= i + image.shape[1] % chunkDimY
         for j in range(0,image.shape[2], chunkDimX):
-            if j <= image.shape[1]-chunkDimY:
+            if j <= image.shape[2]-chunkDimX:
                 jEnd = j + chunkDimX
             else:
                 jEnd= j + image.shape[2] % chunkDimX
@@ -148,7 +148,7 @@ def DeconImage(
         else:
             iEnd= i + image.shape[1] % chunkDimY
         for j in range(0,image.shape[2], chunkDimX):
-            if j <= image.shape[1]-chunkDimY:
+            if j <= image.shape[2]-chunkDimX:
                 jEnd = j + chunkDimX
             else:
                 jEnd= j + image.shape[2] % chunkDimX
@@ -277,7 +277,8 @@ def MaxLikelhoodEstimationFFT_3D(image, kernell, iterLimit=20, debug_flag=False,
     """
     f_0 = image
     # if there is NAN in image array(seems from source image) replace it with zeros
-    f_0[np.isnan(f_0)] = 0
+    f_0[np.isnan(f_0)] = 1.e-11
+    f_0[f_0<1.e-11] = 1.e-11
     beadMaxInt = np.amax(image)
     padSize = kernell.shape
     f_0 = np.pad(f_0, list(zip(padSize, padSize)), "edge")
@@ -302,11 +303,19 @@ def MaxLikelhoodEstimationFFT_3D(image, kernell, iterLimit=20, debug_flag=False,
             e = signal.fftconvolve(f_i, kernell, mode="same")
             e = e + b_noize
             r = f_0 / e
+            # possible zero check 
+            # print(getpid(),np.any(e == 0))
+            # with np.errstate(all='raise'):
+            #     try:
+            #         print(getpid(),"zero:",e.size - np.count_nonzero(e))
+            #         r = f_0 / e # this gets caught and handled as an exception
+            #     except FloatingPointError:
+            #         print(getpid(),'oh no!')
             # second convolution
             pReversed = np.flip(kernell)
             rConv = signal.fftconvolve(r, pReversed, mode="same")
             rConv = np.real(rConv)
-            #      rConv = rConv.clip(min=0)
+            rConv = rConv.clip(min=0)
             f_i = f_i * rConv
 
             f_i = f_i / np.amax(f_i) * beadMaxInt
@@ -347,7 +356,8 @@ def DeconvolutionRLTMR(
 
     f_0 = image
     # if there is NAN in image array(seems from source image) replace it with zeros
-    f_0[np.isnan(f_0)] = 0.0
+    f_0[np.isnan(f_0)] = 1.e-11
+    f_0[f_0<1.e-11] = 1.e-11
     padSize = psf.shape
     b_noize = (np.mean(f_0[0, 0, :]) + np.mean(f_0[0, :, 0]) + np.mean(f_0[:, 0, 0])) / 3
     f_0 = np.pad(f_0, list(zip(padSize, padSize)), "edge")
@@ -560,7 +570,8 @@ def DeconvolutionRLTVR(
 
     f_0 = image
     # if there is NAN in image array(seems from source image) replace it with zeros
-    f_0[np.isnan(f_0)] = 0.0
+    f_0[np.isnan(f_0)] = 1.e-11
+    f_0[f_0<1.e-11] = 1.e-11
     padSize = psf.shape
     f_0 = np.pad(f_0, list(zip(padSize, padSize)), "edge")
     beadMaxInt = np.amax(image)
