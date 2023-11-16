@@ -1,8 +1,3 @@
-2023-10-20 19:37:07,824 __main__.model.decon_psf_model INFO: Decon PSF object created
-2023-10-20 19:37:07,827 __main__.model.decon_image_model INFO: Decon Image object created
-2023-10-20 19:37:07,856 __main__.view.decon_view INFO: Decon PSF view loaded
-2023-10-20 19:37:17,300 __main__.controller.decon_controller INFO: Bead File Loaded: D:/tmp/Psf-and-neuron/17-1.tif
-2023-10-20 19:37:19,986 __main__.controller.decon_controller INFO: PSF File Loaded: D:/tmp/Psf-and-neuron/psf.tif
-2023-10-20 19:37:31,151 __main__.controller.decon_controller INFO: Starting image deconvolution. Method code: RLTMR
-2023-10-20 19:38:15,957 __main__.model.decon_image_model INFO: Deconvolution time: 44.78338050842285 seconds 
-2023-10-20 19:38:16,010 __main__.controller.decon_controller INFO: Image deconvolution finished.
+2023-11-09 11:43:59,291 __main__.model.decon_psf_model INFO: Decon PSF object created
+2023-11-09 11:43:59,293 __main__.model.decon_image_model INFO: Decon Image object created
+2023-11-09 11:43:59,314 __main__.view.decon_view INFO: Decon PSF view loaded

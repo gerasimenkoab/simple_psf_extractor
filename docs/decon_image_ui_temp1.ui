@@ -1,12 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <interface version="1.3">
-  <object class="ttk.Frame" id="frame2">
+  <object class="ttk.Frame" id="deconImageFrame" named="True">
     <property name="height">600</property>
+    <property name="takefocus">true</property>
     <property name="width">800</property>
     <layout manager="grid">
       <property name="column">0</property>
       <property name="row">0</property>
-      <property name="sticky">n</property>
+      <property name="sticky">nsew</property>
     </layout>
     <containerlayout manager="grid">
       <property name="anchor">center</property>
@@ -66,7 +67,9 @@
       <object class="ttk.Frame" id="imageFrame" named="True">
         <property name="height">200</property>
         <property name="width">200</property>
-        <layout manager="grid" />
+        <layout manager="grid">
+          <property name="sticky">nsew</property>
+        </layout>
         <child>
           <object class="tk.Canvas" id="image_cnv" named="True">
             <property name="background">#c0c0c0</property>
@@ -88,6 +91,51 @@
             <property name="width">200</property>
             <layout manager="pack" />
             <child>
+              <object class="ttk.Frame" id="imgScalers" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">left</property>
+                </layout>
+                <child>
+                  <object class="ttk.Label" id="imgBrightnessLabel" named="True">
+                    <property name="text" translatable="yes">Brightness:</property>
+                    <layout manager="pack">
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Scale" id="imgBrightnessScaler" named="True">
+                    <property name="length">50</property>
+                    <property name="orient">horizontal</property>
+                    <layout manager="pack">
+                      <property name="padx">5</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Label" id="imgContrastLabel" named="True">
+                    <property name="text" translatable="yes">Contrast:</property>
+                    <layout manager="pack">
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Scale" id="imgContrastScaler" named="True">
+                    <property name="length">50</property>
+                    <property name="orient">horizontal</property>
+                    <layout manager="pack">
+                      <property name="padx">5</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
               <object class="ttk.Frame" id="imageLayerSwitch" named="True">
                 <property name="height">200</property>
                 <property name="width">200</property>
@@ -103,6 +151,7 @@
                     <property name="state">normal</property>
                     <property name="text" translatable="yes">Z Layer</property>
                     <layout manager="pack">
+                      <property name="anchor">s</property>
                       <property name="padx">2</property>
                       <property name="pady">2</property>
                       <property name="side">left</property>
@@ -121,6 +170,7 @@
                     <bind sequence="&lt;&lt;Decrement&gt;&gt;" handler="ImageLayer_spDown" add="" />
                     <bind sequence="&lt;&lt;Increment&gt;&gt;" handler="ImageLayer_spUp" add="" />
                     <layout manager="pack">
+                      <property name="anchor">s</property>
                       <property name="padx">2</property>
                       <property name="pady">2</property>
                       <property name="side">left</property>
@@ -191,6 +241,7 @@
         <layout manager="grid">
           <property name="column">2</property>
           <property name="row">1</property>
+          <property name="sticky">nsew</property>
         </layout>
         <child>
           <object class="tk.Canvas" id="psf_cnv" named="True">
@@ -292,7 +343,7 @@
               </object>
             </child>
             <child>
-              <object class="ttk.Combobox" id="combobox1">
+              <object class="ttk.Combobox" id="deconMethodCombobox" named="True">
                 <property name="width">25</property>
                 <layout manager="pack">
                   <property name="side">left</property>
@@ -395,6 +446,7 @@
         <layout manager="grid">
           <property name="column">4</property>
           <property name="row">1</property>
+          <property name="sticky">nsew</property>
         </layout>
         <child>
           <object class="tk.Canvas" id="result_cnv" named="True">
@@ -420,6 +472,51 @@
               <property name="side">top</property>
             </layout>
             <child>
+              <object class="ttk.Frame" id="resScalers" named="True">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">left</property>
+                </layout>
+                <child>
+                  <object class="ttk.Label" id="resBrightnessLabel" named="True">
+                    <property name="text" translatable="yes">Brightness:</property>
+                    <layout manager="pack">
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Scale" id="resBrightnessScaler" named="True">
+                    <property name="length">50</property>
+                    <property name="orient">horizontal</property>
+                    <layout manager="pack">
+                      <property name="padx">5</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Label" id="resContrastLabel" named="True">
+                    <property name="text" translatable="yes">Contrast:</property>
+                    <layout manager="pack">
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Scale" id="resContrastScaler" named="True">
+                    <property name="length">50</property>
+                    <property name="orient">horizontal</property>
+                    <layout manager="pack">
+                      <property name="padx">5</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
               <object class="ttk.Frame" id="resLayerSwitch" named="True">
                 <property name="height">200</property>
                 <property name="width">200</property>
@@ -428,7 +525,7 @@
                   <property name="fill">both</property>
                   <property name="padx">2</property>
                   <property name="pady">2</property>
-                  <property name="side">top</property>
+                  <property name="side">left</property>
                 </layout>
                 <child>
                   <object class="ttk.Label" id="resLayer_lbl" named="True">
@@ -451,7 +548,7 @@
                     <layout manager="pack">
                       <property name="padx">2</property>
                       <property name="pady">2</property>
-                      <property name="side">top</property>
+                      <property name="side">left</property>
                     </layout>
                   </object>
                 </child>
