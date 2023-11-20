@@ -1,3 +1,3 @@
-2023-11-09 11:43:59,291 __main__.model.decon_psf_model INFO: Decon PSF object created
-2023-11-09 11:43:59,293 __main__.model.decon_image_model INFO: Decon Image object created
-2023-11-09 11:43:59,314 __main__.view.decon_view INFO: Decon PSF view loaded
+2023-11-16 11:17:39,654 __main__.model.decon_psf_model INFO: Decon PSF object created
+2023-11-16 11:17:39,656 __main__.model.decon_image_model INFO: Decon Image object created
+2023-11-16 11:17:39,727 __main__.view.decon_view INFO: Decon PSF view loaded

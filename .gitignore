@@ -33,3 +33,6 @@ src/controller/__pycache__/extractor_controller.cpython-311.pyc
 src/view/todo.txt
 logs/extractor_event.log
 logs/extractor_event.log
+.venv/*
+logs/
+src/**/__pycache__/
