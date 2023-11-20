@@ -322,9 +322,14 @@ class DeconvolveImageFrame(ttk.Frame):
         self.deconMethod_lbl = ttk.Label(self.methodFrame)
         self.deconMethod_lbl.configure(text='Method:', width=9)
         self.deconMethod_lbl.pack(padx=2, side="left")
-        self.deconMethodCombobox = ttk.Combobox(self.methodFrame)
-        self.deconMethodCombobox.configure(width=25)
-        self.deconMethodCombobox.pack(side="left")
+        self.deconMethod = tk.StringVar()
+        self.deconMethod_combobox = ttk.Combobox(
+            self.methodFrame,
+            textvariable = self.deconMethod,
+            values = list( self._deconMethodsDict.keys() ),
+            state="readonly",)
+        self.deconMethod_combobox.configure(width=25)
+        self.deconMethod_combobox.pack(side="left")
         self.decon_progbar = ttk.Progressbar(self.methodFrame)
         self.decon_progbar.configure(length=50, orient="horizontal")
         self.decon_progbar.pack(padx=2, pady=2, side="left")
