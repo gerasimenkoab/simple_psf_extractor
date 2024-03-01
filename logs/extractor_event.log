@@ -1,3 +1,4 @@
-2023-11-20 09:05:34,375 __main__.model.decon_psf_model INFO: Decon PSF object created
-2023-11-20 09:05:34,383 __main__.model.decon_image_model INFO: Decon Image object created
-2023-11-20 09:05:34,457 __main__.view.decon_view INFO: Decon PSF view loaded
+2024-03-01 11:22:54,877 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
+2024-03-01 11:22:54,878 __main__.model.extractor_model INFO: Extractor object created
+2024-03-01 11:22:54,907 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
+2024-03-01 11:22:56,805 __main__.controller.extractor_bead_prev_controller INFO: Initializing Extractor Bead Preview module.

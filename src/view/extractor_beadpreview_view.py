@@ -23,6 +23,7 @@ except:
 class ExtractorBeadPreviewWidget(tk.Toplevel):
     def __init__(self, master=None, **kw):
         super(ExtractorBeadPreviewWidget, self).__init__(master, **kw)
+        self.title("Bead Preview")
         self.mainFrame = ttk.Frame(self)
         self.mainFrame.configure(height=600, width=600)
         self.colorPlotframe = ttk.Frame(self.mainFrame)
@@ -107,15 +108,19 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
         self.beadListFrame.pack(expand=True, fill="both", padx=2, pady=2, side="top")
         self.beadListFrame.rowconfigure(0, weight=1)
         self.beadListFrame.columnconfigure(0, weight=1)
+
         self.deleteBeadBtn = ttk.Button(self.controlFrame)
         self.deleteBeadBtn.configure(text="Delete", underline=0)
         self.deleteBeadBtn.pack(fill="x", padx=2, pady=2, side="top")
+
         self.preview3DBtn = ttk.Button(self.controlFrame)
         self.preview3DBtn.configure(text="Preview 3D")
         self.preview3DBtn.pack(fill="x", padx=2, pady=2, side="top")
+
         self.previewCloseBtn = ttk.Button(self.controlFrame)
         self.previewCloseBtn.configure(text="Close")
         self.previewCloseBtn.pack(fill="x", padx=2, pady=2, side="top")
+        self.previewCloseBtn.config(command=self.CloseBeadPreview)
         self.controlFrame.grid(column=4, padx=2, pady=5, row=0, sticky="ns")
         self.mainFrame.pack(expand=True, fill="both", side="top")
         self.mainFrame.rowconfigure(0, weight=10)
@@ -125,7 +130,11 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
         self.geometry("640x480")
         self.minsize(640, 480)
 
-    def SetBeadList(self, beadCoords):
+    def SetBeadList(self, beadCoords = None):
+        """ Load beads list form controller """
+        if beadCoords is None:
+            showerror("Caution", "Bead list is empty!")
+            return
         self.beadsList.delete(0, tk.END)
         self._beadCoords = beadCoords
         self.beadsList.insert(0, *self._beadCoords)
@@ -185,7 +194,7 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
         self.linePlotYZ.draw()
 
     def PlotBeadPreview3D(self, beadArray, winTitle="3D Plot"):
-        """ "Plots three bead in 3D pointplot"""
+        """ Plots three bead in 3D pointplot"""
         try:
             # popup window creation with canvas and exit button
             child_tmp = tk.Toplevel(self)
@@ -238,11 +247,15 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
         im = ax.imshow(data, cmap=cm.jet)
         canvas.draw()
 
+    def CloseBeadPreview(self, event=None):
+        """Default close window method """
+        self.destroy()
+
 
 
 if __name__ == "__main__":
     root = tk.Tk()
     widget = ExtractorBeadPreviewWidget(root)
-    widget.PlotColorGraphs()
+    # widget.PlotColorGraphs()
     # widget.pack(expand=True, fill="both")
     root.mainloop()
