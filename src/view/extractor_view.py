@@ -341,8 +341,36 @@ class ExtractorView(tk.Toplevel):
         beadPreviewMenuFrame.pack(side=TOP, padx=2, pady=2)
 
         beadPreviewFrame.grid(row=1, column=4, sticky="NSWE")
+   
+        self._bindEvents()
+
+        self.attributes("-topmost", True)
 
         # ---------------------- end __init__  ---------------------------------
+
+    def _bindEvents(self):
+        """Default local events binder"""
+        # menus:
+        # File:
+        # self.bind("<<LoadImageDialog>>",self.LoadsBeadPhoto)
+        # self.bind("<Control-o>",self.LoadsBeadPhoto)
+        # self.bind("<<SaveSelectedBeads>>",self.SaveExtractedBeads)
+        # self.bind("<<SaveAverageBead>>",self.SaveAverageBead)
+        # self.bind("<<AverageSeveralBeads>>",self.AverageSeveralBeads)
+        self.bind("<<CloseExtractor>>",self.CloseExtractor)
+        # Selection:
+
+        # self.bind("<<UndoSelect>>",self.UndoMark)
+        # self.bind("<Control-z>",self.UndoMark)
+        # self.bind("<<ClearAllBeads>>",self.ClearMarks)
+        # self.bind("<<PreviewBeads>>",self.PreviewBeads)
+
+        # Help:
+        # self.bind("<<ShowHelp>>",self.ShowExtractorHelp)
+
+        # buttons:
+        # self.processBeads_btn.config(command=self.ProcessBeads)
+
 
     def AdjustBrightness(self,scalerValue):
         """
@@ -595,8 +623,13 @@ class ExtractorView(tk.Toplevel):
             ).get_tk_widget().pack(side="top")
         except Exception as e:
             raise RuntimeError("Bead 3D plot failed" + str(e))
+        
+    def CloseExtractor(self, event=None):
+        """Default close window method """
+        self.destroy()
 
 
 if __name__ == "__main__":
-    base1 = ExtractorView(Tk())
+    base1 = ExtractorView(tk.Tk())
+    base1.focus_force()
     base1.mainloop()

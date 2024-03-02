@@ -268,5 +268,6 @@ if __name__ == "__main__":
     root = tk.Tk()
     widget = DeconImageUiTemp1Widget(root)
     widget.pack(expand=True, fill="both")
+    widget.focus_force()
     root.mainloop()
 

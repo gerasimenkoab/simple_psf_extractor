@@ -148,6 +148,7 @@ class EditorView(tk.Toplevel):
         self.mainPhotoCanvas.config(yscrollcommand=self.vScroll.set)
 
         canvasFrame.grid(row=1, column=2, sticky="WENS")
+        self.attributes("-topmost", True)
 
     # ---------------------- end __init__  ---------------------------------
 
