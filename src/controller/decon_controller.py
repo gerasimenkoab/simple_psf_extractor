@@ -6,7 +6,7 @@ import logging
 # TODO: log string output
 class DeconController:
     def __init__(self, master) -> None:
-        super().__init__()
+        # super().__init__()
         # setup logger
         self.logger = logging.getLogger("__main__." + __name__)
 

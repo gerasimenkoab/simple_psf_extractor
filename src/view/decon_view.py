@@ -27,26 +27,24 @@ except:
 """
 
 
-class DeconView:
-    def __init__(self, master=None):
-        # build ui
+class DeconView(tk.Toplevel):
+    def __init__(self, master=None, wwidth=1024, wheight=768):
+        super().__init__(master)
         self.logger = logging.getLogger('__main__.'+__name__)
-
-        self.deconViewToplevel = tk.Tk() if master is None else tk.Toplevel(master)
-        self.deconViewToplevel.configure(
-            height=768,
-            padx=5,
-            pady=5,
-            takefocus=True,
-            width=1024)
-        self.deconViewToplevel.geometry("950x600")
-        self.deconViewToplevel.maxsize(1920, 1080)
-        self.deconViewToplevel.minsize(950, 600)
-        self.deconViewToplevel.resizable(True, True)
-        self.deconViewToplevel.title("Deconvolution widget")
+        self.configure(
+            height = wheight,
+            padx = 5,
+            pady = 5,
+            takefocus = True,
+            width = wwidth)
+        self.geometry("950x600")
+        self.maxsize(1920, 1080)
+        self.minsize(wheight, wheight)
+        self.resizable(True, True)
+        self.title("Deconvolution widget")
         
         # setting up tabs for PSF and Image deconvolution
-        self.deconNotebook = ttk.Notebook(self.deconViewToplevel)
+        self.deconNotebook = ttk.Notebook(self)
         self.deconNotebook.configure(height=700, width=900)
         self.deconNotebook.pack(expand=True, fill="both", side="top")
 
@@ -56,7 +54,7 @@ class DeconView:
         self.deconImageView = DeconvolveImageFrame(self.deconNotebook)
         self.deconNotebook.add(self.deconImageView, text = "Image deconvolution")
 
-        self.logOutputLabel = ttk.Label(self.deconViewToplevel)
+        self.logOutputLabel = ttk.Label(self)
         self.logOutStringVar = tk.StringVar(value = 'Log Output')
         self.logOutputLabel.configure(
             compound = "top",
@@ -65,7 +63,7 @@ class DeconView:
         self.logOutputLabel.pack(fill="x", side = "bottom")
 
         # Main widget
-        self.mainwindow = self.deconViewToplevel
+        self.mainwindow = self
         self.logger.info("Decon PSF view loaded")
         
 
@@ -216,11 +214,12 @@ class DeconView:
     def GetImageDeconMethod(self):
         return self.deconImageView._deconMethodsDict[self.deconImageView.deconMethod.get()]
     
-    def run(self):
-        self.mainwindow.mainloop()
+    # def run(self):
+    #     self.mainwindow.mainloop()
 
 
 
 if __name__ == "__main__":
-    app = DeconView()
-    app.run()
+    # app = DeconView()
+    # app.run()
+    DeconView(tk.Tk()).mainloop()

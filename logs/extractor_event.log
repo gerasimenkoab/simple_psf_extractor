@@ -1,4 +1,4 @@
-2024-03-01 11:22:54,877 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
-2024-03-01 11:22:54,878 __main__.model.extractor_model INFO: Extractor object created
-2024-03-01 11:22:54,907 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
-2024-03-01 11:22:56,805 __main__.controller.extractor_bead_prev_controller INFO: Initializing Extractor Bead Preview module.
+2024-03-04 19:53:57,616 __main__.model.decon_psf_model INFO: Decon PSF object created
+2024-03-04 19:53:57,616 __main__.model.decon_image_model INFO: Decon Image object created
+2024-03-04 19:53:57,645 __main__.view.decon_view INFO: Decon PSF view loaded
+2024-03-04 19:54:11,863 __main__.controller.decon_controller INFO: File not saved. Deconvolution result image was not created.
