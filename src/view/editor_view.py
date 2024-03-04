@@ -256,7 +256,7 @@ class EditorView(tk.Toplevel):
             arrayIn, cnvCompare, plotName=""
         )
         figImg.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
-        tk.Button(top, text="Close", command=lambda: top.destroy()).pack(side=TOP)
+        ttk.Button(top, text="Close", command=lambda: top.destroy()).pack(side=TOP)
 
     def PlotBeadPreview2D(self, beadArray, winTitle="2D Plot"):
         """ "Plots three bead in XYZ planes"""
@@ -271,7 +271,7 @@ class EditorView(tk.Toplevel):
             cnvTmp.get_tk_widget().pack(side="top", fill=BOTH)
         except Exception as e:
             raise RuntimeError("Bead 2D plot failed" + str(e))
-        Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side="top")
+        ttk.Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side="top")
 
     def PlotBeadPreview3D(self, beadArray, winTitle="3D Plot"):
         """ "Plots three bead in 3D pointplot"""
@@ -281,7 +281,7 @@ class EditorView(tk.Toplevel):
             child_tmp.title(winTitle)
             cnvPlot = tk.Canvas(child_tmp, width=300, height=300)
             cnvPlot.pack(side="top")
-            Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side="top")
+            ttk.Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side="top")
 
             AuxCanvasPlot.FigureCanvasTk3DFrom3DArray(
                 beadArray, cnvPlot
@@ -295,7 +295,13 @@ if __name__ == "__main__":
     # need to SetProcessDPIAware to get correct resolution numbers for both TK and user32 method.
     user32 = ctypes.windll.user32
     user32.SetProcessDPIAware()
-    root = Tk()
+    root = tk.Tk()
+    root.title("GUI testing")
+    root.configure(bg="grey")
+    root.geometry("300x200")
+    quitBtn = ttk.Button(root, text="Quit", command=root.quit).pack(side=TOP,fill=X)
+    openBtn = ttk.Button(root, text="Open", command=lambda: root.event_generate("<<LoadImage>>")).pack(side=TOP,fill=X)
+    saveBtn = ttk.Button(root, text="Save", command=lambda: root.event_generate("<<SaveImage>>")).pack(side=TOP,fill=X)
     # print("Tk screen dimensions:", root.winfo_screenwidth(), root.winfo_screenheight())
     # print("user32 screen dimensions:", user32.GetSystemMetrics(78), user32.GetSystemMetrics(79))
     winWidth = user32.GetSystemMetrics(78)/4

@@ -344,7 +344,12 @@ class ExtractorView(tk.Toplevel):
    
         self._bindEvents()
 
-        self.attributes("-topmost", True)
+        # bring widget in the center of the screen
+        # self.attributes("-topmost", True)
+        # OR
+        self.update_idletasks()
+        self.lift()
+
 
         # ---------------------- end __init__  ---------------------------------
 

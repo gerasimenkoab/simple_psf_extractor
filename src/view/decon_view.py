@@ -44,7 +44,8 @@ class DeconView:
         self.deconViewToplevel.minsize(950, 600)
         self.deconViewToplevel.resizable(True, True)
         self.deconViewToplevel.title("Deconvolution widget")
-
+        
+        # setting up tabs for PSF and Image deconvolution
         self.deconNotebook = ttk.Notebook(self.deconViewToplevel)
         self.deconNotebook.configure(height=700, width=900)
         self.deconNotebook.pack(expand=True, fill="both", side="top")
@@ -66,6 +67,7 @@ class DeconView:
         # Main widget
         self.mainwindow = self.deconViewToplevel
         self.logger.info("Decon PSF view loaded")
+        
 
 # ======= Auxilary Functions ==========================
 

@@ -129,6 +129,10 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
         self.configure(height=200, width=200)
         self.geometry("640x480")
         self.minsize(640, 480)
+        # bring widget in the center of the screen area
+        self.update_idletasks()
+        self.lift()
+
 
     def SetBeadList(self, beadCoords = None):
         """ Load beads list form controller """
@@ -255,6 +259,11 @@ class ExtractorBeadPreviewWidget(tk.Toplevel):
 
 if __name__ == "__main__":
     root = tk.Tk()
+    root.title("Bead Preview Test")
+    root.geometry("300x30")
+    # close window button at root window
+    closeButton = ttk.Button(root, text="Close", command=root.destroy)
+    closeButton.pack()
     widget = ExtractorBeadPreviewWidget(root)
     # widget.PlotColorGraphs()
     # widget.pack(expand=True, fill="both")
