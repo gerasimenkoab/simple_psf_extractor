@@ -12,7 +12,14 @@ class MainAppController(tk.Tk):
         self.logger = logging.getLogger('__main__.'+__name__)
         self.logger.info("Main Utilites Launcher started.")
         user32 = ctypes.windll.user32
-        # user32.SetProcessDPIAware()
+
+        setDPIAware = False
+        if setDPIAware:
+            user32.SetProcessDPIAware()
+            self.logger.info("App DPI Awareness set to True")
+        else:
+            self.logger.info("App DPI Awareness set to False")
+
         self.logger.info("TK Screen dimensions: %s x %s", self.winfo_screenwidth(), self.winfo_screenheight())
         self.logger.info("user32 Screen dimensions: %s x %s", user32.GetSystemMetrics(78), user32.GetSystemMetrics(79))
         # self.tk.call('tk', 'scaling', 2.0)
