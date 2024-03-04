@@ -296,9 +296,7 @@ if __name__ == "__main__":
     user32 = ctypes.windll.user32
     user32.SetProcessDPIAware()
     root = tk.Tk()
-    root.title("GUI testing")
-    root.configure(bg="grey")
-    root.geometry("300x200")
+    root.title("Editor view testing")
     quitBtn = ttk.Button(root, text="Quit", command=root.quit).pack(side=TOP,fill=X)
     # print("Tk screen dimensions:", root.winfo_screenwidth(), root.winfo_screenheight())
     # print("user32 screen dimensions:", user32.GetSystemMetrics(78), user32.GetSystemMetrics(79))
