@@ -294,7 +294,7 @@ if __name__ == "__main__":
 
     # need to SetProcessDPIAware to get correct resolution numbers for both TK and user32 method.
     user32 = ctypes.windll.user32
-    user32.SetProcessDPIAware()
+    # user32.SetProcessDPIAware()
     root = tk.Tk()
     root.title("Editor view testing")
     quitBtn = ttk.Button(root, text="Quit", command=root.quit).pack(side=TOP,fill=X)

@@ -282,7 +282,10 @@ class DeconvolveImageFrame(ttk.Frame):
         self.psfLoad_btn.pack(padx=2, pady=2, side="top")
         self.psfLoad_btn.bind("<1>", self.DeconPSF_clb, add="")
         self.psfInfo_lbl = ttk.Label(self.headerPsfFrame)
-        self.psfInfo_lbl.configure(text='No PSF Loaded')
+        self.psfInfoStr = tk.StringVar(value='No Image Loaded')
+        self.psfInfo_lbl.configure(
+            text='No PSF Loaded',
+            textvariable=self.psfInfoStr)
         self.psfInfo_lbl.pack(padx=2, pady=2, side="top")
         self.headerPsfFrame.grid(column=2, row=0)
         self.psfFrame = ttk.Frame(self)

@@ -1,4 +1,7 @@
-2024-03-04 19:53:57,616 __main__.model.decon_psf_model INFO: Decon PSF object created
-2024-03-04 19:53:57,616 __main__.model.decon_image_model INFO: Decon Image object created
-2024-03-04 19:53:57,645 __main__.view.decon_view INFO: Decon PSF view loaded
-2024-03-04 19:54:11,863 __main__.controller.decon_controller INFO: File not saved. Deconvolution result image was not created.
+2024-03-04 21:56:13,014 __main__.controller.main_controller INFO: Main Utilites Launcher started.
+2024-03-04 21:56:13,015 __main__.controller.main_controller INFO: TK Screen dimensions: 1920 x 1200
+2024-03-04 21:56:13,016 __main__.controller.main_controller INFO: user32 Screen dimensions: 1920 x 1200
+2024-03-04 21:56:14,589 __main__.model.decon_psf_model INFO: Decon PSF object created
+2024-03-04 21:56:14,593 __main__.model.decon_image_model INFO: Decon Image object created
+2024-03-04 21:56:14,627 __main__.view.decon_view INFO: Decon widget created
+2024-03-04 21:56:18,714 __main__.controller.decon_controller INFO: PSF File Loaded: D:/tmp/Psf-and-neuron/psf.tif

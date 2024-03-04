@@ -3,6 +3,7 @@ import logging.config
 import os
 from controller.main_controller import MainAppController
 
+
 def startApplication():
     if not os.path.exists('logs'):
         os.mkdir('logs')

@@ -4,12 +4,18 @@ from controller.extractor_controller import ExtractorController
 from controller.decon_controller import DeconController
 # from cnn.cnn_deconvolution_gui import *
 import logging
+import ctypes
 
 class MainAppController(tk.Tk):
     def __init__(self, master=None, width = 300, height = 250):
         super().__init__()
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger('__main__.'+__name__)
         self.logger.info("Main Utilites Launcher started.")
+        user32 = ctypes.windll.user32
+        # user32.SetProcessDPIAware()
+        self.logger.info("TK Screen dimensions: %s x %s", self.winfo_screenwidth(), self.winfo_screenheight())
+        self.logger.info("user32 Screen dimensions: %s x %s", user32.GetSystemMetrics(78), user32.GetSystemMetrics(79))
+        # self.tk.call('tk', 'scaling', 2.0)
 
         self.title("Simple PSF")
         ttk.Label(self, text = "Avialable Utilites:").pack(side = 'top',pady=10)
