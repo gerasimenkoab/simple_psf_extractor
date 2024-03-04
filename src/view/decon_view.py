@@ -28,17 +28,12 @@ except:
 
 
 class DeconView(tk.Toplevel):
-    def __init__(self, master=None, wwidth=1024, wheight=768):
-        super().__init__(master)
+    def __init__(self, master=None, wwidth=950, wheight=600):
         self.logger = logging.getLogger('__main__.'+__name__)
-        self.configure(
-            height = wheight,
-            padx = 5,
-            pady = 5,
-            takefocus = True,
-            width = wwidth)
-        self.geometry("950x600")
-        self.maxsize(1920, 1080)
+        super().__init__(master)
+
+        self.geometry(str(wwidth)+"x"+str(wheight))
+        # self.maxsize(1920, 1080)
         self.minsize(wheight, wheight)
         self.resizable(True, True)
         self.title("Deconvolution widget")
@@ -222,3 +217,7 @@ if __name__ == "__main__":
     # app = DeconView()
     # app.run()
     DeconView(tk.Tk()).mainloop()
+
+
+    
+
