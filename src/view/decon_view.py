@@ -214,8 +214,6 @@ class DeconView(tk.Toplevel):
 
 
 if __name__ == "__main__":
-    # app = DeconView()
-    # app.run()
     DeconView(tk.Tk()).mainloop()
 
 

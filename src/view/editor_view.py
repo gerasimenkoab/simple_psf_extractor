@@ -300,8 +300,6 @@ if __name__ == "__main__":
     root.configure(bg="grey")
     root.geometry("300x200")
     quitBtn = ttk.Button(root, text="Quit", command=root.quit).pack(side=TOP,fill=X)
-    openBtn = ttk.Button(root, text="Open", command=lambda: root.event_generate("<<LoadImage>>")).pack(side=TOP,fill=X)
-    saveBtn = ttk.Button(root, text="Save", command=lambda: root.event_generate("<<SaveImage>>")).pack(side=TOP,fill=X)
     # print("Tk screen dimensions:", root.winfo_screenwidth(), root.winfo_screenheight())
     # print("user32 screen dimensions:", user32.GetSystemMetrics(78), user32.GetSystemMetrics(79))
     winWidth = user32.GetSystemMetrics(78)/4
