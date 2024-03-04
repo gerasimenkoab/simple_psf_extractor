@@ -62,9 +62,10 @@ class DeconView(tk.Toplevel):
             textvariable = self.logOutStringVar)
         self.logOutputLabel.pack(fill="x", side = "bottom")
 
-        # Main widget
-        self.mainwindow = self
-        self.logger.info("Decon PSF view loaded")
+        self.logger.info("Decon widget created")
+        # focus on the widget
+        self.update_idletasks()
+        self.lift()
         
 
 # ======= Auxilary Functions ==========================
@@ -214,8 +215,6 @@ class DeconView(tk.Toplevel):
     def GetImageDeconMethod(self):
         return self.deconImageView._deconMethodsDict[self.deconImageView.deconMethod.get()]
     
-    # def run(self):
-    #     self.mainwindow.mainloop()
 
 
 
