@@ -9,7 +9,7 @@ import logging
 class MainAppController():
     def __init__(self, master=None):
         self.logger = logging.getLogger('__main__.'+__name__)
-        self.logger.info("Main App Utilites Launcher started.")
+        self.logger.info("Main App started.")
         self.MainView = MainAppView( wWidth = 300, wHeight = 250)        
         self._bind()
 

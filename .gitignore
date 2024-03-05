@@ -36,3 +36,4 @@ logs/extractor_event.log
 .venv/*
 logs/
 src/**/__pycache__/
+
