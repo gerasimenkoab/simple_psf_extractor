@@ -1,4 +1,16 @@
-2024-03-04 22:03:08,871 __main__.controller.main_controller INFO: Main Utilites Launcher started.
-2024-03-04 22:03:08,872 __main__.controller.main_controller INFO: App DPI Awareness set to False
-2024-03-04 22:03:08,872 __main__.controller.main_controller INFO: TK Screen dimensions: 1920 x 1200
-2024-03-04 22:03:08,873 __main__.controller.main_controller INFO: user32 Screen dimensions: 1920 x 1200
+2024-03-05 12:04:34,893 __main__.controller.app_main_controller INFO: Main App Utilites Launcher started.
+2024-03-05 12:04:34,963 __main__.view.app_main_view INFO: App DPI Awareness set to False
+2024-03-05 12:04:34,963 __main__.view.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-03-05 12:04:34,963 __main__.view.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-03-05 12:04:36,494 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
+2024-03-05 12:04:36,496 __main__.model.extractor_model INFO: Extractor object created
+2024-03-05 12:04:36,551 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
+2024-03-05 12:04:44,083 __main__.controller.extractor_controller INFO: Bead Extractor Closed.
+2024-03-05 12:04:45,381 __main__.model.decon_psf_model INFO: Decon PSF object created
+2024-03-05 12:04:45,383 __main__.model.decon_image_model INFO: Decon Image object created
+2024-03-05 12:04:45,416 __main__.view.decon_view INFO: Decon widget created
+2024-03-05 12:04:49,716 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
+2024-03-05 12:04:49,716 __main__.model.extractor_model INFO: Extractor object created
+2024-03-05 12:04:49,763 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
+2024-03-05 12:04:53,775 __main__.controller.extractor_bead_prev_controller INFO: Initializing Extractor Bead Preview module.
+2024-03-05 12:05:37,473 __main__.controller.extractor_controller INFO: Bead Extractor Closed.

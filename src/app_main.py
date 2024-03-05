@@ -1,7 +1,7 @@
 import logging
 import logging.config
 import os
-from controller.main_controller import MainAppController
+from controller.app_main_controller import MainAppController
 
 
 def startApplication():
