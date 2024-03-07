@@ -24,14 +24,22 @@ import time
 # from cupyx.scipy.ndimage import laplace as laplace_gpu
 
 def DeconPSF(
-    image: np.ndarray, beadSizePx: int, iterNum: int,
-    deconType: str, lambdaR: float, progBar, parentWin
+    image: np.ndarray, 
+    beadSizePx: int,
+    zoomFactor: float,
+    beadVoxel: dict,
+    iterNum: int,
+    deconType: str, 
+    lambdaR: float, 
+    progBar, parentWin
 ):
     """
     General function for restoration of PSF. Singlethreaded since image size is small.
     Input:
         image: np.ndarray  - averaged single bead image
         beadSizePx: int - actual bead size in pixels
+        zoomFactor: float - zoom of bead circle  from microscope
+        beadVoxel: dict - voxel sizes in dict in micrometer
         iterNum: int - number of iteration steps
         deconType: str  - deconvolution method name ( default - RL)
         lambdaR: float - regularization coefficient

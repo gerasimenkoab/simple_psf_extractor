@@ -17,6 +17,7 @@ class DeconPsfModel():
         self._psfImage = ImageRaw( None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)) )
         self._resultImage = None
         self._beadDiameter = 0.2
+        self._zoomFactor = 2.6
         self._iterationNumber = 1
         self._regularizationParameter = 0.00001
 
@@ -106,6 +107,8 @@ class DeconPsfModel():
             PSF = DeconPSF(
                 self._psfImage.imArray,
                 self._beadDiameter,
+                self._zoomFactor,
+                self._psfImage.voxel['X'],
                 self._iterationNumber,
                 deconMethodIn,
                 self._regularizationParameter,

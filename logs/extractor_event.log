@@ -1,7 +1,11 @@
-2024-03-07 16:02:24,734 __main__.controller.app_main_controller INFO: Main App started.
-2024-03-07 16:02:24,789 __main__.view.app_main_view INFO: App DPI Awareness set to False
-2024-03-07 16:02:24,790 __main__.view.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-03-07 16:02:24,791 __main__.view.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-03-07 16:02:26,011 __main__.model.decon_psf_model INFO: Decon PSF object created
-2024-03-07 16:02:26,013 __main__.model.decon_image_model INFO: Decon Image Model object created
-2024-03-07 16:02:26,043 __main__.view.decon_view INFO: Decon widget created
+2024-03-07 16:45:52,313 __main__.controller.app_main_controller INFO: Main App started.
+2024-03-07 16:45:52,365 __main__.view.app_main_view INFO: App DPI Awareness set to False
+2024-03-07 16:45:52,367 __main__.view.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-03-07 16:45:52,369 __main__.view.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-03-07 16:45:53,866 __main__.model.decon_psf_model INFO: Decon PSF object created
+2024-03-07 16:45:53,869 __main__.model.decon_image_model INFO: Decon Image Model object created
+2024-03-07 16:45:53,897 __main__.view.decon_view INFO: Decon widget created
+2024-03-07 16:45:56,907 __main__.controller.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/beads_average.tif
+2024-03-07 16:46:11,091 __main__.controller.decon_controller INFO: Starting bead deconvolution. Method code: RLTMR
+2024-03-07 16:46:13,751 __main__.model.decon_psf_model INFO: Deconvolution time: 2.658674478530884 seconds 
+2024-03-07 16:46:13,833 __main__.controller.decon_controller INFO: Bead image deconvolution finished.
