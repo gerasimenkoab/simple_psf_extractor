@@ -14,12 +14,11 @@ class DeconImageModel:
     def __init__(self):
         super().__init__
         self.logger = logging.getLogger("__main__." + __name__)
-        self.logger.info("Decon Image object created")
+        self.logger.info("Decon Image Model object created")
 
         self._deconImage = ImageRaw(None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)))
         self._deconPsf = ImageRaw(None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)))
-        self._deconResult = (
-            None  # ImageRaw( None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)) )
+        self._deconResult = ( None  # ImageRaw( None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)) )
         )
 
         self._iterationNumber = 1
@@ -89,6 +88,7 @@ class DeconImageModel:
 
     def DeconvolveImage(self, deconMethodIn: str, progBarIn, masterWidget):
         doRescalePSF = True
+        self.logger.debug("step 1: rescale PSF to match image voxel size. "+ str(doRescalePSF))
         if doRescalePSF:
             rescaleCoefZ = self._deconPsf.voxel["Z"] / self._deconImage.voxel["Z"] 
             rescaleCoefY = self._deconPsf.voxel["Y"] / self._deconImage.voxel["Y"] 
@@ -99,6 +99,7 @@ class DeconImageModel:
             except Exception as e:
                 self.logger.debug("rescale failed"+str(e))
                 return
+        self.logger.debug("step 2: deconvolution")
         start_time = time.time()
         try:
             PSF = DeconImage(
@@ -112,6 +113,7 @@ class DeconImageModel:
             )
 
         except Exception as e:
+            print("Deconvolution failed" + str(e))
             self.logger.debug(str(e))
             return
         try:
@@ -119,6 +121,7 @@ class DeconImageModel:
                 None, list(self._deconImage.voxel.values()), PSF
             )
         except Exception as e:
+            print("Deconvolution result save failed" + str(e))
             self.logger.debug(str(e))
             return
         self.logger.info("Deconvolution time: %s seconds " % (time.time() - start_time))

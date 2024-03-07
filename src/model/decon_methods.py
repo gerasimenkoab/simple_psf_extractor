@@ -76,7 +76,7 @@ def DeconPSF(
 
 def DeconImage(
     image: np.ndarray, kernell: np.ndarray,
-    iterNum: int, deconType: str, lambdaR: float, progBar, parentWin
+    iterNum: int, deconType: str, lambdaR: float, progBar = None, parentWin = None
 ):
     """
     General function for restoration of image with known PSF(kernell) with multiprocessing usage

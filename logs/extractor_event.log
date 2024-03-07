@@ -1,11 +1,12 @@
-2024-03-05 12:38:36,412 __main__.controller.app_main_controller INFO: Main App Utilites Launcher started.
-2024-03-05 12:38:36,472 __main__.view.app_main_view INFO: App DPI Awareness set to False
-2024-03-05 12:38:36,473 __main__.view.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-03-05 12:38:36,473 __main__.view.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-03-05 12:38:40,981 __main__.controller.extractor_controller INFO: Initializing Bead Extractor module.
-2024-03-05 12:38:40,982 __main__.model.extractor_model INFO: Extractor object created
-2024-03-05 12:38:41,034 __main__.controller.extractor_controller INFO: _bind: Binding buttons and entries is done.
-2024-03-05 12:38:49,031 __main__.controller.extractor_controller INFO: Bead Extractor Closed.
-2024-03-05 12:38:50,161 __main__.model.decon_psf_model INFO: Decon PSF object created
-2024-03-05 12:38:50,164 __main__.model.decon_image_model INFO: Decon Image object created
-2024-03-05 12:38:50,195 __main__.view.decon_view INFO: Decon widget created
+2024-03-07 13:27:28,847 __main__.controller.app_main_controller INFO: Main App started.
+2024-03-07 13:27:28,929 __main__.view.app_main_view INFO: App DPI Awareness set to False
+2024-03-07 13:27:28,930 __main__.view.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-03-07 13:27:28,931 __main__.view.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-03-07 13:27:30,306 __main__.model.decon_psf_model INFO: Decon PSF object created
+2024-03-07 13:27:30,308 __main__.model.decon_image_model INFO: Decon Image Model object created
+2024-03-07 13:27:30,339 __main__.view.decon_view INFO: Decon widget created
+2024-03-07 13:27:35,359 __main__.controller.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/image256x256.tif
+2024-03-07 13:27:38,166 __main__.controller.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
+2024-03-07 13:27:41,348 __main__.controller.decon_controller INFO: Starting image deconvolution. Method code: RLTMR
+2024-03-07 13:27:46,898 __main__.model.decon_image_model INFO: Deconvolution time: 5.523621559143066 seconds 
+2024-03-07 13:27:46,908 __main__.controller.decon_controller INFO: Image deconvolution finished.

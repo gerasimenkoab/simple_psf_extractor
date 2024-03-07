@@ -9,11 +9,11 @@ class DeconController:
         # super().__init__()
         # setup logger
         self.logger = logging.getLogger("__main__." + __name__)
-
         self._master = master
 
         self.modelDeconPSF = DeconPsfModel()
         self.modelDeconImage = DeconImageModel()
+
         self.viewDecon = DeconView(self._master)
 
         self.viewDecon.SetVoxelValues(self.modelDeconPSF.PSFImage.voxel)
@@ -296,16 +296,19 @@ class DeconController:
 
 
     def DeconStart_clb(self, event=None):
-        progBar = self.viewDecon.GetDeconImageProgressbar()
-        method = self.viewDecon.GetImageDeconMethod()
+        try:
+            progBar = self.viewDecon.GetDeconImageProgressbar()
+            method = self.viewDecon.GetImageDeconMethod()
+        except Exception as e:
+            self.logger.debug("Can not get parameters for deconvolution. " + str(e))
+            return
         decon_wgt = self.modelDeconImage
         self.logger.info("Starting image deconvolution. Method code: " + method)
         
         try:
-            self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon.deconViewToplevel )
-            # self.modelDeconImage.deconResult = self.modelDeconImage.deconImage
-        except:
-            self.logger.info("Image deconvolution failed.")
+            self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon )
+        except Exception as e:
+            self.logger.info("Image deconvolution failed."+str(e))
             return
 
 
@@ -314,6 +317,7 @@ class DeconController:
             layerId = int(self.viewDecon.deconImageView.resLayer_spinbox.get())
             self.viewDecon.DrawResultImage(decon_wgt.deconResult.imArray[layerId,:,:])
         except Exception as e:
+            self.logger.debug("Can not draw deconvolution resulting image. " + str(e))
             return
         self.logger.info("Image deconvolution finished.")
         
