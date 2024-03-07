@@ -48,14 +48,16 @@ def DeconPSF(
             print(deconType," selected")
             imagePSF = MaxLikelhoodEstimationFFT_3D(
                 image,
-                MakeIdealSphereArray(image.shape[0], beadSizePx),
+                MakeIdealSphereArray(image.shape[0], beadSizePx, zoomfactor=2.6,
+                                    beadVoxelSize = 0.044, beadDiameter = 0.2),
                 iterNum, False, progBar, parentWin
             )
         case "RLTMR":
             # Richardson Lucy with Tikhonov-Miller regularisation
             imagePSF = DeconvolutionRLTMR(
                 image,
-                MakeIdealSphereArray(image.shape[0], beadSizePx),
+                MakeIdealSphereArray(image.shape[0], beadSizePx, zoomfactor=2.6,
+                                    beadVoxelSize = 0.044, beadDiameter = 0.2),
                 lambdaR,
                 iterNum, False, progBar, parentWin
             )
@@ -63,7 +65,8 @@ def DeconPSF(
             # Richardson Lucy with Total Variation regularisation
             imagePSF = DeconvolutionRLTVR(
                 image,
-                MakeIdealSphereArray(image.shape[0], beadSizePx),
+                MakeIdealSphereArray(image.shape[0], beadSizePx, zoomfactor=2.6,
+                                    beadVoxelSize = 0.044, beadDiameter = 0.2),
                 lambdaR,
                 iterNum, False, progBar, parentWin
             )
@@ -170,33 +173,8 @@ def PointFunction(pt, r0, r, maxIntensity):
     return result
 
 
-def PointFunctionAiryNotZoomed(pt, r0, maxIntensity=255, zoomfactor=2.6):
-    """
-    Function of sphere of radius r with center in r0.
-    Function return Airy disk intesity within first circle if pt in sphere and 0 if out of sphere.
-    pt and r0 are np.array vectors : np.array([x,y,z])
-    All  dimension in pixels are equal to x-dimension
-    """
-    beadVoxelSize = 0.044
-    beadDiameter = 0.2
-    pt = pt * beadVoxelSize
-    r0 = r0 * beadVoxelSize
-    r = beadDiameter * zoomfactor / 2.0
-    distSq = (pt - r0).dot(pt - r0)
-    dist = np.sqrt(distSq)
-    if distSq <= r * r:
-        x = dist / r * 4.0
-        # NOTE: If 'x' is equal zero - result == nan!. To prevent it - make result equal 'maxIntensity'
-        if abs(x) >= 0.00001:  # Zero-criterion
-            result = (2.0 * jv(1, x) / x) ** 2 * maxIntensity
-        else:
-            result = maxIntensity
-    else:
-        result = 0
-    return result
-
-
-def PointFunctionAiry(pt, r0, maxIntensity=255, zoomfactor=2.6):
+#def PointFunctionAiry(pt, r0, maxIntensity=255, zoomfactor=2.6):
+def PointFunctionAiry(pt, r0, maxIntensity=255, zoomfactor=2.6, beadVoxelSize = 0.044, beadDiameter = 0.2):
     """
     Zoom of bead circle  from microscope
     Radius = self.BeadDiameter / 2
@@ -205,8 +183,6 @@ def PointFunctionAiry(pt, r0, maxIntensity=255, zoomfactor=2.6):
     pt and r0 are np.array vectors : np.array([x,y,z])
     All  dimension in pixels are equal to x-dimension
     """
-    beadVoxelSize = 0.044
-    beadDiameter = 0.2
 
     l = abs(r0[0] - pt[0]) * beadVoxelSize
     r = beadDiameter / 2.0
@@ -230,9 +206,14 @@ def PointFunctionAiry(pt, r0, maxIntensity=255, zoomfactor=2.6):
     return result
 
 
-def MakeIdealSphereArray(imgSize=36, sphRadius=5):
+def MakeIdealSphereArray(imgSize=36, sphRadius=5, zoomfactor=2.6,
+            beadVoxelSize = 0.044, beadDiameter = 0.2):
     """
     Create ideal  sphere array corresponding to sphere_type
+    Following parameters can be found in microscope project xml file:
+    zoomFactor - zoom of bead circle  from microscope
+    beadVoxelSize - voxel size in microns
+    beadDiameter - bead diameter in microns
     """
     imgMidCoord = int(imgSize / 2)
     # imgSize = self.sideHalf *2
@@ -249,7 +230,9 @@ def MakeIdealSphereArray(imgSize=36, sphRadius=5):
 
     for i, j, k in product(range(imgSize), repeat=3):
         tiffDraw[i, j, k] = PointFunctionAiry(
-            np.array([i, j, k]), imgCenter, lightIntensity
+            np.array([i, j, k]), imgCenter, 
+            lightIntensity, zoomfactor=zoomfactor,
+            beadVoxelSize = beadVoxelSize, beadDiameter = beadDiameter
         )
     print("Sphere created")
     return tiffDraw

@@ -152,7 +152,7 @@ class DeconController:
         method = self.viewDecon.GetPsfDeconMethod()
         self.logger.info("Starting bead deconvolution. Method code: " + method)
         try:
-            self.modelDeconPSF.CalculatePSF( method, progBar, self.viewDecon.deconViewToplevel )
+            self.modelDeconPSF.CalculatePSF( method, progBar, self.viewDecon )
         except Exception as e:
             self.logger.info("Bead deconvolution failed with exception: " + str(e))
             return

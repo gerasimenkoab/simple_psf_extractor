@@ -42,7 +42,7 @@ class DeconvolvePSFFrame(ttk.Frame):
         self.step2 = ttk.Frame(self.deconPSF_settings)
         self.step2.configure(height=200, width=200)
         self.step2_lbl = ttk.Label(self.step2)
-        self.step2_lbl.configure(font="Helvetica 10 bold", text="Bead Parameters")
+        self.step2_lbl.configure(font="Helvetica 10 bold", text="Parameters")
         self.step2_lbl.pack(side="top")
         self.beadParamFrame = ttk.Frame(self.step2)
         self.beadParamFrame.configure(height=200, width=200)
