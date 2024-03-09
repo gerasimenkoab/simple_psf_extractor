@@ -79,6 +79,20 @@ class DeconvolvePSFFrame(ttk.Frame):
             self.voxel_entry[key].pack(padx=5, pady=5, side="left")
         self.psfVoxelSizeFrame.pack(side="top")
         self.beadParamFrame.pack(expand=True, fill="both", side="top")
+
+        self.zoomFactorFrame = ttk.Frame(self.beadParamFrame)
+        self.zoomFactorFrame.configure(height=200, width=200)
+        self.zoomFactor_lbl = ttk.Label(self.zoomFactorFrame)
+        self.zoomFactor_lbl.configure(text="Microscope Zoom Factor :")
+        self.zoomFactor_lbl.pack(padx=5, pady=5, side="left")
+        self.zoomFactor_entry = ttk.Entry(self.zoomFactorFrame)
+        self.zoomFactor_entry.configure(validate="focusout", width=10)
+        _text_ = "2.6"
+        self.zoomFactor_entry.delete("0", "end")
+        self.zoomFactor_entry.insert("0", _text_)
+        self.zoomFactor_entry.pack(padx=5, pady=5, side="left")
+        self.zoomFactorFrame.pack(side="top")
+
         separator3 = ttk.Separator(self.step2)
         separator3.configure(orient="horizontal")
         separator3.pack(fill="x", padx=10, pady=10, side="top")

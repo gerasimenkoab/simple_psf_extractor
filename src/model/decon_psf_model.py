@@ -70,6 +70,21 @@ class DeconPsfModel():
             self._beadDiameter = value
         else:
             raise ValueError("Wrong bead diameter value", "beadDiameter_incorrect")
+        
+    @property
+    def zoomFactor(self):
+        return self._zoomFactor
+    
+    @zoomFactor.setter
+    def zoomFactor(self, value):
+        try:
+            value = float(value)
+        except:
+            raise ValueError("Wrong zoom factor value", "zoomFactor_incorrect")
+        if value > 0 :
+            self._zoomFactor = value
+        else:
+            raise ValueError("Wrong zoom factor value", "zoomFactor_incorrect")
 
     @property
     def iterationNumber(self):

@@ -39,6 +39,9 @@ class DeconController:
         self.viewDecon.deconPsfView.psfReg_entry.bind("<FocusOut>", self.UpdatePsfReglValue, add="")
         self.viewDecon.deconPsfView.calcPSF_btn.bind("<1>", self.CalcPSF_btn_click, add="")
         self.viewDecon.deconPsfView.savePsf_btn.bind("<1>", self.SavePSF_btn_click, add="")
+        self.viewDecon.deconPsfView.zoomFactor_entry.bind("<Return>", self.UpdateZoomFactorValue, add="")
+        self.viewDecon.deconPsfView.zoomFactor_entry.bind("<FocusOut>", self.UpdateZoomFactorValue, add="")
+
 
     def _bindDeconImage(self):
         """
@@ -102,6 +105,16 @@ class DeconController:
             return
         self.viewDecon.SetValueWidgetNormal( eventWgt, newValue )
 
+
+    def UpdateZoomFactorValue(self, event=None):
+        eventWgt = event.widget
+        try:
+            newValue = float( eventWgt.get() )  
+        except:
+            self.viewDecon.SetValueWidgetNormal( eventWgt, self.modelDeconPSF.zoomFactor )
+            return
+        self.viewDecon.SetValueWidgetNormal( eventWgt, newValue )
+
     def UpdateBeadVoxelValues(self, event=None):
         eventWgt = event.widget
         axisName = eventWgt.name
@@ -118,6 +131,8 @@ class DeconController:
         self.viewDecon.SetValueWidgetNormal( eventWgt, newValue )
 
         pass
+
+
 
     def UpdatePsfIterlValue(self, event=None):
         eventWgt = event.widget
