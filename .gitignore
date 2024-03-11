@@ -26,9 +26,6 @@ src/model/decon_methods copy.py
 src/install_simple_psf2.2.exe
 src/installer_config.ifp
 logs/extractor_event.log
-src/view/__pycache__/extractor_view.cpython-311.pyc
-src/model/__pycache__/extractor_model.cpython-311.pyc
-src/model/__pycache__/ImageRaw_class.cpython-311.pyc
 src/controller/__pycache__/extractor_controller.cpython-311.pyc
 src/view/todo.txt
 logs/extractor_event.log
@@ -36,4 +33,5 @@ logs/extractor_event.log
 .venv/*
 logs/
 src/**/__pycache__/
+src/__pycache__/
 
