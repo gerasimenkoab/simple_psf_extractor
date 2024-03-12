@@ -49,15 +49,16 @@ class EditorController:
         self.view.bind("<<LoadImageDialog>>",self.LoadsBeadPhoto)
         self.view.bind("<Control-o>",self.LoadsBeadPhoto)
         self.view.bind("<<SaveImage>>",self.SaveImage)
-        self.view.bind("<<CloseExtractor>>",self.CloseEditor)
-
+        self.view.bind("<<Control-s>>",self.SaveImage)
+        self.view.bind("<<CloseEditor>>",self.CloseEditor)
         # Help:
         self.view.bind("<<ShowHelp>>",self.ShowExtractorHelp)
+
         # buttons:
         # entries bind at two events:
         self.logger.info("_bind: Binding buttons and entries is done.")
 
-    def ShowExtractorHelp(self):
+    def ShowExtractorHelp(self, event=None):
         """Show help window"""
         raise NotImplementedError("ShowExtractorHelp")
     
@@ -113,8 +114,6 @@ class EditorController:
 
 
     def CloseEditor(self, event=None):
-        # Checking existance of self.imgBeadsRaw.close()
-        if askokcancel("Close", "Close Editor Widget?"):
-            self.view.destroy()
-            self.logger.info("Editor Closed.")
+        self.view.destroy()
+        self.logger.info("Editor Closed.")
 

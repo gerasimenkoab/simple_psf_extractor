@@ -5,17 +5,13 @@ from tkinter import ttk
 from tkinter.messagebox import showerror
 from PIL import ImageTk, Image, ImageEnhance, ImageOps
 
-import ctypes
+from editor.editor_view_menu import EditorMenuBar
 
-try:
-    from ..common.AuxTkPlot_class import AuxCanvasPlot
-except:
-    from common.AuxTkPlot_class import AuxCanvasPlot
+from common.AuxTkPlot_class import AuxCanvasPlot
 
-"""   TODO:
-        - fix  AuxTkPlot_class  for all modules
-       - add  bead size to tiff tag
-"""
+#    TODO:
+#         - 
+
 
 
 class EditorView(tk.Toplevel):
@@ -24,7 +20,8 @@ class EditorView(tk.Toplevel):
     def __init__(self, parent, wwidth=600, wheight=600):
         super().__init__(parent)
         self.beadsPhotoLayerID = 0  # default index of beads microscope photo
-        self.imgBeadsRaw = None
+        self.imgBeadsRaw = None   # current tiff frame as Image object
+        self.imgBeadsRawList = [] # list of all tiff frames as  Image objects
         self.brightnessValue = 1
         self.contrastValue = 1
         self.mainImageColor = "green" #"red"
@@ -42,24 +39,11 @@ class EditorView(tk.Toplevel):
         self.resizable(False, False)
 
         # ----------------------------- Menu Bar ----------------------------
-        self.menubar = Menu(self)
-        filemenu = Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="File", menu=filemenu)
-        # filemenu.add_command(
-        #     label="Load Image",
-        #     underline=0,
-        #     accelerator="Ctrl+o",
-        #     command=lambda: self.event_generate("<<LoadImage>>"),
-        # )
-        filemenu.add_command(
-            label="Save Image",
-            underline=1,
-            command=lambda: self.event_generate("<<SaveImageInEditor>>"),
-        )
-        filemenu.add_separator()
-        filemenu.add_command( label="Close", comman=lambda: self.event_generate("<<CloseEditor>>") )
-        self.config(menu=self.menubar)
-
+        try:        
+            self.menubar = EditorMenuBar(self)
+            self.config(menu=self.menubar)
+        except Exception as e:
+            raise ValueError("Can't create menu bar", "menu-creation-failed")
         # --------------------------- End Menu Bar ------------------------------
 
 
@@ -256,36 +240,8 @@ class EditorView(tk.Toplevel):
         figImg.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
         ttk.Button(top, text="Close", command=lambda: top.destroy()).pack(side=TOP)
 
-    def PlotBeadPreview2D(self, beadArray, winTitle="2D Plot"):
-        """ "Plots three bead in XYZ planes"""
-        child_tmp = tk.Toplevel(self)
-        child_tmp.title(winTitle)
-        cnvPlot = tk.Canvas(child_tmp, width=400, height=600)
-        cnvPlot.pack(side="top", fill=BOTH)
-        try:
-            cnvTmp = AuxCanvasPlot.FigureCanvasTkFrom3DArray(
-                beadArray, cnvPlot, " ", 300, 700
-            )
-            cnvTmp.get_tk_widget().pack(side="top", fill=BOTH)
-        except Exception as e:
-            raise RuntimeError("Bead 2D plot failed" + str(e))
-        ttk.Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side="top")
 
-    def PlotBeadPreview3D(self, beadArray, winTitle="3D Plot"):
-        """ "Plots three bead in 3D pointplot"""
-        try:
-            # popup window creation with canvas and exit button
-            child_tmp = tk.Toplevel(self)
-            child_tmp.title(winTitle)
-            cnvPlot = tk.Canvas(child_tmp, width=300, height=300)
-            cnvPlot.pack(side="top")
-            ttk.Button(child_tmp, text="Close", command=child_tmp.destroy).pack(side="top")
 
-            AuxCanvasPlot.FigureCanvasTk3DFrom3DArray(
-                beadArray, cnvPlot
-            ).get_tk_widget().pack(side="top")
-        except Exception as e:
-            raise RuntimeError("Bead 3D plot failed" + str(e))
 
 
 if __name__ == "__main__":
