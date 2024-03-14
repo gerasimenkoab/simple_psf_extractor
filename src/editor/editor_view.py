@@ -116,6 +116,8 @@ class EditorView(tk.Toplevel):
             canvasFrame, width=wwidth, height=wheight, bg="white"
         )
         self.mainPhotoCanvas.grid(row=0, column=0, sticky=(N, E, S, W))
+        self.update()
+
         # main image scrollbars
         self.hScroll = ttk.Scrollbar(canvasFrame, orient="horizontal")
         self.vScroll = ttk.Scrollbar(canvasFrame, orient="vertical")
@@ -162,10 +164,13 @@ class EditorView(tk.Toplevel):
         """Draw image on canvas"""
         if img is None:
             return
-        self.imgCnv = ImageTk.PhotoImage(image=img, master=self.mainPhotoCanvas)
-        self.mainPhotoCanvas.create_image(
-            (0, 0), image=self.imgCnv, state="normal", anchor=NW
-        )
+        # Get the width and height of the canvas
+        canvas_width = self.mainPhotoCanvas.winfo_width()
+        canvas_height = self.mainPhotoCanvas.winfo_height()
+        # Resize the image to the size of the canvas
+        imgResized = img.resize((canvas_width, canvas_height))
+        self.imgCnv = ImageTk.PhotoImage(image=imgResized, master=self.mainPhotoCanvas)
+        self.mainPhotoCanvas.create_image((0, 0), image=self.imgCnv, state="normal", anchor=NW)
         # updating scrollers
         self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
 

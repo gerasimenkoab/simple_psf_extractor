@@ -31,12 +31,11 @@ class EditorController:
         self._masterWidget = masterWidget
         # try set image to view
         try:
-            self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
             self.view.setLayerNumber(self.model.GetVisibleLayerNumber())
+            self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
         except Exception as e:          
             self.logger.error("Can't set image to view. "+str(e))
             raise ValueError("Can't set image to view", "view-image-setting-failed")
-
 
         # binding buttons and entries events
         self._bind()
@@ -75,7 +74,6 @@ class EditorController:
 
     def OnScaleChangeEventHandler(self, event=None):
         brightnessValue,contrastValue = self.view.GetScalersValues()
-        print("Brightness:", brightnessValue, "Contrast:", contrastValue)
         self.model.AdjustImageBrightnessContrast(brightnessValue, contrastValue)
         self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
 

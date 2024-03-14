@@ -19,12 +19,12 @@ class EditorModel:
         self.imgBeadsRawList = [] # list of all tiff frames as  Image objects
         self.imgBeadsRawListStatic = [] # NOT CHANGED list of all tiff frames as  Image objects
         self._mainImageColor = "green"
+        self._visibleLayerNumber = 0
         try:
             self._ConvertMainImageRawToPILImage()
         except Exception as e:
             self.logger.error("Can't convert raw image to PIL. "+str(e))
             raise ValueError("Can't convert raw image to PIL", "image-conversion-failed")
-        self._visibleLayerNumber = int((len(self.imgBeadsRawList) + 1) / 2)
 
     @property
     def mainImageRaw(self):
