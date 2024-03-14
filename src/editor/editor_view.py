@@ -2,12 +2,10 @@ import numpy as np
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
-from tkinter.messagebox import showerror
-from PIL import ImageTk, Image, ImageEnhance, ImageOps
+from PIL import ImageTk, Image
 
 from editor.editor_view_menu import EditorMenuBar
 
-from common.AuxTkPlot_class import AuxCanvasPlot
 
 #    TODO:
 #         - 
@@ -20,8 +18,6 @@ class EditorView(tk.Toplevel):
     def __init__(self, parent, wwidth=600, wheight=600):
         super().__init__(parent)
         self.beadsPhotoLayerID = 0  # default index of beads microscope photo
-        self.imgBeadsRaw = None   # current tiff frame as Image object
-        self.imgBeadsRawList = [] # list of all tiff frames as  Image objects
         self.brightnessValue = 1
         self.contrastValue = 1
         self.mainImageColor = "green" #"red"
@@ -84,14 +80,13 @@ class EditorView(tk.Toplevel):
         self.brightnessScaleVar = DoubleVar()
         self.brightnessScale = ttk.Scale(brightnessFrame, orient='horizontal', from_=-8, to_=8,
                                          variable = self.brightnessScaleVar)
-        self.brightnessScale.set(1)
-        self.brightnessScale.configure( command= self.AdjustBrightness )
+        self.brightnessScale.configure( command= self.onBrightnessScaleChanged )
         self.brightnessScale.pack(side=tk.TOP)
         ttk.Label(brightnessFrame, text="Contrast").pack(side=tk.TOP, padx=2, pady=2)
         self.contrastScale = ttk.Scale(brightnessFrame, orient='horizontal', from_=-8, to_=8)
-        self.contrastScale.set(1)
-        self.contrastScale.configure( command= self.AdjustContrast )
+        self.contrastScale.configure( command= self.onContrastScaleChanged )
         self.contrastScale.pack(side=tk.TOP)
+        self.setScalersToDefault()
 
         brightnessFrame.grid(row=3, column=0, sticky="n")
 
@@ -99,14 +94,14 @@ class EditorView(tk.Toplevel):
         layerFrame = Frame(imageParamFrame)
 
         ttk.Label(layerFrame, text=" Layer:").pack(side=LEFT, padx=2, pady=2)
-        ttk.Button(layerFrame, text="-", width=3, command=self.ShowPrevLayer).pack(
+        self.buttonLayerSub = ttk.Button(layerFrame, text="-", width=3, command=self.onClickLayerNumberDecrease).pack(
             side=LEFT, padx=2, pady=2
         )
         self.label_beadsPhotoLayerID = ttk.Label(
             layerFrame, text=str(self.beadsPhotoLayerID)
         )
         self.label_beadsPhotoLayerID.pack(side=LEFT, padx=2, pady=2)
-        ttk.Button(layerFrame, text="+", width=3, command=self.ShowNextLayer).pack(
+        self.buttonLayerAdd = ttk.Button(layerFrame, text="+", width=3, command=self.onClickLayerNumberIncrease).pack(
             side=LEFT, padx=2, pady=2
         )
         layerFrame.grid(row=4, column=0, sticky="n")
@@ -136,125 +131,146 @@ class EditorView(tk.Toplevel):
 
     # ---------------------- end __init__  ---------------------------------
 
-    def AdjustBrightness(self,scalerValue):
-        """
-        Callback for Redraw canvas with current  brightness scaler value.
-        """
-        if self.imgBeadsRaw is None:
+    def setScalersToDefault(self):
+        self.brightnessScale.set(1)
+        self.contrastScale.set(1)
+
+    def onBrightnessScaleChanged(self, value):
+        # generate event for brightness change
+        self.event_generate("<<BrightnessScaleChanged>>")
+
+    def onContrastScaleChanged(self, value):
+        # generate event for contrast change
+        self.event_generate("<<ContrastScaleChanged>>")
+
+    def onClickLayerNumberIncrease(self):
+        self.event_generate("<<LayerUp>>")
+
+    def onClickLayerNumberDecrease(self):
+        self.event_generate("<<LayerDown>>")
+
+    def setLayerNumber(self, layerNumber:int):
+        """Set current shown layer number on the label"""
+        self.label_beadsPhotoLayerID.config(text=str(layerNumber))
+
+    def GetScalersValues(self):
+        """Return current values of brightness and contrast scalers"""
+        
+        return pow(2,float(self.brightnessScale.get())), pow(2,float(self.contrastScale.get()))
+
+    def DrawImageOnCanvas(self, img:Image = None):
+        """Draw image on canvas"""
+        if img is None:
             return
-        # brightness adjust
-        self.brightnessValue = pow(2,float(scalerValue))
-        self.AdjustImageBrightnessContrast()
-
-    def AdjustContrast(self, scalerValue):
-        """
-        Callback for Redraw canvas with current  contrast scaler value.
-        """
-        if self.imgBeadsRaw is None:
-            return
-        # contrast adjust
-        self.contrastValue = pow(2,float(scalerValue))
-        self.AdjustImageBrightnessContrast()
-
-    def AdjustImageBrightnessContrast(self):
-        """
-        Redraw canvas with current brightness and contrast scalers values.
-        """
-        enhancerBrightness = ImageEnhance.Brightness(self.imgBeadsRaw)
-        imgCanvEnhaced = enhancerBrightness.enhance( self.brightnessValue )
-        enhancerContrast = ImageEnhance.Contrast(imgCanvEnhaced)
-        imgCanvEnhaced = enhancerContrast.enhance( self.contrastValue )
-        self.imgCnv = ImageTk.PhotoImage(imgCanvEnhaced)
-        self.mainPhotoCanvas.create_image(0, 0, image=self.imgCnv, anchor=NW)
-        # updating scrollers
-        self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
-
-
-    def ShowNextLayer(self):
-        """Change visible layer"""
-        self.beadsPhotoLayerID += 1
-        if self.beadsPhotoLayerID > len(self.imgBeadsRawList) - 1:
-            self.beadsPhotoLayerID = len(self.imgBeadsRawList) - 1
-        # updating label on interface
-        self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
-        self.imgBeadsRaw = self.imgBeadsRawList[self.beadsPhotoLayerID]
-        self.AdjustImageBrightnessContrast()
-
-    def ShowPrevLayer(self):
-        """Change visible layer"""
-        self.beadsPhotoLayerID += -1
-        if self.beadsPhotoLayerID < 0:
-            self.beadsPhotoLayerID = 0
-        # updating label on interface
-        self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
-        self.imgBeadsRaw = self.imgBeadsRawList[self.beadsPhotoLayerID]
-        self.AdjustImageBrightnessContrast()
-
-    def SetMainPhotoImageArray(self, ArrayIn = None):
-        """Loading raw beads photo from file"""
-        if ArrayIn is None:
-            raise ValueError("No array provided", "no_file_path")
-        try:
-            self.imgBeadsRawList=[]
-            for i in range(ArrayIn.shape[0]):
-                tmpArray = ArrayIn[i,:,:].reshape((ArrayIn.shape[1],ArrayIn.shape[2]))
-                # use .convert('L') when make array from numpyArray to avoid problem with F mode   
-                # !caution! fromarray(tmpArray, mode="L") does not work as intended, so use convert('L').
-                tmp = ImageOps.colorize(Image.fromarray(tmpArray).convert('L'),
-                                        black="black",
-                                        white="white",
-                                        mid = self.mainImageColor)
-                self.imgBeadsRawList.append(tmp)
-                # ImageOps.colorize(self.imgBeadsRawList[i], black="green", white="white")
-        except:
-            raise ValueError(
-                "Cant set canvas image with beads photo."
-            )
-        self.beadsPhotoLayerID = int((len(self.imgBeadsRawList) + 1) / 2)
-        self.imgBeadsRaw = self.imgBeadsRawList[self.beadsPhotoLayerID]
-        # updating label on interface
-        self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
-        # preparing image for canvas from desired frame
-        self.imgCnv = ImageTk.PhotoImage(
-            image=self.imgBeadsRaw, master=self.mainPhotoCanvas
-        )
-        # replacing image on the canvas
+        self.imgCnv = ImageTk.PhotoImage(image=img, master=self.mainPhotoCanvas)
         self.mainPhotoCanvas.create_image(
             (0, 0), image=self.imgCnv, state="normal", anchor=NW
         )
         # updating scrollers
         self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
 
+# update this method later
     def SetFileInfo(self, infoStr: str):
+
         self.imageInfoStr.set(infoStr)
 
     
-    def PlotCanvasInWindow(self, arrayIn: np.ndarray):
-        top = Toplevel(self)
-        top.geometry("600x600")
-        cnvCompare = Canvas(top, width=590, height=590, bg="white")
-        cnvCompare.pack(side=TOP, fill=BOTH, expand=True)
-        figImg = AuxCanvasPlot.FigureCanvasTkFrom3DArray(
-            arrayIn, cnvCompare, plotName=""
-        )
-        figImg.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
-        ttk.Button(top, text="Close", command=lambda: top.destroy()).pack(side=TOP)
+    # def PlotCanvasInWindow(self, arrayIn: np.ndarray):
+    #     top = Toplevel(self)
+    #     top.geometry("600x600")
+    #     cnvCompare = Canvas(top, width=590, height=590, bg="white")
+    #     cnvCompare.pack(side=TOP, fill=BOTH, expand=True)
+    #     figImg = AuxCanvasPlot.FigureCanvasTkFrom3DArray(
+    #         arrayIn, cnvCompare, plotName=""
+    #     )
+    #     figImg.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
+    #     ttk.Button(top, text="Close", command=lambda: top.destroy()).pack(side=TOP)
 
 
+    # def AdjustBrightness(self,scalerValue):
+    #     """
+    #     Callback for Redraw canvas with current  brightness scaler value.
+    #     """
+    #     if self.imgBeadsRaw is None:
+    #         return
+    #     # brightness adjust
+    #     self.brightnessValue = pow(2,float(scalerValue))
+    #     self.AdjustImageBrightnessContrast()
 
+    # def AdjustContrast(self, scalerValue):
+    #     """
+    #     Callback for Redraw canvas with current  contrast scaler value.
+    #     """
+    #     if self.imgBeadsRaw is None:
+    #         return
+    #     # contrast adjust
+    #     self.contrastValue = pow(2,float(scalerValue))
+    #     self.AdjustImageBrightnessContrast()
 
+    # def AdjustImageBrightnessContrast(self):
+    #     """
+    #     Redraw canvas with current brightness and contrast scalers values.
+    #     """
+    #     enhancerBrightness = ImageEnhance.Brightness(self.imgBeadsRaw)
+    #     imgCanvEnhaced = enhancerBrightness.enhance( self.brightnessValue )
+    #     enhancerContrast = ImageEnhance.Contrast(imgCanvEnhaced)
+    #     imgCanvEnhaced = enhancerContrast.enhance( self.contrastValue )
+    #     self.imgCnv = ImageTk.PhotoImage(imgCanvEnhaced)
+    #     self.mainPhotoCanvas.create_image(0, 0, image=self.imgCnv, anchor=NW)
+    #     # updating scrollers
+    #     self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
 
-if __name__ == "__main__":
+    # def SetMainPhotoImageArray(self, ArrayIn = None):
+    #     """Loading raw beads photo from file"""
+    #     if ArrayIn is None:
+    #         raise ValueError("No array provided", "no_file_path")
+    #     try:
+    #         self.imgBeadsRawList=[]
+    #         for i in range(ArrayIn.shape[0]):
+    #             tmpArray = ArrayIn[i,:,:].reshape((ArrayIn.shape[1],ArrayIn.shape[2]))
+    #             # use .convert('L') when make array from numpyArray to avoid problem with F mode   
+    #             # !caution! fromarray(tmpArray, mode="L") does not work as intended, so use convert('L').
+    #             tmp = ImageOps.colorize(Image.fromarray(tmpArray).convert('L'),
+    #                                     black="black",
+    #                                     white="white",
+    #                                     mid = self.mainImageColor)
+    #             self.imgBeadsRawList.append(tmp)
+    #             # ImageOps.colorize(self.imgBeadsRawList[i], black="green", white="white")
+    #     except:
+    #         raise ValueError(
+    #             "Cant set canvas image with beads photo."
+    #         )
+    #     self.beadsPhotoLayerID = int((len(self.imgBeadsRawList) + 1) / 2)
+    #     self.imgBeadsRaw = self.imgBeadsRawList[self.beadsPhotoLayerID]
+    #     # updating label on interface
+    #     self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
+    #     # preparing image for canvas from desired frame
+    #     self.imgCnv = ImageTk.PhotoImage(
+    #         image=self.imgBeadsRaw, master=self.mainPhotoCanvas
+    #     )
+    #     # replacing image on the canvas
+    #     self.mainPhotoCanvas.create_image(
+    #         (0, 0), image=self.imgCnv, state="normal", anchor=NW
+    #     )
+    #     # updating scrollers
+    #     self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
 
-    # need to SetProcessDPIAware to get correct resolution numbers for both TK and user32 method.
-    user32 = ctypes.windll.user32
-    # user32.SetProcessDPIAware()
-    root = tk.Tk()
-    root.title("Editor view testing")
-    quitBtn = ttk.Button(root, text="Quit", command=root.quit).pack(side=TOP,fill=X)
-    # print("Tk screen dimensions:", root.winfo_screenwidth(), root.winfo_screenheight())
-    # print("user32 screen dimensions:", user32.GetSystemMetrics(78), user32.GetSystemMetrics(79))
-    winWidth = user32.GetSystemMetrics(78)/4
-    winHeight = user32.GetSystemMetrics(79)/3
-    base1 = EditorView(root, winWidth, winHeight)
-    base1.mainloop()
+    # def ShowNextLayer(self):
+    #     """Change visible layer"""
+    #     self.beadsPhotoLayerID += 1
+    #     if self.beadsPhotoLayerID > len(self.imgBeadsRawList) - 1:
+    #         self.beadsPhotoLayerID = len(self.imgBeadsRawList) - 1
+    #     # updating label on interface
+    #     self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
+    #     self.imgBeadsRaw = self.imgBeadsRawList[self.beadsPhotoLayerID]
+    #     self.AdjustImageBrightnessContrast()
+
+    # def ShowPrevLayer(self):
+    #     """Change visible layer"""
+    #     self.beadsPhotoLayerID += -1
+    #     if self.beadsPhotoLayerID < 0:
+    #         self.beadsPhotoLayerID = 0
+    #     # updating label on interface
+    #     self.label_beadsPhotoLayerID.config(text=str(self.beadsPhotoLayerID))
+    #     self.imgBeadsRaw = self.imgBeadsRawList[self.beadsPhotoLayerID]
+    #     self.AdjustImageBrightnessContrast()

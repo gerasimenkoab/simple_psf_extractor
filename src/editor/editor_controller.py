@@ -1,5 +1,4 @@
-from tkinter.messagebox import askokcancel, showerror
-from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
+from tkinter.filedialog import askopenfilenames
 from tkinter.simpledialog import askstring
 import logging
 
@@ -14,7 +13,6 @@ class EditorController:
     """
 
     def __init__(self, masterWidget=None, image:ImageRaw = None):
-        # super().__init__()
         # setup logger
         self.logger = logging.getLogger("__main__." + __name__)
         self.logger.info("Initializing Bead Extractor module.")
@@ -33,10 +31,12 @@ class EditorController:
         self._masterWidget = masterWidget
         # try set image to view
         try:
-            self.view.SetMainPhotoImageArray(self.model.mainImage.imArray)
-        except Exception as e:
+            self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
+            self.view.setLayerNumber(self.model.GetVisibleLayerNumber())
+        except Exception as e:          
             self.logger.error("Can't set image to view. "+str(e))
             raise ValueError("Can't set image to view", "view-image-setting-failed")
+
 
         # binding buttons and entries events
         self._bind()
@@ -55,6 +55,13 @@ class EditorController:
         self.view.bind("<<ShowHelp>>",self.ShowExtractorHelp)
 
         # buttons:
+        self.view.bind("<<LayerUp>>", self.VisibleLayerUp)
+        self.view.bind("<<LayerDown>>", self.VisibleLayerDown)
+
+        # scalers events binding:
+        self.view.bind("<<BrightnessScaleChanged>>", self.OnScaleChangeEventHandler)
+        self.view.bind("<<ContrastScaleChanged>>", self.OnScaleChangeEventHandler)
+
         # entries bind at two events:
         self.logger.info("_bind: Binding buttons and entries is done.")
 
@@ -65,7 +72,25 @@ class EditorController:
     def SaveImage(self, event=None):
         """Adjust image according to current brightness and contrast settings and save it to file"""
         raise NotImplementedError("SaveImage")
-    
+
+    def OnScaleChangeEventHandler(self, event=None):
+        brightnessValue,contrastValue = self.view.GetScalersValues()
+        print("Brightness:", brightnessValue, "Contrast:", contrastValue)
+        self.model.AdjustImageBrightnessContrast(brightnessValue, contrastValue)
+        self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
+
+    def VisibleLayerUp(self, event=None):
+        self.model.VisibleLayerNumberUp()
+        self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
+        self.view.setLayerNumber(self.model.GetVisibleLayerNumber())
+
+
+    def VisibleLayerDown(self, event=None):
+        self.model.VisibleLayerNumberDown()
+        self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
+        self.view.setLayerNumber(self.model.GetVisibleLayerNumber())
+
+
     def GetVoxelDialog(self, text=""):
         """
         Create diealog and return list of values
@@ -106,11 +131,11 @@ class EditorController:
 
         # visualization:
         try:
-            self.view.SetMainPhotoImageArray(self.model.mainImage.imArray)
+            self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
         except Exception as e:
-            self.logger.error("LoadsBeadPhoto: can't array  " + str(e))
+            self.logger.error("Draw image  " + str(e))
             raise IOError("Cant update GUI properly")
-        self.view.SetFileInfo(self.model.mainImage.GetImageInfoStr(output = "full"))
+        self.view.SetFileInfo(self.model.mainImageRaw.GetImageInfoStr(output = "full"))
 
 
     def CloseEditor(self, event=None):
