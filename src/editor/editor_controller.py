@@ -1,4 +1,4 @@
-from tkinter.filedialog import askopenfilenames
+from tkinter.filedialog import askopenfilenames, asksaveasfilename
 from tkinter.simpledialog import askstring
 import logging
 
@@ -45,9 +45,9 @@ class EditorController:
         """binding all events"""
         # menus:
         # File:
-        self.view.bind("<<LoadImageDialog>>",self.LoadsBeadPhoto)
+        self.view.bind("<<LoadImageInEditor>>",self.LoadsBeadPhoto)
         self.view.bind("<Control-o>",self.LoadsBeadPhoto)
-        self.view.bind("<<SaveImage>>",self.SaveImage)
+        self.view.bind("<<SaveImageInEditor>>",self.SaveImage)
         self.view.bind("<<Control-s>>",self.SaveImage)
         self.view.bind("<<CloseEditor>>",self.CloseEditor)
         # Help:
@@ -56,6 +56,9 @@ class EditorController:
         # buttons:
         self.view.bind("<<LayerUp>>", self.VisibleLayerUp)
         self.view.bind("<<LayerDown>>", self.VisibleLayerDown)
+
+        #options menu:
+        self.view.bind("<<ImageColorChanged>>", self.OnImageColorChange)
 
         # scalers events binding:
         self.view.bind("<<BrightnessScaleChanged>>", self.OnScaleChangeEventHandler)
@@ -70,11 +73,27 @@ class EditorController:
     
     def SaveImage(self, event=None):
         """Adjust image according to current brightness and contrast settings and save it to file"""
-        raise NotImplementedError("SaveImage")
+        fname = asksaveasfilename( parent = self.view, title="Save Image",
+                                   filetypes=[("TIFF files", "*.tiff")],
+                                   defaultextension=".tiff" )
+        outBitType = self.view.GetTiffBitType()
+        if fname is None:
+            return
+        try:
+            self.model.SaveImageAsTiff(fname, outBitType)
+        except Exception as e:
+            self.logger.error("Can't save image. "+str(e))
+            raise ValueError("Can't save image", "image-saving-failed")
+        self.logger.info("Image saved as tiff. "+fname)
 
     def OnScaleChangeEventHandler(self, event=None):
         brightnessValue,contrastValue = self.view.GetScalersValues()
-        self.model.AdjustImageBrightnessContrast(brightnessValue, contrastValue)
+        self.model.SetBrightnessValue(brightnessValue)
+        self.model.SetContrastValue(contrastValue)
+        self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
+
+    def OnImageColorChange(self, event=None):
+        self.model.SetImageColor(self.view.GetImageColor())
         self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
 
     def VisibleLayerUp(self, event=None):

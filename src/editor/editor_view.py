@@ -20,7 +20,7 @@ class EditorView(tk.Toplevel):
         self.beadsPhotoLayerID = 0  # default index of beads microscope photo
         self.brightnessValue = 1
         self.contrastValue = 1
-        self.mainImageColor = "green" #"red"
+        self.mainImageColor = "green" # default color of the main image
 
         self.xr = 0
         self.yr = 0
@@ -47,6 +47,8 @@ class EditorView(tk.Toplevel):
 
         parametersFrame = Frame(self)
         imageParamFrame = Frame(parametersFrame)
+        imageParamFrame.grid_columnconfigure(0, minsize=200)  # Set minimum width for the first column
+        # imageParamFrame.grid_propagate(False)  # Prevent the frame from shrinking
         ttk.Label(
             imageParamFrame,
             text="Image",
@@ -58,22 +60,51 @@ class EditorView(tk.Toplevel):
         self.imageInfo_lbl.grid(row=1, column=0, sticky="n")
 
         tiffTypeSelectFrame = Frame(imageParamFrame)
-        self.tiffMenuBitText = ["8 bit", "16 bit", "32 bit"]
+        # self.tiffMenuBitDict = {
+        #     "8 bit": "uint8",
+        #     "16 bit": "uint16",
+        #     "32 bit": "uint32",
+        # }
         self.tiffMenuBitDict = {
-            "8 bit": "uint8",
-            "16 bit": "uint16",
-            "32 bit": "uint32",
+            "8 bit": "L",
+            "16 bit": "I;16",
+            "32 bit": "I;32",
+            "RGB": "RGB",
         }
         self.tiffSaveBitType = StringVar()
-        self.tiffSaveBitType.set(self.tiffMenuBitText[0])
-        ttk.Label(tiffTypeSelectFrame, width=10, text="Tiff type ").pack(
+        self.tiffSaveBitType.set( list(self.tiffMenuBitDict.keys())[0] )
+        ttk.Label(tiffTypeSelectFrame, text="Tiff type ", width=12).pack(
             side=LEFT, padx=2, pady=2
         )
         self.tiffType_menu = ttk.OptionMenu(
-            tiffTypeSelectFrame, self.tiffSaveBitType, *self.tiffMenuBitText
+            tiffTypeSelectFrame, 
+            self.tiffSaveBitType, 
+            self.tiffSaveBitType.get(),  # Add the current value to the values list (avoid value vanish error when changing the value)
+            *list(self.tiffMenuBitDict.keys())
         )
+        self.tiffType_menu.configure(width=10)
+        self.tiffSaveBitType.set(list(self.tiffMenuBitDict.keys())[0])
         self.tiffType_menu.pack(side=LEFT, padx=2, pady=2)
         tiffTypeSelectFrame.grid(row=2, column=0, sticky="n")
+
+#  option menu for color selection and variable for color
+        self.colorList = ["green", "red", "blue"]
+        self.mainImageColor = StringVar()
+        colorSelectFrame = Frame(imageParamFrame)
+        ttk.Label(colorSelectFrame, text = "Image Color:", width = 12).pack(side=LEFT, padx=2, pady=2)
+        self.colorMenu = ttk.OptionMenu(
+            colorSelectFrame, 
+            self.mainImageColor, 
+            self.mainImageColor.get(),  # Add the current value to the values list (avoid error when changing the value)
+            *self.colorList
+        )
+        self.colorMenu.configure(width=10)
+        self.mainImageColor.set(self.colorList[0])
+        self.mainImageColor.trace_add("write", self.onImageColorChanged)
+        self.colorMenu.pack(side=LEFT, padx=2, pady=2)
+        colorSelectFrame.grid(row=3, column=0, sticky="n")
+
+
 
         brightnessFrame = Frame(imageParamFrame)
         ttk.Label(brightnessFrame, text="Brightness").pack(side=tk.TOP, padx=2, pady=2)
@@ -88,7 +119,7 @@ class EditorView(tk.Toplevel):
         self.contrastScale.pack(side=tk.TOP)
         self.setScalersToDefault()
 
-        brightnessFrame.grid(row=3, column=0, sticky="n")
+        brightnessFrame.grid(row=4, column=0, sticky="n")
 
 
         layerFrame = Frame(imageParamFrame)
@@ -104,7 +135,7 @@ class EditorView(tk.Toplevel):
         self.buttonLayerAdd = ttk.Button(layerFrame, text="+", width=3, command=self.onClickLayerNumberIncrease).pack(
             side=LEFT, padx=2, pady=2
         )
-        layerFrame.grid(row=4, column=0, sticky="n")
+        layerFrame.grid(row=5, column=0, sticky="n")
         imageParamFrame.pack(side= TOP)
 
         parametersFrame.grid(row=1, column=1, sticky="NSWE")
@@ -145,6 +176,9 @@ class EditorView(tk.Toplevel):
         # generate event for contrast change
         self.event_generate("<<ContrastScaleChanged>>")
 
+    def onImageColorChanged(self, *args):
+        self.event_generate("<<ImageColorChanged>>")
+
     def onClickLayerNumberIncrease(self):
         self.event_generate("<<LayerUp>>")
 
@@ -174,8 +208,12 @@ class EditorView(tk.Toplevel):
         # updating scrollers
         self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
 
-# update this method later
+    # update this method later
     def SetFileInfo(self, infoStr: str):
-
         self.imageInfoStr.set(infoStr)
 
+    def GetTiffBitType(self):
+        return self.tiffMenuBitDict[self.tiffSaveBitType.get()]
+    # function to get color from option menu
+    def GetImageColor(self):
+        return self.mainImageColor.get()

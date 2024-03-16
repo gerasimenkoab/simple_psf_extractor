@@ -3,7 +3,7 @@ import copy
 import numpy as np
 from common.ImageRaw_class import ImageRaw
 
-from PIL import Image, ImageEnhance, ImageOps
+from PIL import Image, ImageEnhance, ImageOps, TiffImagePlugin
 
 
 class EditorModel:
@@ -16,15 +16,24 @@ class EditorModel:
             self._mainImageRaw = image
         else:
             raise ValueError("ImageRaw object expected", "image-type-error")
+        self.imgVisibleLayer = None # visible layer of tiff frames as  Image objects 
         self.imgBeadsRawList = [] # list of all tiff frames as  Image objects
         self.imgBeadsRawListStatic = [] # NOT CHANGED list of all tiff frames as  Image objects
         self._mainImageColor = "green"
         self._visibleLayerNumber = 0
+        # Brightness and contrast values
+        self._brightnessValue = 1
+        self._contrastValue = 1
+      
         try:
             self._ConvertMainImageRawToPILImage()
         except Exception as e:
             self.logger.error("Can't convert raw image to PIL. "+str(e))
             raise ValueError("Can't convert raw image to PIL", "image-conversion-failed")
+        
+        self.SetVisibleLayerNumber( int((len(self.imgBeadsRawList) + 1) / 2) )
+        
+        
 
     @property
     def mainImageRaw(self):
@@ -45,16 +54,27 @@ class EditorModel:
         self._visibleLayerNumber = int((len(self.imgBeadsRawList) + 1) / 2)
 
 
-    def AdjustImageBrightnessContrast(self, brightnessValue, contrastValue)->None:
+    def _AdjustImageBrightnessContrast(self)->None:
         """
-        Update Image Layers with  brightness and contrast values.
+        Update Image Layers according to  brightness and contrast values.
+        Returns: List of adjusted Image objects.
         """
-        for i in range(len(self.imgBeadsRawList)):
-            enhancerBrightness = ImageEnhance.Brightness(self.imgBeadsRawListStatic[i])
-            imgCanvEnhaced = enhancerBrightness.enhance( brightnessValue )
-            enhancerContrast = ImageEnhance.Contrast(imgCanvEnhaced)
-            self.imgBeadsRawList[i] = enhancerContrast.enhance( contrastValue )
-        
+        imgAdjusted = []
+        for imgLayer in range(len(self.imgBeadsRawList)):
+            imgAdjusted.append(self._AdjustImageLayerBrightnessContrast(imgLayer))
+        return imgAdjusted   
+
+    def _AdjustImageLayerBrightnessContrast(self, layerNum : int)->Image:
+        """
+        Adjust basic  Image layer number layerNum according to  brightness and contrast values.
+        Return: adjusted image as Image object.
+        """
+        enhancerBrightness = ImageEnhance.Brightness(self.imgBeadsRawList[layerNum])
+        imgCanvEnhaced = enhancerBrightness.enhance( self._brightnessValue )
+        enhancerContrast = ImageEnhance.Contrast(imgCanvEnhaced)
+        return enhancerContrast.enhance( self._contrastValue )
+
+
     def SetMainImageColor(self, color:str):
         self._mainImageColor = color
 
@@ -79,15 +99,33 @@ class EditorModel:
             raise ValueError(
                 "Cant set canvas image with beads photo."
             )
-        self.imgBeadsRawListStatic = copy.deepcopy(self.imgBeadsRawList)
         self._visibleLayerNumber = int((len(self.imgBeadsRawList) + 1) / 2)
 
+    def SetBrightnessValue(self, value):
+        if value < 0:
+            raise ValueError("Brightness value can't be negative", "negative-brightness")
+        self._brightnessValue = value
+
+    def SetContrastValue(self, value):
+        if value < 0:
+            raise ValueError("Contrast value can't be negative", "negative-contrast")
+        self._contrastValue = value
+
+    def SetImageColor(self, color:str):
+        self._mainImageColor = color
+        self._ConvertMainImageRawToPILImage()
 
     def GetVisibleLayerNumber(self):
         return self._visibleLayerNumber
+    
+    def SetVisibleLayerNumber(self, number):
+        if number < 0 or number >= len(self.imgBeadsRawList):
+            raise ValueError("Layer number out of range", "layer-number-out-of-range")
+        self._visibleLayerNumber = number
 
     def GetVisibleLayerImage(self):
-        return self.imgBeadsRawList[self._visibleLayerNumber]
+        img = self._AdjustImageLayerBrightnessContrast( self.GetVisibleLayerNumber() )
+        return img
     
     def VisibleLayerNumberUp(self):
         self._visibleLayerNumber = (self._visibleLayerNumber + 1) % len(self.imgBeadsRawList)
@@ -96,3 +134,20 @@ class EditorModel:
     def VisibleLayerNumberDown(self):
         self._visibleLayerNumber = (self._visibleLayerNumber - 1) % len(self.imgBeadsRawList)
         return self._visibleLayerNumber
+    
+
+    def SaveImageAsTiff(self, fname:str = "img.tiff", outBitType:str = "L", tagString:str = None):
+        """Save Image objects list as multiframe tiff file"""
+        images = self._AdjustImageBrightnessContrast()
+        images = [img.convert(outBitType) for img in images]
+        # Create a TIFF info object and add the custom tag
+        info = TiffImagePlugin.ImageFileDirectory_v2()
+        if tagString is None:
+            info[270] = self._mainImageRaw.GetImageInfoStr()  # 270 is the tag for ImageDescription
+        else:
+            info[270] = tagString
+        try:
+            images[0].save(fname, append_images=images[1:], save_all=True, tiffinfo=info)
+        except Exception as e:
+            self.logger.error("Can't save image as tiff. "+str(e))
+            raise ValueError("Can't save image as tiff", "image-saving-failed")
