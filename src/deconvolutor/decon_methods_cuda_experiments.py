@@ -9,10 +9,23 @@ from os import cpu_count, getpid
 
 import time
 
-class DeconMethods:
-    """Class provides methods for deconvolution of PSF and images.
-        Multithread version of deconvolution is used for image deconvolution.
-    """
+# CUDA modules. Use in WSL with conda enviroment.
+# powershell: wsl
+# wsl-ubuntu:  conda activate cusignal-dev 
+#------------------------------------------------
+# Currently known issue with CUDA: 
+# 1.slowdown after iteration. 
+# Possibly may be solved with some proper kernell queue management
+# 2.Very slow retrieve of ndarray from GPU.
+#------------------------------------------------
+# Imports for CUDA
+import sys
+import cusignal
+import cupy as cp
+from cupyx.scipy.ndimage import laplace as laplace_gpu
+
+class DeconMethodsCUDA:
+
     def __init__(self):
         pass
 
@@ -45,21 +58,21 @@ class DeconMethods:
         """
         imagePSF: np.ndarray
 
-        idealSphereArray =  DeconMethods.MakeIdealSphereArray(image.shape[0], beadSizePx, zoomFactor,
+        idealSphereArray =  DeconMethodsCUDA.MakeIdealSphereArray(image.shape[0], beadSizePx, zoomFactor,
                                         beadVoxel["X"], beadDiameter = 0.2)
         match deconType:
             case "RL":
                 # Richardson Lucy
                 print(deconType," selected")
                             
-                imagePSF = DeconMethods.MaxLikelhoodEstimationFFT_3D(
+                imagePSF = DeconMethodsCUDA.MaxLikelhoodEstimationFFT_3D(
                     image,
                     idealSphereArray,
                     iterNum, False, progBar, parentWin
                 )
             case "RLTMR":
                 # Richardson Lucy with Tikhonov-Miller regularisation
-                imagePSF = DeconMethods.DeconvolutionRLTMR(
+                imagePSF = DeconMethodsCUDA.DeconvolutionRLTMR(
                     image,
                     idealSphereArray,
                     lambdaR,
@@ -67,7 +80,7 @@ class DeconMethods:
                 )
             case "RLTVR":
                 # Richardson Lucy with Total Variation regularisation
-                imagePSF = DeconMethods.DeconvolutionRLTVR(
+                imagePSF = DeconMethodsCUDA.DeconvolutionRLTVR(
                     image,
                     idealSphereArray,
                     lambdaR,
@@ -131,7 +144,7 @@ class DeconMethods:
                             repeat(iterNum),
                             repeat(False),
                             )
-                chunkListDec = workers.starmap(DeconMethods.MaxLikelhoodEstimationFFT_3D, argsList)
+                chunkListDec = workers.starmap(DeconMethodsCUDA.MaxLikelhoodEstimationFFT_3D, argsList)
             elif deconType == "RLTMR":
                 # Richardson Lucy with Tikhonov-Miller regularisation
                 argsList = zip(chunkList,
@@ -139,7 +152,7 @@ class DeconMethods:
                     repeat(lambdaR),
                     repeat(iterNum),
                     ) 
-                chunkListDec = workers.starmap(DeconMethods.DeconvolutionRLTMR, argsList)
+                chunkListDec = workers.starmap(DeconMethodsCUDA.DeconvolutionRLTMR, argsList)
             elif deconType == "RLTVR":
                 # Richardson Lucy with Total Variation regularisation
                 argsList = zip(chunkList,
@@ -147,7 +160,7 @@ class DeconMethods:
                     repeat(lambdaR),
                     repeat(iterNum),
                     ) 
-                chunkListDec = workers.starmap(DeconMethods.DeconvolutionRLTVR, argsList)
+                chunkListDec = workers.starmap(DeconMethodsCUDA.DeconvolutionRLTVR, argsList)
             else:
                 chunkListDec = None
                 print("DeconImage: Invalid option. Please choose a valid option.")
@@ -238,7 +251,7 @@ class DeconMethods:
         lightIntensity = 255
 
         for i, j, k in product(range(imgSize), repeat=3):
-            tiffDraw[i, j, k] = DeconMethods.PointFunctionAiry(
+            tiffDraw[i, j, k] = DeconMethodsCUDA.PointFunctionAiry(
                 np.array([i, j, k]), imgCenter, 
                 lightIntensity, zoomfactor=zoomfactor,
                 beadVoxelSize = beadVoxelSize, beadDiameter = beadDiameter
@@ -256,7 +269,7 @@ class DeconMethods:
         for i in range(imgSize):
             for j in range(imgSize):
                 for k in range(imgSize):
-                    tiffDraw[i, j, k] = DeconMethods.PointFunction(
+                    tiffDraw[i, j, k] = DeconMethodsCUDA.PointFunction(
                         np.array([i, j, k]), imgCenter, sphRadius, lightIntensity
                     )
         return tiffDraw
@@ -267,6 +280,8 @@ class DeconMethods:
         Function for  convolution with (Maximum likelihood estimaton)Richardson-Lucy method
         For psf calculation kernell = ideal sphere
         """
+
+        raise NotImplementedError("MaxLikelhoodEstimationFFT_3D is not implemented with CUDA yet")
         f_0 = image
         # if there is NAN in image array(seems from source image) replace it with zeros
         f_0[np.isnan(f_0)] = 1.e-11
@@ -322,6 +337,39 @@ class DeconMethods:
         # end of iteration cycle
         return f_i[padSize[0]:-padSize[0], padSize[1]:-padSize[1], padSize[2]:-padSize[2]]
 
+
+    # ======= CUDA version =========
+    # 
+
+    @cp.fuse()
+    def fuse1(hm_gpu, b_noize, e_gpu):
+        r_gpu = hm_gpu / (e_gpu + b_noize)
+        return r_gpu
+
+    @cp.fuse()
+    def e_fuse(b_noize, e_gpu):
+        e_gpu = e_gpu + b_noize
+        return e_gpu
+
+    @cp.fuse()
+    def r_fuse(hm_gpu, e_gpu):
+        r_gpu = hm_gpu / e_gpu
+        return r_gpu
+
+
+    @cp.fuse()
+    def f_old_fuse(beadMaxInt, f_old_gpu, rNew_gpu, regTM_gpu,max_f_old_gpu):
+        f_old_gpu = ((f_old_gpu * (rNew_gpu)) / regTM_gpu )/ max_f_old_gpu * beadMaxInt
+        return f_old_gpu
+
+    @cp.fuse()
+    def regTM_fuse( lambdaTM, lapl_f_old_gpu):
+        try:
+            regTM_gpu = lapl_f_old_gpu * 2.0 * 0.000001  + 1.0
+        except Exception as e:
+            print("ddd: " + str(e))
+        return regTM_gpu
+
     @staticmethod
     def DeconvolutionRLTMR(
         image: np.ndarray,
@@ -331,6 +379,7 @@ class DeconMethods:
         debug_flag=False, pb = None , parentWin=None
     ):
         """
+        CUDA
         Function for  convolution Richardson Lucy Tikhonov Miller Regularization
 
         Parameters:
@@ -348,8 +397,7 @@ class DeconMethods:
 
         f_0 = image
         # if there is NAN in image array(seems from source image) replace it with zeros
-        f_0[np.isnan(f_0)] = 1.e-11
-        f_0[f_0<1.e-11] = 1.e-11
+        f_0[np.isnan(f_0)] = 0.0
         padSize = psf.shape
         b_noize = (np.mean(f_0[0, 0, :]) + np.mean(f_0[0, :, 0]) + np.mean(f_0[:, 0, 0])) / 3
         f_0 = np.pad(f_0, list(zip(padSize, padSize)), "edge")
@@ -365,32 +413,55 @@ class DeconMethods:
                 f_0.shape,
                 psf.shape,
             )
+        #    b_noize = 0.1
         if pb != None:
             # initializing progressbar
             pb['value'] = 0
             pb_step = 100 / iterLimit
         # preparing for start of iteration cycle
         f_old = f_0
+        # setting CUDA memory limits
+        # with cp.cuda.Device(0):
+        #     mempool.set_limit(size=2*1024**3)  # 2 GiB
+        print("Image memory size %d MB" % (sys.getsizeof(f_old)*1.e-6))
+        psf_gpu = cp.array(p)
+        psf_flip_gpu = cp.flip(psf_gpu)
+        hm_gpu = cp.array(f_0)
+        f_old_gpu = cp.array(f_old)
+        totalBytes = hm_gpu.nbytes + psf_gpu.nbytes + f_old_gpu.nbytes
+        print('Expecting {} GB of GPU memory!'.format(totalBytes * 1e-9)) #4 GB have !!
+        totaltime= time.time()
         # starting iteration cycle
-        # totaltime = time.time()
-        for i in range(0, iterLimit):
+        for k in range(0, iterLimit):
+            # print("\r", "iter:", k, end=" ")
+            print("iter:", k, end=" ")
             # first convolution
+            #CUDA cusignal code
             starttime = time.time()
-            e = signal.fftconvolve(f_old, p, mode="same")
-            e = e + b_noize
-            r = f_0 / e
-            # second convolution
-            p1 = np.flip(p)
-            rnew = signal.fftconvolve(r, p1, mode="same")
-            rnew = np.real(rnew)
-            regTM = 1.0 + 2.0 * lambdaTM * laplace(f_old)
-            f_old = f_old * rnew / regTM
-            f_old = f_old / np.amax(f_old) * beadMaxInt
+            try:
+                e_gpu = cusignal.fftconvolve(f_old_gpu, psf_gpu, mode="same")
+                r_gpu = fuse1(hm_gpu, b_noize, e_gpu)
+                rNew_gpu = cusignal.fftconvolve(r_gpu, psf_flip_gpu, mode="same")
+                lapl_f_old_gpu = laplace_gpu(f_old_gpu)
+                regTM_gpu = regTM_fuse( lambdaTM, lapl_f_old_gpu)
+                rNew_gpu =cp.real(rNew_gpu)
+                max_f_old_gpu = cp.amax(f_old_gpu)
+                f_old_gpu = f_old_fuse(beadMaxInt, f_old_gpu, rNew_gpu, regTM_gpu, max_f_old_gpu)
+                cp.cuda.runtime.deviceSynchronize()
+            except Exception as e:
+                print("CUDA problem "+str(e))
+                return
             if pb != None:
                 # updating progressbar
                 pb.step(pb_step)
                 parentWin.update_idletasks()
-
+            print(" GPU Conv time: %7.4f s" % (time.time()-starttime))
+        
+        print(" GPU total time: %7.4f s" % (time.time()-totaltime ))
+        startTime = time.time()
+        print("Recieving data, from GPU...", end= "")
+        f_old = cp.ndarray.get(f_old_gpu)
+        print("finished in %7.1f s " % (time.time()-starttime))
         f_old = f_old[padSize[0]:-padSize[0], padSize[1]:-padSize[1], padSize[2]:-padSize[2]]
 
         if debug_flag:
@@ -399,138 +470,6 @@ class DeconMethods:
             print("Deconvoluiton output shape :", f_old.shape)
 
         return f_old
-
-    # ======= CUDA version =========
-    # 
-
-    # @cp.fuse()
-    # def fuse1(hm_gpu, b_noize, e_gpu):
-    #     r_gpu = hm_gpu / (e_gpu + b_noize)
-    #     return r_gpu
-
-    # @cp.fuse()
-    # def e_fuse(b_noize, e_gpu):
-    #     e_gpu = e_gpu + b_noize
-    #     return e_gpu
-
-    # @cp.fuse()
-    # def r_fuse(hm_gpu, e_gpu):
-    #     r_gpu = hm_gpu / e_gpu
-    #     return r_gpu
-
-
-    # @cp.fuse()
-    # def f_old_fuse(beadMaxInt, f_old_gpu, rNew_gpu, regTM_gpu,max_f_old_gpu):
-    #     f_old_gpu = ((f_old_gpu * (rNew_gpu)) / regTM_gpu )/ max_f_old_gpu * beadMaxInt
-    #     return f_old_gpu
-
-    # @cp.fuse()
-    # def regTM_fuse( lambdaTM, lapl_f_old_gpu):
-    #     try:
-    #         regTM_gpu = lapl_f_old_gpu * 2.0 * 0.000001  + 1.0
-    #     except Exception as e:
-    #         print("ddd: " + str(e))
-    #     return regTM_gpu
-
-    # def DeconvolutionRLTMR_CUDA(
-    #     image: np.ndarray,
-    #     psf: np.ndarray,
-    #     lambdaTM: float = 0.0001,
-    #     iterLimit: int = 20,
-    #     debug_flag=False, pb = None , parentWin=None
-    # ):
-    #     """
-    #     CUDA
-    #     Function for  convolution Richardson Lucy Tikhonov Miller Regularization
-
-    #     Parameters:
-    #         image (ndarray): The 3D image to be deconvolved.
-    #         psf (ndarray): The point spread function (PSF) of the imaging system.
-    #         lambdaTM (float): The weight of the tikhonov miller regularization term. Defaults to 0.0001.
-    #         iterLimit (int): The number of iterations to perform. Defaults to 10.
-    #         debug_flag (bool) : debug output
-    #         pb : tkinter.ttk.progressbar progressbar widget
-    #         parentWin : tkinter window widget instance
-    
-    #     Returns:
-    #         ndarray: The deconvolved image.    
-    #     """
-
-    #     f_0 = image
-    #     # if there is NAN in image array(seems from source image) replace it with zeros
-    #     f_0[np.isnan(f_0)] = 0.0
-    #     padSize = psf.shape
-    #     b_noize = (np.mean(f_0[0, 0, :]) + np.mean(f_0[0, :, 0]) + np.mean(f_0[:, 0, 0])) / 3
-    #     f_0 = np.pad(f_0, list(zip(padSize, padSize)), "edge")
-    #     beadMaxInt = np.amax(image)
-    #     p = psf
-
-    #     if debug_flag:
-    #         print("Debug output:")
-    #         print("Background intensity:", b_noize, "Max intensity:", np.amax(f_0))
-    #         print(
-    #             "Deconvoluiton input shape (image, padded, psf):",
-    #             image.shape,
-    #             f_0.shape,
-    #             psf.shape,
-    #         )
-    #     #    b_noize = 0.1
-    #     if pb != None:
-    #         # initializing progressbar
-    #         pb['value'] = 0
-    #         pb_step = 100 / iterLimit
-    #     # preparing for start of iteration cycle
-    #     f_old = f_0
-    #     # setting CUDA memory limits
-    #     # with cp.cuda.Device(0):
-    #     #     mempool.set_limit(size=2*1024**3)  # 2 GiB
-    #     print("Image memory size %d MB" % (sys.getsizeof(f_old)*1.e-6))
-    #     psf_gpu = cp.array(p)
-    #     psf_flip_gpu = cp.flip(psf_gpu)
-    #     hm_gpu = cp.array(f_0)
-    #     f_old_gpu = cp.array(f_old)
-    #     totalBytes = hm_gpu.nbytes + psf_gpu.nbytes + f_old_gpu.nbytes
-    #     print('Expecting {} GB of GPU memory!'.format(totalBytes * 1e-9)) #4 GB have !!
-    #     totaltime= time.time()
-    #     # starting iteration cycle
-    #     for k in range(0, iterLimit):
-    #         # print("\r", "iter:", k, end=" ")
-    #         print("iter:", k, end=" ")
-    #         # first convolution
-    #         #CUDA cusignal code
-    #         starttime = time.time()
-    #         try:
-    #             e_gpu = cusignal.fftconvolve(f_old_gpu, psf_gpu, mode="same")
-    #             r_gpu = fuse1(hm_gpu, b_noize, e_gpu)
-    #             rNew_gpu = cusignal.fftconvolve(r_gpu, psf_flip_gpu, mode="same")
-    #             lapl_f_old_gpu = laplace_gpu(f_old_gpu)
-    #             regTM_gpu = regTM_fuse( lambdaTM, lapl_f_old_gpu)
-    #             rNew_gpu =cp.real(rNew_gpu)
-    #             max_f_old_gpu = cp.amax(f_old_gpu)
-    #             f_old_gpu = f_old_fuse(beadMaxInt, f_old_gpu, rNew_gpu, regTM_gpu, max_f_old_gpu)
-    #             cp.cuda.runtime.deviceSynchronize()
-    #         except Exception as e:
-    #             print("CUDA problem "+str(e))
-    #             return
-    #         if pb != None:
-    #             # updating progressbar
-    #             pb.step(pb_step)
-    #             parentWin.update_idletasks()
-    #         print(" GPU Conv time: %7.4f s" % (time.time()-starttime))
-        
-    #     print(" GPU total time: %7.4f s" % (time.time()-totaltime ))
-    #     startTime = time.time()
-    #     print("Recieving data, from GPU...", end= "")
-    #     f_old = cp.ndarray.get(f_old_gpu)
-    #     print("finished in %7.1f s " % (time.time()-starttime))
-    #     f_old = f_old[padSize[0]:-padSize[0], padSize[1]:-padSize[1], padSize[2]:-padSize[2]]
-
-    #     if debug_flag:
-    #         print("Debug output:")
-    #         print("Input image shape: ", image.shape)
-    #         print("Deconvoluiton output shape :", f_old.shape)
-
-    #     return f_old
 
 
 
@@ -559,6 +498,9 @@ class DeconMethods:
         Returns:
             ndarray: The deconvolved image.    
         """
+
+
+        raise NotImplementedError("DeconvolutionRLTVR is not implemented with CUDA yet")
 
         f_0 = image
         # if there is NAN in image array(seems from source image) replace it with zeros
@@ -618,117 +560,3 @@ class DeconMethods:
             print("Deconvoluiton output shape :", f_old.shape)
 
         return f_old
-
-    #   ================= obsolete code =================================
-    # def DeconImageOld(
-    #     image: np.ndarray, kernell: np.ndarray,
-    #     iterNum: int, deconType: str, lambdaR: float, progBar, parentWin
-    # ):
-    #     """    
-    #     General function for restoration of image with known PSF(kernell). Single threaded.
-    #     Input:
-    #         image: np.ndarray  - averaged single bead image
-    #         kernell: np.ndarray - PSF or other kernell
-    #         iterNum: int - number of iteration steps
-    #         deconType: str  - deconvolution method name ( default - RL)
-    #         lambdaR: float - regularization coefficient
-    #         progBar : ttk.progressbar - progressbar to update
-    #         parentWin : tkinter window widget
-
-    #     Returns:
-    #         imagePSF: np.ndarray
-    #     """
-    #     chunkID=0
-    #     imageDeconvolved = np.copy(image)
-    #     chunkDimX = image.shape[2] // 4 # chunk size X
-    #     chunkDimY = image.shape[1] // 4 # chunk size Y
-    #     for i in range(0, image.shape[1], chunkDimY):
-    #         if i <= image.shape[1]-chunkDimY:
-    #             iEnd = i + chunkDimY
-    #         else:
-    #             iEnd= i + image.shape[1] % chunkDimY
-    #         for j in range(0,image.shape[2], chunkDimX):
-    #             if j <= image.shape[1]-chunkDimY:
-    #                 jEnd = j + chunkDimX
-    #             else:
-    #                 jEnd= j + image.shape[2] % chunkDimX
-    #             imageChunk = image[:,i:iEnd, j:jEnd]
-    #             print("Chunk number %03d" %(chunkID))
-    #             chunkID += 1
-    #             if deconType == "RL":
-    #                 # Richardson Lucy
-    #                 chunkDeconvolved = MaxLikelhoodEstimationFFT_3D(
-    #                     imageChunk, kernell,
-    #                     iterNum, False, progBar, parentWin
-    #                 )
-    #             elif deconType == "RLTMR":
-    #                 # Richardson Lucy with Tikhonov-Miller regularisation
-    #                 chunkDeconvolved = DeconvolutionRLTMR(
-    #                     imageChunk, kernell,
-    #                     lambdaR, iterNum, False, progBar, parentWin
-    #                 )
-    #             elif deconType == "RLTVR":
-    #                 # Richardson Lucy with Total Variation regularisation
-    #                 chunkDeconvolved = DeconvolutionRLTVR(
-    #                     imageChunk, kernell,
-    #                     lambdaR, iterNum, False, progBar, parentWin
-    #                 )
-    #             else:
-    #                 imageDeconvolved = None
-    #                 print("DeconImage: Invalid option. Please choose a valid option.")
-
-    #             imageDeconvolved[:,i:iEnd, j:jEnd] = chunkDeconvolved 
-    #     return imageDeconvolved
-
-    # def DeconvolutionRL(image, psf, iterLimit=20, debug_flag=False):
-    #     """Function for  convolution"""
-
-    #     f_0 = image
-    #     # if there is NAN in image array(seems from source image) replace it with zeros
-    #     f_0[np.isnan(f_0)] = 0.0
-    #     # do image padding
-    #     pad = psf.shape
-    #     f_0 = np.pad(f_0, ((pad[0], pad[0]), (pad[1], pad[1]), (pad[2], pad[2])), "edge")
-    #     beadMaxInt = np.amax(image)
-
-    #     p = psf
-
-    #     b_noize = (np.mean(f_0[0, 0, :]) + np.mean(f_0[0, :, 0]) + np.mean(f_0[:, 0, 0])) / 3
-
-    #     if debug_flag:
-    #         print("Debug output:")
-    #         print("Background intensity:", b_noize, "Max intensity:", np.amax(f_0))
-    #         print(
-    #             "Deconvoluiton input shape (image, padded, psf):",
-    #             image.shape,
-    #             f_0.shape,
-    #             psf.shape,
-    #         )
-    #     # preparing for start of iteration cycle
-    #     f_old = f_0
-    #     # starting iteration cycle
-    #     for k in range(0, iterLimit):
-    #         print("\r", "iter:", k, end=" ")
-    #         # first convolution
-    #         e = signal.fftconvolve(f_old, p, mode="same")
-    #         # e = np.real(e)
-    #         e = e + b_noize
-    #         r = f_0 / e
-    #         # second convolution
-    #         p1 = np.flip(p)
-    #         rnew = signal.fftconvolve(r, p1, mode="same")
-    #         rnew = np.real(rnew)
-    #         #      rnew = rnew.clip(min=0)
-    #         f_old = f_old * rnew
-    #         f_old = f_old  # / np.amax(f_old) * beadMaxInt
-    #     # end of iteration cycle
-    #     imSh = f_0.shape
-    #     pad = psf.shape
-    #     f_old = f_old[
-    #         pad[0] : imSh[0] - pad[0], pad[1] : imSh[1] - pad[1], pad[2] : imSh[2] - pad[2]
-    #     ]
-    #     if debug_flag:
-    #         print("Debug output:")
-    #         print("Deconvoluiton output shape :", f_old.shape)
-
-    #     return f_old

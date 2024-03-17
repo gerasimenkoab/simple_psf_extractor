@@ -1,7 +1,6 @@
 import numpy as np
-from scipy.ndimage import gaussian_filter, median_filter
 from common.ImageRaw_class import ImageRaw
-from .decon_methods import DeconPSF
+from .decon_methods import DeconMethods
 
 import logging
 import time
@@ -119,11 +118,11 @@ class DeconPsfModel():
     def CalculatePSF(self, deconMethodIn : str, progBarIn, masterWidget):
         start_time = time.time()
         try:
-            PSF = DeconPSF(
+            PSF = DeconMethods.DeconPSF(
                 self._psfImage.imArray,
                 self._beadDiameter,
                 self._zoomFactor,
-                self._psfImage.voxel['X'],
+                self._psfImage.voxel,
                 self._iterationNumber,
                 deconMethodIn,
                 self._regularizationParameter,

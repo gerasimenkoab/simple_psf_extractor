@@ -1,9 +1,7 @@
 import numpy as np
-import os
-from scipy.ndimage import gaussian_filter, median_filter
 from scipy.ndimage import zoom
 from common.ImageRaw_class import ImageRaw
-from .decon_methods import DeconImage
+from .decon_methods import DeconMethods
 
 import logging
 import time
@@ -102,7 +100,7 @@ class DeconImageModel:
         self.logger.debug("step 2: deconvolution")
         start_time = time.time()
         try:
-            PSF = DeconImage(
+            PSF = DeconMethods.DeconImage(
                 self._deconImage.imArray,
                 self._deconPsf.imArray,
                 self._iterationNumber,
