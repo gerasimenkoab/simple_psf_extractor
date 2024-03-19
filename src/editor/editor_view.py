@@ -21,6 +21,8 @@ class EditorView(tk.Toplevel):
         self.brightnessValue = 1
         self.contrastValue = 1
         self.mainImageColor = "green" # default color of the main image
+        self._imageScaleFactor = 1.0
+
 
         self.xr = 0
         self.yr = 0
@@ -106,20 +108,32 @@ class EditorView(tk.Toplevel):
 
 
 
-        brightnessFrame = Frame(imageParamFrame)
-        ttk.Label(brightnessFrame, text="Brightness").pack(side=tk.TOP, padx=2, pady=2)
+        scalesrsParamFrame = Frame(imageParamFrame)
+        ttk.Label(scalesrsParamFrame, text="Brightness").pack(side=tk.TOP, padx=2, pady=2)
         self.brightnessScaleVar = DoubleVar()
-        self.brightnessScale = ttk.Scale(brightnessFrame, orient='horizontal', from_=-8, to_=8,
+        self.brightnessScale = ttk.Scale(scalesrsParamFrame, orient='horizontal', from_=-8, to_=8,
                                          variable = self.brightnessScaleVar)
         self.brightnessScale.configure( command= self.onBrightnessScaleChanged )
         self.brightnessScale.pack(side=tk.TOP)
-        ttk.Label(brightnessFrame, text="Contrast").pack(side=tk.TOP, padx=2, pady=2)
-        self.contrastScale = ttk.Scale(brightnessFrame, orient='horizontal', from_=-8, to_=8)
+        ttk.Label(scalesrsParamFrame, text="Contrast").pack(side=tk.TOP, padx=2, pady=2)
+        self.contrastScale = ttk.Scale(scalesrsParamFrame, orient='horizontal', from_=-8, to_=8)
         self.contrastScale.configure( command= self.onContrastScaleChanged )
         self.contrastScale.pack(side=tk.TOP)
         self.setScalersToDefault()
 
-        brightnessFrame.grid(row=4, column=0, sticky="n")
+        # add scaler for image size scaling
+        self.scale_value = tk.StringVar()
+        formatted_value = "{0:.1f}".format(self._imageScaleFactor)
+        self.scale_value.set(f"Image Scale: {formatted_value}")
+        ttk.Label(scalesrsParamFrame, textvariable=self.scale_value).pack(side=tk.TOP, padx=2, pady=2)
+        self.imageScale = ttk.Scale(scalesrsParamFrame, orient='horizontal', from_=1, to_=4)
+        self.imageScale.set(1.0)
+        self.imageScale.configure( command= self.onImageScaleChanged )
+        self.imageScale.pack(side=tk.TOP)
+
+
+        scalesrsParamFrame.grid(row=4, column=0, sticky="n")
+
 
 
         layerFrame = Frame(imageParamFrame)
@@ -168,7 +182,14 @@ class EditorView(tk.Toplevel):
 
 
     # ---------------------- end __init__  ---------------------------------
-        
+
+    def onImageScaleChanged(self, value):
+        self._imageScaleFactor = float(value)
+        formatted_value = "{0:.1f}".format(self._imageScaleFactor)
+        self.scale_value.set(f"Image Scale: {formatted_value}")
+        self.event_generate("<<ImageScaleChanged>>")
+
+
     #set text message to the status bar
     def SetStatusBarMessage(self, message:str):
         self.statusBar.config(text=message) 
@@ -208,8 +229,8 @@ class EditorView(tk.Toplevel):
         if img is None:
             return
         # Get the width and height of the canvas
-        canvas_width = self.mainPhotoCanvas.winfo_width()
-        canvas_height = self.mainPhotoCanvas.winfo_height()
+        canvas_width = int(self.mainPhotoCanvas.winfo_width()*self._imageScaleFactor)
+        canvas_height = int(self.mainPhotoCanvas.winfo_height()*self._imageScaleFactor)
         # Resize the image to the size of the canvas
         imgResized = img.resize((canvas_width, canvas_height))
         self.imgCnv = ImageTk.PhotoImage(image=imgResized, master=self.mainPhotoCanvas)

@@ -38,7 +38,7 @@ class EditorController:
             self.logger.error("Can't set image to view. "+str(e))
             raise ValueError("Can't set image to view", "view-image-setting-failed")
         self.view.SetImageInfo("Deconvolution result")
-        self.view.SetStatusBarMessage(" Loaded image parameters: "+self.model.mainImageRaw.GetImageInfoStr(output = "full"))
+        self.view.SetStatusBarMessage(" Loaded image parameters: " + self.model.mainImageRaw.GetImageInfoStr(output = "full"))
 
         # binding buttons and entries events
         self._bind()
@@ -66,6 +66,7 @@ class EditorController:
         # scalers events binding:
         self.view.bind("<<BrightnessScaleChanged>>", self.OnScaleChangeEventHandler)
         self.view.bind("<<ContrastScaleChanged>>", self.OnScaleChangeEventHandler)
+        self.view.bind("<<ImageScaleChanged>>", self.OnScaleChangeEventHandler)
 
         # entries bind at two events:
         self.logger.info("_bind: Binding buttons and entries is done.")
@@ -94,6 +95,9 @@ class EditorController:
         self.model.SetBrightnessValue(brightnessValue)
         self.model.SetContrastValue(contrastValue)
         self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
+
+    # def OnScaleChangeEventHandler(self, event=None):
+    #     self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())        
 
     def OnImageColorChange(self, event=None):
         self.model.SetImageColor(self.view.GetImageColor())
