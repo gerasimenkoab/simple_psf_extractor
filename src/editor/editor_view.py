@@ -88,7 +88,7 @@ class EditorView(tk.Toplevel):
         tiffTypeSelectFrame.grid(row=2, column=0, sticky="n")
 
 #  option menu for color selection and variable for color
-        self.colorList = ["green", "red", "blue"]
+        self.colorList = ["grey","green", "red", "blue"]
         self.mainImageColor = StringVar()
         colorSelectFrame = Frame(imageParamFrame)
         ttk.Label(colorSelectFrame, text = "Image Color:", width = 12).pack(side=LEFT, padx=2, pady=2)
@@ -162,6 +162,9 @@ class EditorView(tk.Toplevel):
         canvasFrame.grid(row=1, column=2, sticky="WENS")
         self.attributes("-topmost", True)
 
+        #status bar at the bottom of the window
+        self.statusBar = ttk.Label(self, text="Ready", relief=SUNKEN, anchor=W)
+
     # ---------------------- end __init__  ---------------------------------
 
     def setScalersToDefault(self):
@@ -217,3 +220,6 @@ class EditorView(tk.Toplevel):
     # function to get color from option menu
     def GetImageColor(self):
         return self.mainImageColor.get()
+    # function to set color in option menu
+    def SetImageColor(self, color:str):
+        self.mainImageColor.set(color)

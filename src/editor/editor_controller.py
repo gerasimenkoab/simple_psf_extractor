@@ -32,6 +32,7 @@ class EditorController:
         # try set image to view
         try:
             self.view.setLayerNumber(self.model.GetVisibleLayerNumber())
+            self.view.SetImageColor(self.model.GetImageColor())
             self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
         except Exception as e:          
             self.logger.error("Can't set image to view. "+str(e))

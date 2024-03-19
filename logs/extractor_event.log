@@ -1,32 +1,15 @@
-2024-03-17 13:05:27,401 __main__.main.app_main_controller INFO: Main App started.
-2024-03-17 13:05:27,471 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-03-17 13:05:27,471 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-03-17 13:05:27,472 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-03-17 13:05:29,123 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
-2024-03-17 13:05:29,125 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
-2024-03-17 13:05:29,159 __main__.deconvolutor.decon_view INFO: Decon widget created
-2024-03-17 13:05:32,365 __main__.deconvolutor.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/beads_average.tif
-2024-03-17 13:05:38,007 __main__.deconvolutor.decon_controller INFO: Starting bead deconvolution. Method code: RL
-2024-03-17 13:05:40,510 __main__.deconvolutor.decon_psf_model INFO: Deconvolution time: 2.501887798309326 seconds 
-2024-03-17 13:05:40,602 __main__.deconvolutor.decon_controller INFO: Bead image deconvolution finished.
-2024-03-17 13:05:53,273 __main__.deconvolutor.decon_controller INFO: Starting bead deconvolution. Method code: RLTMR
-2024-03-17 13:05:57,232 __main__.deconvolutor.decon_psf_model INFO: Deconvolution time: 3.957489013671875 seconds 
-2024-03-17 13:05:57,321 __main__.deconvolutor.decon_controller INFO: Bead image deconvolution finished.
-2024-03-17 13:06:47,027 __main__.deconvolutor.decon_controller INFO: Starting bead deconvolution. Method code: RLTMR
-2024-03-17 13:06:50,966 __main__.deconvolutor.decon_psf_model INFO: Deconvolution time: 3.938323974609375 seconds 
-2024-03-17 13:06:51,133 __main__.deconvolutor.decon_controller INFO: Bead image deconvolution finished.
-2024-03-17 13:07:01,435 __main__.deconvolutor.decon_controller INFO: Starting bead deconvolution. Method code: RLTMR
-2024-03-17 13:07:16,628 __main__.deconvolutor.decon_psf_model INFO: Deconvolution time: 15.191598176956177 seconds 
-2024-03-17 13:07:16,721 __main__.deconvolutor.decon_controller INFO: Bead image deconvolution finished.
-2024-03-17 13:08:00,799 __main__.deconvolutor.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/image256x256.tif
-2024-03-17 13:08:03,323 __main__.deconvolutor.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
-2024-03-17 13:08:07,102 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RL
-2024-03-17 13:08:13,975 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 6.840780258178711 seconds 
-2024-03-17 13:08:13,982 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
-2024-03-17 13:08:17,365 __main__.editor.editor_controller INFO: Initializing Bead Extractor module.
-2024-03-17 13:08:17,366 __main__.editor.editor_model INFO: Image Editor opened
-2024-03-17 13:08:17,484 __main__.editor.editor_controller INFO: _bind: Binding buttons and entries is done.
-2024-03-17 13:10:01,898 __main__.editor.editor_controller INFO: Editor Closed.
-2024-03-17 13:10:35,938 __main__.editor.editor_controller INFO: Initializing Bead Extractor module.
-2024-03-17 13:10:35,939 __main__.editor.editor_model INFO: Image Editor opened
-2024-03-17 13:10:36,051 __main__.editor.editor_controller INFO: _bind: Binding buttons and entries is done.
+2024-03-19 21:44:29,208 __main__.main.app_main_controller INFO: Main App started.
+2024-03-19 21:44:29,280 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-03-19 21:44:29,280 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-03-19 21:44:29,281 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-03-19 21:44:30,626 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
+2024-03-19 21:44:30,629 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
+2024-03-19 21:44:30,665 __main__.deconvolutor.decon_view INFO: Decon widget created
+2024-03-19 21:44:34,085 __main__.deconvolutor.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/image256x256.tif
+2024-03-19 21:44:36,198 __main__.deconvolutor.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
+2024-03-19 21:44:37,912 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RL
+2024-03-19 21:44:44,294 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 6.353571653366089 seconds 
+2024-03-19 21:44:44,301 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
+2024-03-19 21:44:45,681 __main__.editor.editor_controller INFO: Initializing Bead Extractor module.
+2024-03-19 21:44:45,681 __main__.editor.editor_model INFO: Image Editor opened
+2024-03-19 21:44:45,781 __main__.editor.editor_controller INFO: _bind: Binding buttons and entries is done.

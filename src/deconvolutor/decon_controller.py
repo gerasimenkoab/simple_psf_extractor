@@ -11,12 +11,24 @@ class DeconController:
         # setup logger
         self.logger = logging.getLogger("__main__." + __name__)
         self._master = master
-
-        self.modelDeconPSF = DeconPsfModel()
-        self.modelDeconImage = DeconImageModel()
-
-        self.viewDecon = DeconView(self._master)
-
+        try:
+            self.modelDeconPSF = DeconPsfModel()
+        except Exception as e:
+            self.logger.error("Can't create PSF deconvolution model. "+str(e))
+            raise ValueError("Can't create PSF deconvolution model", "model-creation-failed")
+        
+        try:
+            self.modelDeconImage = DeconImageModel()
+        except Exception as e:
+            self.logger.error("Can't create Image deconvolution model. "+str(e))
+            raise ValueError("Can't create Image deconvolution model", "model-creation-failed")
+        
+        try:
+            self.viewDecon = DeconView(self._master)
+        except Exception as e:
+            self.logger.error("Can't create Deconvolution view. "+str(e))
+            raise ValueError("Can't create Deconvolution view", "view-creation-failed")
+        
         self.viewDecon.SetVoxelValues(self.modelDeconPSF.PSFImage.voxel)
         self.viewDecon.SetBeadSize(self.modelDeconPSF.beadDiameter)
         # binding buttons and entries events

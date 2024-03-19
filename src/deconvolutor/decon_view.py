@@ -10,14 +10,8 @@ try:
     from ..common.AuxTkPlot_class import AuxCanvasPlot as CnvPlot
 except ImportError:
     from common.AuxTkPlot_class import AuxCanvasPlot as CnvPlot
-try:
-    from deconvolutor.decon_view_psf import DeconvolvePSFFrame
-except:
-    from deconvolutor.decon_view_psf import DeconvolvePSFFrame
-try:
-    from deconvolutor.decon_view_image import DeconvolveImageFrame
-except:
-    from deconvolutor.decon_view_image import DeconvolveImageFrame
+from deconvolutor.decon_view_psf import DeconvolvePSFFrame
+from deconvolutor.decon_view_image import DeconvolveImageFrame
 
 
 
