@@ -37,7 +37,8 @@ class EditorController:
         except Exception as e:          
             self.logger.error("Can't set image to view. "+str(e))
             raise ValueError("Can't set image to view", "view-image-setting-failed")
-        self.view.SetStatusBarMessage(self.model.mainImageRaw.GetImageInfoStr(output = "full"))
+        self.view.SetImageInfo("Deconvolution result")
+        self.view.SetStatusBarMessage(" Loaded image parameters: "+self.model.mainImageRaw.GetImageInfoStr(output = "full"))
 
         # binding buttons and entries events
         self._bind()
@@ -147,7 +148,6 @@ class EditorController:
                 self.logger.error("file(s) load failed. "+fNames[0])
                 raise ValueError("Unknown error", "unknown-error")
         self.logger.info("File loaded. ")
-        self.view.SetStatusBarMessage(self.model.mainImageRaw.GetImageInfoStr(output = "full"))
 
 
         # visualization:
@@ -156,7 +156,8 @@ class EditorController:
         except Exception as e:
             self.logger.error("Draw image  " + str(e))
             raise IOError("Cant update GUI properly")
-        self.view.SetFileInfo(self.model.mainImageRaw.GetImageInfoStr(output = "full"))
+        self.view.SetImageInfo(fNames[0])
+        self.view.SetStatusBarMessage(self.model.mainImageRaw.GetImageInfoStr(output = "full"))
 
 
     def CloseEditor(self, event=None):

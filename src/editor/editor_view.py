@@ -172,7 +172,6 @@ class EditorView(tk.Toplevel):
     #set text message to the status bar
     def SetStatusBarMessage(self, message:str):
         self.statusBar.config(text=message) 
-        
 
     def setScalersToDefault(self):
         self.brightnessScale.set(1)
@@ -219,7 +218,7 @@ class EditorView(tk.Toplevel):
         self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
 
     # update this method later
-    def SetFileInfo(self, infoStr: str):
+    def SetImageInfo(self, infoStr: str):
         self.imageInfoStr.set(infoStr)
 
     def GetTiffBitType(self):
