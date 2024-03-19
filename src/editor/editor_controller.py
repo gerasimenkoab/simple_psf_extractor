@@ -37,6 +37,7 @@ class EditorController:
         except Exception as e:          
             self.logger.error("Can't set image to view. "+str(e))
             raise ValueError("Can't set image to view", "view-image-setting-failed")
+        self.view.SetStatusBarMessage(self.model.mainImageRaw.GetImageInfoStr(output = "full"))
 
         # binding buttons and entries events
         self._bind()
@@ -145,7 +146,9 @@ class EditorController:
             else:
                 self.logger.error("file(s) load failed. "+fNames[0])
                 raise ValueError("Unknown error", "unknown-error")
-        self.logger.info("File(s) load success. ")
+        self.logger.info("File loaded. ")
+        self.view.SetStatusBarMessage(self.model.mainImageRaw.GetImageInfoStr(output = "full"))
+
 
         # visualization:
         try:

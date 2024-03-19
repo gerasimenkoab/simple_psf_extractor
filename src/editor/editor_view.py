@@ -162,10 +162,17 @@ class EditorView(tk.Toplevel):
         canvasFrame.grid(row=1, column=2, sticky="WENS")
         self.attributes("-topmost", True)
 
-        #status bar at the bottom of the window
-        self.statusBar = ttk.Label(self, text="Ready", relief=SUNKEN, anchor=W)
+        #create status bar and place it at the bottom of the widget
+        self.statusBar = ttk.Label(self, text="Status: Ready", relief=SUNKEN, anchor=W)
+        self.statusBar.grid(row=2, column=0, columnspan=3, sticky="WENS")
+
 
     # ---------------------- end __init__  ---------------------------------
+        
+    #set text message to the status bar
+    def SetStatusBarMessage(self, message:str):
+        self.statusBar.config(text=message) 
+        
 
     def setScalersToDefault(self):
         self.brightnessScale.set(1)

@@ -92,7 +92,6 @@ class EditorModel:
 
     def _ConvertMainImageRawToPILImage(self):
         """Loading raw beads photo from file"""
-        print("Converting main image raw to PIL 3")
         ArrayIn = self._mainImageRaw.imArray
         if ArrayIn is None:
             raise ValueError("Main image array is None", "array-empty")
