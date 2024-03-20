@@ -228,6 +228,7 @@ class EditorView(tk.Toplevel):
         """Draw image on canvas"""
         if img is None:
             return
+        self.mainPhotoCanvas.delete("all")
         # Get the width and height of the canvas
         canvas_width = int(self.mainPhotoCanvas.winfo_width()*self._imageScaleFactor)
         canvas_height = int(self.mainPhotoCanvas.winfo_height()*self._imageScaleFactor)
