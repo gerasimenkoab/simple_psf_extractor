@@ -163,7 +163,7 @@ class EditorModel:
         # Create a TIFF info object and add the custom tag
         info = TiffImagePlugin.ImageFileDirectory_v2()
         if tagString is None:
-            info[270] = self._mainImageRaw.GetImageInfoStr()  # 270 is the tag for ImageDescription
+            info[270] = self._mainImageRaw.GetImageInfoStr("json_voxel")  # 270 is the tag for ImageDescription  # 270 is the tag for ImageDescription
         else:
             info[270] = tagString
         try:
