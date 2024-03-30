@@ -80,6 +80,7 @@ class MainAppController():
             raise ValueError("Can't crop image", "image-cropping-failed")
         self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
         self.view.setLayerNumber(self.model.GetVisibleLayerNumber())
+        self.view.SetStatusBarMessage(self.model.mainImageRaw.GetImageInfoStr(output = "full"))
         self.logger.info("Image cropped.")
 
     def ShowExtractorHelp(self, event=None):
