@@ -1,16 +1,9 @@
-2024-03-20 20:51:35,939 __main__.main.app_main_controller INFO: Main App started.
-2024-03-20 20:51:35,992 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-03-20 20:51:35,992 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-03-20 20:51:35,993 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-03-20 20:51:37,327 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
-2024-03-20 20:51:37,330 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
-2024-03-20 20:51:37,362 __main__.deconvolutor.decon_view INFO: Decon widget created
-2024-03-20 20:51:41,256 __main__.deconvolutor.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/image256x256.tif
-2024-03-20 20:51:43,192 __main__.deconvolutor.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
-2024-03-20 20:51:45,673 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RL
-2024-03-20 20:51:52,035 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 6.328287839889526 seconds 
-2024-03-20 20:51:52,042 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
-2024-03-20 20:51:55,880 __main__.editor.editor_controller INFO: Initializing Bead Extractor module.
-2024-03-20 20:51:55,881 __main__.editor.editor_model INFO: Image Editor opened
-2024-03-20 20:51:55,974 __main__.editor.editor_controller INFO: _bind: Binding buttons and entries is done.
-2024-03-20 20:52:28,962 __main__.editor.editor_controller INFO: Editor Closed.
+2024-03-30 11:53:42,258 __main__.main.app_main_controller INFO: Main App started.
+2024-03-30 11:53:42,258 __main__.main.app_main_model INFO: Image Editor opened
+2024-03-30 11:53:42,346 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-03-30 11:53:42,346 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-03-30 11:53:42,347 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-03-30 11:53:42,435 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
+2024-03-30 11:53:51,759 __main__.main.app_main_controller INFO: File loaded. 
+2024-03-30 11:53:57,484 __main__.main.app_main_controller INFO: Application Closed.
+2024-03-30 11:53:57,485 __main__.main.app_main_controller INFO: Main App running.

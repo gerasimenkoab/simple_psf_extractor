@@ -6,11 +6,11 @@ import logging
 
 # TODO: log string output
 class DeconController:
-    def __init__(self, master) -> None:
+    def __init__(self, parentView) -> None:
         # super().__init__()
         # setup logger
         self.logger = logging.getLogger("__main__." + __name__)
-        self._master = master
+        self._master = parentView
         try:
             self.modelDeconPSF = DeconPsfModel()
         except Exception as e:

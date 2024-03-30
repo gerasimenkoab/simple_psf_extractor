@@ -221,7 +221,6 @@ class EditorView(tk.Toplevel):
 
     def GetScalersValues(self):
         """Return current values of brightness and contrast scalers"""
-        
         return pow(2,float(self.brightnessScale.get())), pow(2,float(self.contrastScale.get()))
 
     def DrawImageOnCanvas(self, img:Image = None):
@@ -239,7 +238,6 @@ class EditorView(tk.Toplevel):
         # updating scrollers
         self.mainPhotoCanvas.configure(scrollregion=self.mainPhotoCanvas.bbox("all"))
 
-    # update this method later
     def SetImageInfo(self, infoStr: str):
         self.imageInfoStr.set(infoStr)
 

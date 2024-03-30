@@ -10,18 +10,20 @@ from extractor.extractor_view import ExtractorView
 from extractor.extractor_bead_prev_controller import ExtractorBeadPreviewController
 
 
+
+
 class ExtractorController:
     """
     Passing actions and data from gui to model and back
     """
 
-    def __init__(self, master=None):
+    def __init__(self, parentView=None):
         # super().__init__()
         # setup logger
         self.logger = logging.getLogger("__main__." + __name__)
         self.logger.info("Initializing Bead Extractor module.")
 
-        self._master = master
+        self._master = parentView
         self.model = ExtractorModel()
         self.view = ExtractorView(self._master)
 

@@ -12,7 +12,7 @@ class EditorController:
     Passing actions and data from gui to model and back
     """
 
-    def __init__(self, masterWidget=None, image:ImageRaw = None):
+    def __init__(self, parentView=None, image:ImageRaw = None):
         # setup logger
         self.logger = logging.getLogger("__main__." + __name__)
         self.logger.info("Initializing Bead Extractor module.")
@@ -24,11 +24,11 @@ class EditorController:
             raise ValueError("Can't create model", "model-creation-failed")
         
         try:
-            self.view = EditorView(masterWidget)
+            self.view = EditorView(parentView)
         except Exception as e:
             self.logger.error("Can't create view. "+str(e))
             raise ValueError("Can't create view", "view-creation-failed")
-        self._masterWidget = masterWidget
+        self._parentView = parentView
         # try set image to view
         try:
             self.view.setLayerNumber(self.model.GetVisibleLayerNumber())
