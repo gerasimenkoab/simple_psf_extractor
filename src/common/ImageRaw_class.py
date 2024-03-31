@@ -15,13 +15,14 @@ class ImageRaw:
         imArrayIn: np.array[nz,ny,nx]
     """
 
+    imArray = None
+    voxel = None #{"Z":0, "Y":0, "X":0}
+    voxelSize = None # obsolete
+    voxelFields = ("Z", "Y", "X") 
+
     def __init__(
         self, fpath : str = None, voxelSizeIn : list = None, imArrayIn : np.ndarray = None
     ):
-        self.imArray = None
-        self.voxel = None #{"Z":0, "Y":0, "X":0}
-        self.voxelSize = None # obsolete
-        self.voxelFields = ("Z", "Y", "X") # obsolete
 
         if fpath is None:
             if imArrayIn is None:
@@ -80,7 +81,7 @@ class ImageRaw:
                 raise ValueError("Only one source of data for pixel values allowed","data_problem")
 
             self.path =  fpath[0] 
-
+    # -------------------- constructor end ----------------------------
 
     # methods
     # context manager support.........
@@ -236,10 +237,6 @@ class ImageRaw:
             "json_voxel" - json string with voxel parameters.
             default - short info with resolution and voxel parameters.
         """
-        # if output == "full":
-        #     return "Image size(z,y,x)px: " + str(self.imArray.shape) + "  Voxel(\u03BCm): " + str(list(self.voxel.values()))
-        # else:
-        #     return str( self.imArray.shape ) + str(list(self.voxel.values()))
         match output:
             case "full":
                 return "Image size(z,y,x)px: " + str(self.imArray.shape) + "  Voxel(\u03BCm): " + str(list(self.voxel.values()))
