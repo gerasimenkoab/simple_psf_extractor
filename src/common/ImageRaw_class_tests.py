@@ -20,13 +20,13 @@ class ImageRawClassTests(unittest.TestCase):
         with ImageRaw(fpath = self.filelist, voxelSizeIn=self.testVoxel) as img:
             # white layer test
             self.testArray = np.zeros((36,36))
-            np.testing.assert_array_equal(img.imArray[0,:,:], self.testArray, 'create from file 0 error')
+            np.testing.assert_array_equal(img.GetIntensities()[0,:,:], self.testArray, 'create from file 0 error')
             #black layer test
             self.testArray = np.ones((36,36)) * 255
-            np.testing.assert_array_equal(img.imArray[1,:,:], self.testArray, 'create from file 255 error')
+            np.testing.assert_array_equal(img.GetIntensities()[1,:,:], self.testArray, 'create from file 255 error')
             #halfblack
             self.testArray[:,18:]=self.testArray[:,18:] * 0
-            np.testing.assert_array_equal(img.imArray[3,:,:], self.testArray, 'create from file 255 error')
+            np.testing.assert_array_equal(img.GetIntensities()[3,:,:], self.testArray, 'create from file 255 error')
 
 
 
