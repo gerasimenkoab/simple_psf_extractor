@@ -3,161 +3,22 @@ import itertools
 from scipy.interpolate import RegularGridInterpolator
 from PIL import Image
 import json
-import json
-
-
-class Voxel:
-    """
-    Class for voxel:
-        attributes:
-        _voxelValues: List [z,y,x]
-        _axisNames: Tuple ("Z", "Y", "X")
-    """
-
-    _voxelValues:list = None
-    _axisNames:tuple = ("Z", "Y", "X")
-
-    def __init__(self, voxelSizeIn: list = None):
-        super().__init__()
-        if voxelSizeIn is not None:
-            self.Set(voxelSizeIn)
-
-    def Set(self, newVoxel: list)->None:
-        """
-            Setting voxel with check
-        """
-        if newVoxel is None or len(newVoxel) != 3 or np.amin(newVoxel) <= 0:
-            raise ValueError("Wrong Voxel Value.")
-        else:
-            self._voxelValues = newVoxel
-
-    def Get(self)->list:
-        """
-            Getting list of voxel values
-        """
-        if self._voxelValues is None:
-            raise ValueError("No voxel Value.")
-        return self._voxelValues
-    
-    def SetToAxis(self, axisName:str, newValue:float)->None:
-        """
-            Setting voxel value by axis name
-        """
-        if newValue <= 0:
-            raise ValueError("Wrong voxel value.")
-        if axisName in self._axisNames:
-            self._voxelValues[self._axisNames.index(axisName)] = newValue
-        else:
-            raise ValueError("Wrong axis name.")
-
-    def GetFromAxis(self, axisName:str)->float:
-        """
-            Getting voxel value by axis name
-        """
-        if axisName in self._axisNames:
-            return self._voxelValues[self._axisNames.index(axisName)]
-        else:
-            raise ValueError("Wrong axis name.")
-        
-    def GetDict(self)->dict:
-        """
-            Getting voxel as dict
-        """
-        return dict(zip(self._axisNames, self._voxelValues))
-
-    def GetValuesStr(self)->str:
-        """
-            Getting voxel values list as string
-        """
-        return str(self._voxelValues)
-
-    def GetVoxelJson(self)->str:
-        """
-            Getting voxel as json string
-        """
-        return json.dumps(dict(zip(self._axisNames, self._voxelValues)))
-
-    def ShowInfo(self)->None:
-        """
-            Prints voxel parameters
-        """
-        print("Voxel size: ", self._voxelValues)
-
-class IntensityValues:
-    """
-    Class for intensity values:
-        attributes:
-        self._pointIntensities: np.ndarray - array of pixel intensities
-    """
-
-    _pointIntensities: np.ndarray = None
-
-    def __init__(self, pointIntensitiesIn: np.ndarray = None):
-        super().__init__()
-        if pointIntensitiesIn is not None:
-            self.Set(pointIntensitiesIn)
-
-    def Set(self, newArray: np.ndarray)->None:
-        """
-        Setting pixel array values
-        """
-        if newArray is None or len(newArray.shape) > 3:
-            raise ValueError("Wrong array Value.")
-        # fixing possible array elements values issues
-        newArray[np.isnan(newArray)] = 0  # replace NaN with 0
-        newArray.clip(0)  # replace negative with 0
-        self._pointIntensities = newArray
-
-    def SetWithoutCorrections(self, newArray: np.ndarray):
-        """
-        Setting pixel array values
-        """
-        if newArray is None or len(newArray.shape) > 3:
-            raise ValueError("Wrong array Value.")
-        self._pointIntensities = newArray
-
-
-    def Get(self)->np.ndarray:
-        """
-            Getting pixel array values
-        """
-        if self._pointIntensities is None:
-            raise ValueError("No array Value.")
-        return self._pointIntensities
-    
-    def GetShape(self)->list:
-        """
-            Getting pixel array dimensions
-        """
-        if self._pointIntensities is None:
-            raise ValueError("No array Value.")
-        return self._pointIntensities.shape
-
-    def ShowInfo(self)->None:
-        """
-            Prints array parameters
-        """
-        print("Array shape: ", self._pointIntensities.shape)
-        print("Array min: ", np.amin(self._pointIntensities))
-        print("Array max: ", np.amax(self._pointIntensities))
-        print("Array mean: ", np.mean(self._pointIntensities))
+from common.voxel_class import Voxel
+from common.intensities_class import IntensityValues
 
 class ImageRaw:
     """
     Class for image:
         attributes:
-        self.intensities: np.ndarray - array of pixel intensities
-        self.voxel: dict - voxel sizes in each dimension
-        voxelSizeIn: List [z,y,x]
-        imArrayIn: np.array[nz,ny,nx]
+        self.intensities: IntensityValues - array of pixel intensities
+        self.voxel: Voxel - voxel sizes in each dimension
+        self.path: str - path to file
     """
 
     intensities = IntensityValues()
     voxel = Voxel() 
-    #{"Z":0, "Y":0, "X":0}
-    # voxelSize = None # obsolete
-    # voxelFields = ("Z", "Y", "X") 
-
+    path = ""
+    
     def __init__(
         self, fpath : str = None, voxelSizeIn : list = None, intensitiesIn : np.ndarray = None
     ):
