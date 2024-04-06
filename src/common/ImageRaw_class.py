@@ -18,11 +18,11 @@ class ImageRaw:
     intensities = IntensityValues()
     voxel = Voxel() 
     path = ""
-    
+
     def __init__(
         self, fpath : str = None, voxelSizeIn : list = None, intensitiesIn : np.ndarray = None
-    ):
-        # super().__init__()
+    )->None:
+        super().__init__()
         if fpath is None:
             if intensitiesIn is None:
                 raise ValueError("No data recieved.","data_problem")
@@ -166,7 +166,7 @@ class ImageRaw:
         except:
             return imgArray, ""
 
-    def SetIntensities(self, newArray: np.ndarray):
+    def SetIntensities(self, newArray: np.ndarray)->None:
         """
         Setting pixel array values
         """
@@ -210,19 +210,12 @@ class ImageRaw:
         """
             Rescale over z. newZVoxelSize in micrometers
         """
-        # теперь разбрасываем бид по отдельным массивам .
         oldShape = self.intensities.GetShape()
 
         zcoord = np.arange(oldShape[0]) * self.voxel.GetFromAxis("Z")
         xcoord = np.arange(oldShape[1]) * self.voxel.GetFromAxis("Y")
         ycoord = np.arange(oldShape[2]) * self.voxel.GetFromAxis("X")
         shapeZ = int(zcoord[oldShape[0] - 1] / newZVoxelSize)
-        # print(
-        #     "voxel size, oldshape, shapeZ :",
-        #     self.voxelSize[0],
-        #     oldShape[0],
-        #     (shapeZ),
-        # )
         zcoordR = np.arange(shapeZ) * newZVoxelSize
         interp_fun = RegularGridInterpolator((zcoord, xcoord, ycoord), self.intensities)
 
