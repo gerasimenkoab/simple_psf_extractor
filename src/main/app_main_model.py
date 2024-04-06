@@ -11,12 +11,12 @@ class MainAppModel:
         self.logger = logging.getLogger("__main__." + __name__)
         self.logger.info("Image Editor opened")
         if image is None:
-            self._mainImageRaw = ImageRaw( voxelSizeIn=[0.1,0.1,0.1], imArrayIn=np.zeros((10,10,10)) )
+            self._mainImageRaw = ImageRaw( voxelSizeIn=[0.1,0.1,0.1], intensitiesIn=np.zeros((10,10,10)) )
         elif isinstance(image, ImageRaw):
             self._mainImageRaw = image
         else:
             raise ValueError("ImageRaw object expected", "image-type-error")
-        self._mainImageRaw.imArray = self.NormalizeImageArray(self._mainImageRaw.imArray)
+        self._mainImageRaw.SetIntensities( self.NormalizeImageArray(self._mainImageRaw.GetIntensities()) )
 
         self.imgVisibleLayer = None # visible layer of tiff frames as  Image objects 
         self.imgBeadsRawList = [] # list of all tiff frames as  Image objects
@@ -92,7 +92,7 @@ class MainAppModel:
 
     def _ConvertMainImageRawToPILImage(self):
         """Loading raw beads photo from file"""
-        ArrayIn = self._mainImageRaw.imArray
+        ArrayIn = self._mainImageRaw.GetIntensities()
         if ArrayIn is None:
             raise ValueError("Main image array is None", "array-empty")
         self.imgBeadsRawList = []
@@ -137,7 +137,8 @@ class MainAppModel:
         # crop main image
         x1, y1, x2, y2 = cropBox
         print("cropBox", cropBox)
-        self._mainImageRaw.imArray = self._mainImageRaw.imArray[:, y1:y2, x1:x2]
+        # self._mainImageRaw.imArray = self._mainImageRaw.imArray[:, y1:y2, x1:x2]
+        self._mainImageRaw.SetIntensities(self._mainImageRaw.GetIntensities()[:, y1:y2, x1:x2])
         self._ConvertMainImageRawToPILImage()
     
 

@@ -1,9 +1,11 @@
-2024-03-30 21:42:35,748 __main__.main.app_main_controller INFO: Main App started.
-2024-03-30 21:42:35,749 __main__.main.app_main_model INFO: Image Editor opened
-2024-03-30 21:42:35,892 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-03-30 21:42:35,894 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-03-30 21:42:35,894 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-03-30 21:42:35,983 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
-2024-03-30 21:42:41,201 __main__.main.app_main_controller INFO: File loaded. 
-2024-03-30 21:42:45,786 __main__.main.app_main_controller INFO: File loaded. 
-2024-03-30 21:42:58,175 __main__.main.app_main_controller INFO: Main App running.
+2024-04-06 22:20:18,118 __main__.main.app_main_controller INFO: Main App started.
+2024-04-06 22:20:18,119 __main__.main.app_main_model INFO: Image Editor opened
+2024-04-06 22:20:18,240 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-04-06 22:20:18,241 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-04-06 22:20:18,241 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-04-06 22:20:18,346 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-06 22:20:59,537 __main__.main.app_main_controller INFO: File loaded. 
+2024-04-06 22:21:05,319 __main__.main.app_main_controller INFO: Image cropped.
+2024-04-06 22:21:40,064 __main__.main.app_main_controller INFO: Image saved as tiff. D:/tmp/test_beads/test_image_testtag.tiff
+2024-04-06 22:21:47,298 __main__.main.app_main_controller INFO: File loaded. 
+2024-04-06 22:21:53,729 __main__.main.app_main_controller INFO: File loaded. 
