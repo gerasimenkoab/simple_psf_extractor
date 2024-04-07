@@ -1,8 +1,16 @@
-2024-04-06 22:56:46,486 __main__.main.app_main_controller INFO: Main App started.
-2024-04-06 22:56:46,494 __main__.main.app_main_model INFO: Image Editor opened
-2024-04-06 22:56:46,642 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-04-06 22:56:46,642 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-04-06 22:56:46,642 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-04-06 22:56:46,778 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
-2024-04-06 22:56:53,044 __main__.main.app_main_controller INFO: File loaded. 
-2024-04-06 22:56:58,042 __main__.main.app_main_controller INFO: Image cropped.
+2024-04-07 16:26:30,186 __main__.main.app_main_controller INFO: Main App started.
+2024-04-07 16:26:30,186 __main__.main.app_main_model INFO: Image Editor opened
+2024-04-07 16:26:30,279 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-04-07 16:26:30,279 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-04-07 16:26:30,280 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-04-07 16:26:30,366 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-07 16:26:32,610 __main__.extractor.extractor_controller INFO: Initializing Bead Extractor module.
+2024-04-07 16:26:32,610 __main__.extractor.extractor_model INFO: Extractor object created
+2024-04-07 16:26:32,656 __main__.extractor.extractor_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-07 16:26:39,943 __main__.extractor.extractor_controller INFO: File(s) load success. 
+2024-04-07 16:26:51,716 __main__.extractor.extractor_controller INFO: Beads processed.
+2024-04-07 16:27:15,373 __main__.common.ImageRaw_class INFO: Trying to save TIFF file. Type: uint8
+2024-04-07 16:27:15,388 __main__.common.ImageRaw_class INFO: File saved at D:/tmp/test_beads/bbb.tif
+2024-04-07 16:27:35,065 __main__.extractor.extractor_controller INFO: Bead Extractor Closed.
+2024-04-07 16:28:15,897 __main__.main.app_main_controller INFO: Application Closed.
+2024-04-07 16:28:15,898 __main__.main.app_main_controller INFO: Main App running.

@@ -10,12 +10,17 @@ class IntensityValues:
         self._pointIntensities: np.ndarray - array of pixel intensities
     """
 
-    _pointIntensities: np.ndarray = None
 
     def __init__(self, pointIntensitiesIn: np.ndarray = None):
         super().__init__()
+        self._pointIntensities: np.ndarray = None
         if pointIntensitiesIn is not None:
             self.Set(pointIntensitiesIn)
+
+    def __iter__(self):
+        """Iterator for layers in array"""
+        for layer in self._pointIntensities:
+            yield layer
 
     def Set(self, newArray: np.ndarray)->None:
         """

@@ -471,7 +471,7 @@ class ExtractorView(tk.Toplevel):
     def SetFileInfo(self, infoStr: str):
         self.imageInfoStr.set(infoStr)
 
-    def SetVoxelValues(self, voxelInDict):
+    def SetVoxelValues(self, voxelInDict: dict):
         """Bead voxel size change"""
         if voxelInDict is None:
             raise ValueError("No voxel values recived", "voxel_is_none")

@@ -27,7 +27,7 @@ class ExtractorController:
         self.model = ExtractorModel()
         self.view = ExtractorView(self._master)
 
-        self.view.SetVoxelValues(self.model.mainImage.voxel)
+        self.view.SetVoxelValues(self.model.mainImage.GetVoxelDict())
         self.view.SetBeadSize(self.model.beadDiameter)
         self.view.SetSelectionFrameSize(2 * self.model.selectionFrameHalf)
         # binding buttons and entries events
@@ -116,12 +116,12 @@ class ExtractorController:
 
         # visualization:
         try:
-            self.view.SetMainPhotoImageArray(self.model.mainImage.imArray)
+            self.view.SetMainPhotoImageArray(self.model.mainImage.GetIntensities())
         except Exception as e:
             self.logger.error("LoadsBeadPhoto: can't array  " + str(e))
             raise IOError("Cant update GUI properly")
         try:
-            self.view.SetVoxelValues(self.model.mainImage.voxel)
+            self.view.SetVoxelValues(self.model.mainImage.GetVoxelDict())
         except Exception as e:
             self.logger.error("LoadsBeadPhoto: can't set voxel values " + str(e))
             raise IOError("Cant update GUI properly")
@@ -156,10 +156,15 @@ class ExtractorController:
         if self.model.isExtractedBeadsEmpty():
             showerror("Error", "No beads to save")
             return
-        self.model.BeadsArithmeticMean()
-        self.model.BlurAveragedBead(self.view.blurApplyType.get())
+        try:
+            self.model.BeadsArithmeticMean()
+            self.model.BlurAveragedBead(self.view.blurApplyType.get())
+            self.logger.info("Beads processed.")
+        except Exception as e:
+            self.logger.error("ProcessBeads: can't process " + str(e))
+            raise IOError("Cant process beads")
         if self.view.precessBeadPrev.get() == 1:
-            self.view.PlotCanvasInWindow(self.model.averageBead.imArray)
+            self.view.PlotCanvasInWindow(self.model.averageBead.GetIntensities())
 
     def SaveAverageBead(self, event=None):
         self.model.SaveAverageBead(asksaveasfilename())
@@ -178,15 +183,6 @@ class ExtractorController:
         """Closing window and clear tmp files"""
         # Checking existance of self.imgBeadsRaw.close()
         if askokcancel("Close", "Close Bead Extractor Widget?"):
-            # try:
-            #     self.view.imgBeadsRaw.close()
-            # except:
-            #     pass
-            # # tmppath = os.getcwd() + "\\tmp.tiff"
-            # try:
-            #     # os.remove(tmppath)
-            # except:
-            #     pass
             self.view.destroy()
             self.logger.info("Bead Extractor Closed.")
 

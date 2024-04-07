@@ -13,21 +13,19 @@ except ImportError:
 
 
 class MainAppView(tk.Tk):
-    beadsPhotoLayerID = 0  # default index of beads microscope photo
-    brightnessValue = 1
-    contrastValue = 1
-    mainImageColor = "green" # default color of the main image
-    _imageScaleFactor = 1.0
-
-    _isCropSelected = False
-
-    xr = 0
-    yr = 0
-    button_dict = {}  # according to list of names {id_name : widget}
-    entry_dict = {}  # according to list of names {id_name : widget}
-    label_dict = {}  # label {id_name : string}
 
     def __init__(self, masterController = None,  wWidth = 600, wHeight = 600):
+        self.beadsPhotoLayerID = 0  # default index of beads microscope photo
+        self.brightnessValue = 1
+        self.contrastValue = 1
+        self.mainImageColor = "green" # default color of the main image
+        self._imageScaleFactor = 1.0
+        self._isCropSelected = False
+        self.xr = 0
+        self.yr = 0
+        self.button_dict = {}  # according to list of names {id_name : widget}
+        self.entry_dict = {}  # according to list of names {id_name : widget}
+        self.label_dict = {}  # label {id_name : string}
         self.logger = logging.getLogger('__main__.'+__name__)
         super().__init__()
         self.title("Simple PSF")

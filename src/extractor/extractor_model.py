@@ -135,9 +135,15 @@ class ExtractorModel:
         bound1 = int(yi - d)
         bound2 = int(yi + d)
 #        # create blured array from sample from slice
-        bluredSample = gaussian_filter(self._mainImage.imArray[:, bound1:bound2, bound3:bound4], sigma=1)
+        try:
+            bluredSample = gaussian_filter(self._mainImage.GetIntensities()[:, bound1:bound2, bound3:bound4], sigma=1)
+        except:
+            raise ValueError("Can not blur sample", "blur_fail")
         # find max coords on blured array
-        coords = np.unravel_index(np.argmax(bluredSample, axis=None), bluredSample.shape)
+        try:
+            coords = np.unravel_index(np.argmax(bluredSample, axis=None), bluredSample.shape)
+        except:
+            raise ValueError("Can not find max intensity coords", "max_intensity_fail")
         return coords[2] + bound3, coords[1] + bound1
 
     def SetVoxelSize(self, newVoxelSizeList):
@@ -154,13 +160,13 @@ class ExtractorModel:
             - number of extracted beads.
         """
         d = self._selectionFrameHalf
-        voxel = list(self._mainImage.voxel.values())
+        voxel = self._mainImage.GetVoxel()
 
         bound3 = int(beadCoords[0] - d)
         bound4 = int(beadCoords[0] + d)
         bound1 = int(beadCoords[1] - d)
         bound2 = int(beadCoords[1] + d)
-        elem = self._mainImage.imArray[:, bound1:bound2, bound3:bound4]
+        elem = self._mainImage.GetIntensities()[:, bound1:bound2, bound3:bound4]
         if elem.shape[1] < 128: # dont shift if selection bigger than 128x128
             # shifting array max intesity toward center along Z axis
             iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
@@ -198,9 +204,9 @@ class ExtractorModel:
         """
 
         if blurType == "gauss":
-            bead = gaussian_filter(bead.imArray, sigma=1)
+            bead = gaussian_filter(bead.GetIntensities(), sigma=1)
         elif blurType == "median":
-            bead = median_filter(bead.imArray, size=3)
+            bead = median_filter(bead.GetIntensities(), size=3)
         return bead
 
     def BeadsArithmeticMean(self):
@@ -208,10 +214,10 @@ class ExtractorModel:
         if self.isExtractedBeadsEmpty():
             raise ValueError("No beads extracted", "empty_beads_list")
         else:
-            sumArray = np.zeros(self._extractedBeads[0].imArray.shape)
+            sumArray = np.zeros(self._extractedBeads[0].GetIntensities().shape)
             try:
                 for bead in self._extractedBeads:
-                    sumArray = sumArray + bead.imArray
+                    sumArray = sumArray + bead.GetIntensities()
             except:
                 raise RuntimeError("Failed to sum beads")
             try:
@@ -220,7 +226,7 @@ class ExtractorModel:
                 raise RuntimeError("Failed to average beads")
             try:
                 self._averageBead = ImageRaw(
-                    None, list(self._extractedBeads[0].voxel.values()), sumArray
+                    None, list(self._extractedBeads[0].GetVoxel()), sumArray
                 )
             except:
                 raise RuntimeError("Failed to create bead object")
@@ -248,13 +254,13 @@ class ExtractorModel:
         else:
             fPath = fileList[0]
             newBead = ImageRaw(fPath)
-            dimensions = newBead.imArray.shape
+            dimensions = newBead.GetIntensities().shape
             beadsList.append(newBead)
 
             for fPath in fileList[1:]:
                 try:
                     newBead = ImageRaw(fPath)
-                    if dimensions == newBead.imArray.shape:
+                    if dimensions == newBead.GetIntensities().shape:
                         beadsList.append(newBead)
                     else:
                         raise ValueError(
@@ -275,10 +281,10 @@ class ExtractorModel:
         except:
             raise ValueError("No beads loaded.")
         try:
-            sumArray = np.zeros(beadsList[0].imArray.shape)
+            sumArray = np.zeros(beadsList[0].GetIntensities().shape)
             try:
                 for bead in beadsList:
-                    sumArray = sumArray + bead.imArray
+                    sumArray = sumArray + bead.GetIntensities()
             except:
                 raise RuntimeError("Failed to sum beads")
             try:

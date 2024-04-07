@@ -9,12 +9,12 @@ class Voxel:
         _voxelValues: List [z,y,x]
         _axisNames: Tuple ("Z", "Y", "X")
     """
-
-    _voxelValues:list = None
+    # Voxel axis names static variable
     _axisNames:tuple = ("Z", "Y", "X")
 
     def __init__(self, voxelSizeIn: list = None):
         super().__init__()
+        self._voxelValues:list = None
         if voxelSizeIn is not None:
             self.Set(voxelSizeIn)
 

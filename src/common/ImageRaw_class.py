@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 import itertools
 from scipy.interpolate import RegularGridInterpolator
 from PIL import Image
@@ -14,19 +15,20 @@ class ImageRaw:
     """
     Class for image:
         attributes:
-        self._inttensities: IntensityValues - array of pixel intensities
+        self._intensities: IntensityValues - array of pixel intensities
         self._voxel: Voxel - voxel sizes in each dimension
         self.path: str - path to file
     """
 
-    _inttensities = IntensityValues()
-    _voxel = Voxel() 
-    path = ""
 
     def __init__(
         self, fpath : str = None, voxelSizeIn : list = None, intensitiesIn : np.ndarray = None
     )->None:
         super().__init__()
+        self.logger = logging.getLogger("__main__." + __name__)
+        self._intensities = IntensityValues()
+        self._voxel = Voxel() 
+        self.path = ""
         if fpath is None:
             if intensitiesIn is None:
                 raise ValueError("No data recieved.","data_problem")
@@ -35,7 +37,7 @@ class ImageRaw:
                     raise ValueError("No voxel recieved.","voxel_problem")
                 else:
                     try:
-                        self._inttensities.Set(intensitiesIn)
+                        self._intensities.Set(intensitiesIn)
                     except:
                         raise ValueError("Can not set array from the argument.","data_problem")
                     try:
@@ -50,7 +52,7 @@ class ImageRaw:
                         raise ValueError("No voxel recieved from file or as argument","voxel_problem")
                     else:
                         try:
-                            self._inttensities.Set(intensitiesFile)
+                            self._intensities.Set(intensitiesFile)
                         except:
                             raise ValueError("Can not set array from file.","data_problem")
                         try:
@@ -60,7 +62,7 @@ class ImageRaw:
                 else:
                     if voxelSizeIn is None:
                         try:
-                            self._inttensities.Set(intensitiesFile)
+                            self._intensities.Set(intensitiesFile)
                         except:
                             raise ValueError("Can not set array from file.","data_problem")
                         try:
@@ -73,7 +75,7 @@ class ImageRaw:
                             raise ValueError("Can not set voxel from tag. Check tag format.","voxel_problem")
                     else:
                         try:
-                            self._inttensities.Set(intensitiesFile)
+                            self._intensities.Set(intensitiesFile)
                         except:
                             raise ValueError("Can not set array from file.","data_problem")
                         try:
@@ -175,21 +177,9 @@ class ImageRaw:
         Setting pixel array values
         """
         try:
-            self._inttensities.Set(newArray)
+            self._intensities.Set(newArray)
         except:
             raise ValueError("Can not set array from the argument.","data_problem")
-
-    def GetIntensities(self)->np.ndarray:
-        """
-        Getting pixel array values
-        """
-        return self._inttensities.Get()
-
-    def GetVoxel(self)->list:
-        """
-            Getting list of voxel values
-        """
-        return self._voxel.Get()
 
     def SetVoxel(self, newVoxel: list):
         """
@@ -210,6 +200,24 @@ class ImageRaw:
         except:
             raise ValueError("Can not set voxel from the argument.","voxel_problem")
         
+    def GetIntensities(self)->np.ndarray:
+        """
+        Getting pixel array values
+        """
+        return self._intensities.Get()
+
+    def GetVoxel(self)->list:
+        """
+            Getting list of voxel values
+        """
+        return self._voxel.Get()
+    
+    def GetVoxelDict(self)->dict:
+        """
+            Getting voxel values as dict
+        """
+        return self._voxel.GetDict()
+
     def GetVoxelFromAxis(self, axisName:str)->float:
         """
             Getting voxel value by axis name
@@ -220,14 +228,14 @@ class ImageRaw:
         """
             Rescale over z. newZVoxelSize in micrometers
         """
-        oldShape = self._inttensities.GetShape()
+        oldShape = self._intensities.GetShape()
 
         zcoord = np.arange(oldShape[0]) * self._voxel.GetFromAxis("Z")
         xcoord = np.arange(oldShape[1]) * self._voxel.GetFromAxis("Y")
         ycoord = np.arange(oldShape[2]) * self._voxel.GetFromAxis("X")
         shapeZ = int(zcoord[oldShape[0] - 1] / newZVoxelSize)
         zcoordR = np.arange(shapeZ) * newZVoxelSize
-        interp_fun = RegularGridInterpolator((zcoord, xcoord, ycoord), self._inttensities)
+        interp_fun = RegularGridInterpolator((zcoord, xcoord, ycoord), self._intensities)
 
         pts = np.array(list(itertools.product(zcoordR, xcoord, ycoord)))
         pts_ID = list(
@@ -239,7 +247,7 @@ class ImageRaw:
         beadInterp = np.ndarray((shapeZ, oldShape[1], oldShape[2]))
         for pID, p_ijk in enumerate(pts_ID):
             beadInterp[p_ijk[0], p_ijk[1], p_ijk[2]] = ptsInterp[pID]
-        self._inttensities = beadInterp
+        self._intensities = beadInterp
         self._voxel.SetToAxis("Z", newZVoxelSize)
 
     
@@ -252,11 +260,11 @@ class ImageRaw:
         """
         match output:
             case "full":
-                return "Image size(z,y,x)px: " + str(self._inttensities.GetShape()) + "  Voxel(\u03BCm): " + str(self._voxel.Get())
+                return "Image size(z,y,x)px: " + str(self._intensities.GetShape()) + "  Voxel(\u03BCm): " + str(self._voxel.Get())
             case "json_voxel":
                 return json.dumps(self._voxel.GetDict())
             case _:
-                return str( self._inttensities.GetShape() ) + str(self._voxel.Get())
+                return str( self._intensities.GetShape() ) + str(self._voxel.Get())
 
 
     def ShowClassInfo( self ):
@@ -266,28 +274,32 @@ class ImageRaw:
         print( " ImageClassInfo: " )
         print( " path: ", self.path )
         print( " voxel(micrometres): ", self._voxel.GetValuesStr() )
-        print( " image shape: ", self._inttensities.GetShape() )
+        print( " image shape: ", self._intensities.GetShape() )
 
-    def SaveAsTiff(self, filename="img", outtype="uint8"):
+    def SaveAsTiff(self, filename:str = "img", outtype:str = "uint8")->None:
         """
         Save Image as TIFF file
         Input: filename - path to file, including file name
                outtype - bit type for output
         """
-        print("Trying to save TIFF file", outtype)
+        # filename end with .tiff or .tif then do nothing else add .tif
+        if not filename.endswith(".tiff") and not filename.endswith(".tif"):
+            filename = filename + ".tif"
+        self.logger.info("Trying to save TIFF file. Type: "+outtype)
         try:
             tagID = 270
             strVoxel = json.dumps(self._voxel.GetDict())
             imlist = []
-            for tmp in self._inttensities:
+            for tmp in self._intensities:
                 imlist.append(Image.fromarray(tmp.astype(outtype)))
             #imlist[0].tag[270] = strVoxel
             imlist[0].save(
                 filename, tiffinfo={tagID:strVoxel}, save_all=True, append_images=imlist[1:]
             )
         except:
+            self.logger.error("Can't save file "+filename)
             raise IOError("Cannot save file "+filename,"file_not_saved")
-        print("File saved in ", filename)
+        self.logger.info("File saved at "+filename)
 
     # context manager support.........
     def __enter__(self):

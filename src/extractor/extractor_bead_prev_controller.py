@@ -40,14 +40,14 @@ class ExtractorBeadPreviewController():
         except:
             self._view.PlotBeadPreview2D()
             return
-        self._view.PlotBeadPreview2D(self._model._extractedBeads[id].imArray)
+        self._view.PlotBeadPreview2D(self._model._extractedBeads[id].GetIntensities())
 
     def ViewBead3D(self, event=None):
         try:
             id = self._view.beadListViewGet()
         except:
             return
-        self._view.PlotBeadPreview3D(self._model._extractedBeads[id].imArray, '3D Bead plot '+ str(self._model.beadCoords[id]))
+        self._view.PlotBeadPreview3D(self._model._extractedBeads[id].GetIntensities(), '3D Bead plot '+ str(self._model.beadCoords[id]))
 
     def CloseBeadPreview(self, event=None):
         """Closing window and clear tmp files"""
