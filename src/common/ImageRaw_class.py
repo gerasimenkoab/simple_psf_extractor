@@ -216,7 +216,7 @@ class ImageRaw:
         """
         return self._voxel.GetFromAxis(axisName)
         
-    def RescaleZ(self, newZVoxelSize):
+    def RescaleZ(self, newZVoxelSize)->None:
         """
             Rescale over z. newZVoxelSize in micrometers
         """
@@ -243,7 +243,7 @@ class ImageRaw:
         self._voxel.SetToAxis("Z", newZVoxelSize)
 
     
-    def GetImageInfoStr(self, output:str = None):
+    def GetImageInfoStr(self, output:str = None)->str:
         """
             Return options:
             "full" - full string info with array and voxel parameters.
