@@ -56,30 +56,30 @@ class ImageRawClassTests(unittest.TestCase):
 
     def test_SetGetVoxel(self):
         img = ImageRaw(voxelSizeIn = [1, 2, 3], intensitiesIn = self.testArray)
-        self.assertEqual( img.voxel.GetFromAxis("Z"), 1, 'wrong Z voxel' )
-        self.assertEqual( img.voxel.GetFromAxis("Y"), 2, 'wrong Y voxel' )
-        self.assertEqual( img.voxel.GetFromAxis("X"), 3, 'wrong X voxel' )
+        self.assertEqual( img.GetVoxelFromAxis("Z"), 1, 'wrong Z voxel' )
+        self.assertEqual( img.GetVoxelFromAxis("Y"), 2, 'wrong Y voxel' )
+        self.assertEqual( img.GetVoxelFromAxis("X"), 3, 'wrong X voxel' )
     
     def test_SetVoxelList(self):
         img = ImageRaw(voxelSizeIn = [1, 2, 3], intensitiesIn = self.testArray)
         img.SetVoxel([4, 5, 6])
-        self.assertEqual( img.voxel.GetFromAxis("Z"), 4, 'wrong Z voxel' )
-        self.assertEqual( img.voxel.GetFromAxis("Y"), 5, 'wrong Y voxel' )
-        self.assertEqual( img.voxel.GetFromAxis("X"), 6, 'wrong X voxel' )
+        self.assertEqual( img.GetVoxelFromAxis("Z"), 4, 'wrong Z voxel' )
+        self.assertEqual( img.GetVoxelFromAxis("Y"), 5, 'wrong Y voxel' )
+        self.assertEqual( img.GetVoxelFromAxis("X"), 6, 'wrong X voxel' )
 
     def test_SetVoxelAtAxis(self):
         img = ImageRaw(voxelSizeIn = [1, 2, 3], intensitiesIn = self.testArray)
         img.SetVoxelToAxis("Z", 7)
-        self.assertEqual( img.voxel.GetFromAxis("Z"), 7, 'wrong Z voxel' )
+        self.assertEqual( img.GetVoxelFromAxis("Z"), 7, 'wrong Z voxel' )
         img.SetVoxelToAxis("Y", 8)
-        self.assertEqual( img.voxel.GetFromAxis("Y"), 8, 'wrong Y voxel' )
+        self.assertEqual( img.GetVoxelFromAxis("Y"), 8, 'wrong Y voxel' )
         img.SetVoxelToAxis("X", 9)
-        self.assertEqual( img.voxel.GetFromAxis("X"), 9, 'wrong X voxel' )
+        self.assertEqual( img.GetVoxelFromAxis("X"), 9, 'wrong X voxel' )
 
     def test_SetArray(self):
         img = ImageRaw(voxelSizeIn=self.testVoxel, intensitiesIn = self.testArray)
         newArray = np.random.randint(0, 100, size=(5, 10, 10))
-        img.intensities.Set(newArray)
+        img.SetIntensities(newArray)
         # using numpy.testing.assert_array_equal to avoid ambiguous ValueError
         np.testing.assert_array_equal(img.GetIntensities(),newArray,'create from array error')
 

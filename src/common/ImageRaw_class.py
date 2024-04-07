@@ -14,13 +14,13 @@ class ImageRaw:
     """
     Class for image:
         attributes:
-        self.intensities: IntensityValues - array of pixel intensities
-        self.voxel: Voxel - voxel sizes in each dimension
+        self._inttensities: IntensityValues - array of pixel intensities
+        self._voxel: Voxel - voxel sizes in each dimension
         self.path: str - path to file
     """
 
-    intensities = IntensityValues()
-    voxel = Voxel() 
+    _inttensities = IntensityValues()
+    _voxel = Voxel() 
     path = ""
 
     def __init__(
@@ -35,11 +35,11 @@ class ImageRaw:
                     raise ValueError("No voxel recieved.","voxel_problem")
                 else:
                     try:
-                        self.intensities.Set(intensitiesIn)
+                        self._inttensities.Set(intensitiesIn)
                     except:
                         raise ValueError("Can not set array from the argument.","data_problem")
                     try:
-                        self.voxel.Set(voxelSizeIn)
+                        self._voxel.Set(voxelSizeIn)
                     except:
                         raise ValueError("Can not set voxel from the argument.","voxel_problem")
         else:
@@ -50,17 +50,17 @@ class ImageRaw:
                         raise ValueError("No voxel recieved from file or as argument","voxel_problem")
                     else:
                         try:
-                            self.intensities.Set(intensitiesFile)
+                            self._inttensities.Set(intensitiesFile)
                         except:
                             raise ValueError("Can not set array from file.","data_problem")
                         try:
-                            self.voxel.Set(voxelSizeIn)
+                            self._voxel.Set(voxelSizeIn)
                         except:
                             raise ValueError("Can not set voxel from argument.","voxel_problem")
                 else:
                     if voxelSizeIn is None:
                         try:
-                            self.intensities.Set(intensitiesFile)
+                            self._inttensities.Set(intensitiesFile)
                         except:
                             raise ValueError("Can not set array from file.","data_problem")
                         try:
@@ -68,16 +68,16 @@ class ImageRaw:
                                 voxelSizeIn = json.loads(tagString)
                             except :
                                 raise ValueError("Can not convert tag. Check tag format.","voxel_problem")
-                            self.voxel.Set( [voxelSizeIn["Z"], voxelSizeIn["X"], voxelSizeIn["Y"]] ) 
+                            self._voxel.Set( [voxelSizeIn["Z"], voxelSizeIn["X"], voxelSizeIn["Y"]] ) 
                         except:
                             raise ValueError("Can not set voxel from tag. Check tag format.","voxel_problem")
                     else:
                         try:
-                            self.intensities.Set(intensitiesFile)
+                            self._inttensities.Set(intensitiesFile)
                         except:
                             raise ValueError("Can not set array from file.","data_problem")
                         try:
-                            self.voxel.Set(voxelSizeIn)
+                            self._voxel.Set(voxelSizeIn)
                         except:
                             raise ValueError("Can not set voxel from argument.","voxel_problem")
             else:
@@ -175,7 +175,7 @@ class ImageRaw:
         Setting pixel array values
         """
         try:
-            self.intensities.Set(newArray)
+            self._inttensities.Set(newArray)
         except:
             raise ValueError("Can not set array from the argument.","data_problem")
 
@@ -183,20 +183,20 @@ class ImageRaw:
         """
         Getting pixel array values
         """
-        return self.intensities.Get()
+        return self._inttensities.Get()
 
     def GetVoxel(self)->list:
         """
             Getting list of voxel values
         """
-        return self.voxel.Get()
+        return self._voxel.Get()
 
     def SetVoxel(self, newVoxel: list):
         """
             Setting voxel with check
         """
         try:
-            self.voxel.Set(newVoxel)
+            self._voxel.Set(newVoxel)
         except:
             raise ValueError("Can not set voxel from the argument.","voxel_problem")
 
@@ -206,22 +206,28 @@ class ImageRaw:
             Setting voxel value by axis name
         """
         try:
-            self.voxel.SetToAxis(axisName, newValue)
+            self._voxel.SetToAxis(axisName, newValue)
         except:
             raise ValueError("Can not set voxel from the argument.","voxel_problem")
+        
+    def GetVoxelFromAxis(self, axisName:str)->float:
+        """
+            Getting voxel value by axis name
+        """
+        return self._voxel.GetFromAxis(axisName)
         
     def RescaleZ(self, newZVoxelSize):
         """
             Rescale over z. newZVoxelSize in micrometers
         """
-        oldShape = self.intensities.GetShape()
+        oldShape = self._inttensities.GetShape()
 
-        zcoord = np.arange(oldShape[0]) * self.voxel.GetFromAxis("Z")
-        xcoord = np.arange(oldShape[1]) * self.voxel.GetFromAxis("Y")
-        ycoord = np.arange(oldShape[2]) * self.voxel.GetFromAxis("X")
+        zcoord = np.arange(oldShape[0]) * self._voxel.GetFromAxis("Z")
+        xcoord = np.arange(oldShape[1]) * self._voxel.GetFromAxis("Y")
+        ycoord = np.arange(oldShape[2]) * self._voxel.GetFromAxis("X")
         shapeZ = int(zcoord[oldShape[0] - 1] / newZVoxelSize)
         zcoordR = np.arange(shapeZ) * newZVoxelSize
-        interp_fun = RegularGridInterpolator((zcoord, xcoord, ycoord), self.intensities)
+        interp_fun = RegularGridInterpolator((zcoord, xcoord, ycoord), self._inttensities)
 
         pts = np.array(list(itertools.product(zcoordR, xcoord, ycoord)))
         pts_ID = list(
@@ -233,8 +239,8 @@ class ImageRaw:
         beadInterp = np.ndarray((shapeZ, oldShape[1], oldShape[2]))
         for pID, p_ijk in enumerate(pts_ID):
             beadInterp[p_ijk[0], p_ijk[1], p_ijk[2]] = ptsInterp[pID]
-        self.intensities = beadInterp
-        self.voxel.SetToAxis("Z", newZVoxelSize)
+        self._inttensities = beadInterp
+        self._voxel.SetToAxis("Z", newZVoxelSize)
 
     
     def GetImageInfoStr(self, output:str = None):
@@ -246,11 +252,11 @@ class ImageRaw:
         """
         match output:
             case "full":
-                return "Image size(z,y,x)px: " + str(self.intensities.GetShape()) + "  Voxel(\u03BCm): " + str(self.voxel.Get())
+                return "Image size(z,y,x)px: " + str(self._inttensities.GetShape()) + "  Voxel(\u03BCm): " + str(self._voxel.Get())
             case "json_voxel":
-                return json.dumps(self.voxel.GetDict())
+                return json.dumps(self._voxel.GetDict())
             case _:
-                return str( self.intensities.GetShape() ) + str(self.voxel.Get())
+                return str( self._inttensities.GetShape() ) + str(self._voxel.Get())
 
 
     def ShowClassInfo( self ):
@@ -259,8 +265,8 @@ class ImageRaw:
         """
         print( " ImageClassInfo: " )
         print( " path: ", self.path )
-        print( " voxel(micrometres): ", self.voxel.GetValuesStr() )
-        print( " image shape: ", self.intensities.GetShape() )
+        print( " voxel(micrometres): ", self._voxel.GetValuesStr() )
+        print( " image shape: ", self._inttensities.GetShape() )
 
     def SaveAsTiff(self, filename="img", outtype="uint8"):
         """
@@ -271,9 +277,9 @@ class ImageRaw:
         print("Trying to save TIFF file", outtype)
         try:
             tagID = 270
-            strVoxel = json.dumps(self.voxel.GetDict())
+            strVoxel = json.dumps(self._voxel.GetDict())
             imlist = []
-            for tmp in self.intensities:
+            for tmp in self._inttensities:
                 imlist.append(Image.fromarray(tmp.astype(outtype)))
             #imlist[0].tag[270] = strVoxel
             imlist[0].save(
