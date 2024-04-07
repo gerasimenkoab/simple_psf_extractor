@@ -31,18 +31,18 @@ class ImageRawClassTests(unittest.TestCase):
 
 
     def test_ConstructorFromArray(self):
-        img = ImageRaw(voxelSizeIn=self.testVoxel, imArrayIn = self.testArray)
+        img = ImageRaw(voxelSizeIn=self.testVoxel, intensitiesIn = self.testArray)
         # using numpy.testing.assert_array_equal to avoid ambiguous ValueError
-        np.testing.assert_array_equal(img.imArray,self.testArray,'create from array error')
+        np.testing.assert_array_equal(img.GetIntensities(),self.testArray,'create from array error')
         
 
     def test_ConstructorExceptionVoxel(self):
         with self.assertRaises(ValueError):
-            img = ImageRaw(voxelSizeIn=[0,-1,-2], imArrayIn = self.testArray)
+            img = ImageRaw(voxelSizeIn=[0,-1,-2], intensitiesIn = self.testArray)
 
     def test_ConstructorExceptionArray(self):
         with self.assertRaises(ValueError):
-            img = ImageRaw(voxelSizeIn=[0,-1,-2], imArrayIn = self.testArray)
+            img = ImageRaw(voxelSizeIn=[0,-1,-2], intensitiesIn = self.testArray)
         pass
 
     def test_LoadFileImage(self):
@@ -54,20 +54,36 @@ class ImageRawClassTests(unittest.TestCase):
         pass
 
     def test_SetVoxel(self):
-        img = ImageRaw(voxelSizeIn = [1, 2, 3], imArrayIn = self.testArray)
-        self.assertEqual( img.voxel['Z'], 1, 'wrong Z voxel' )
-        self.assertEqual( img.voxel['Y'], 2, 'wrong Y voxel' )
-        self.assertEqual( img.voxel['X'], 3, 'wrong X voxel' )
- 
+        img = ImageRaw(voxelSizeIn = [1, 2, 3], intensitiesIn = self.testArray)
+        self.assertEqual( img.voxel.GetFromAxis("Z"), 1, 'wrong Z voxel' )
+        self.assertEqual( img.voxel.GetFromAxis("Y"), 2, 'wrong Y voxel' )
+        self.assertEqual( img.voxel.GetFromAxis("X"), 3, 'wrong X voxel' )
+    
+    def test_SetVoxelList(self):
+        img = ImageRaw(voxelSizeIn = [1, 2, 3], intensitiesIn = self.testArray)
+        img.SetVoxel([4, 5, 6])
+        self.assertEqual( img.voxel.GetFromAxis("Z"), 4, 'wrong Z voxel' )
+        self.assertEqual( img.voxel.GetFromAxis("Y"), 5, 'wrong Y voxel' )
+        self.assertEqual( img.voxel.GetFromAxis("X"), 6, 'wrong X voxel' )
+
+    def test_SetVoxelAtAxis(self):
+        img = ImageRaw(voxelSizeIn = [1, 2, 3], intensitiesIn = self.testArray)
+        img.SetVoxelToAxis("Z", 7)
+        self.assertEqual( img.voxel.GetFromAxis("Z"), 7, 'wrong Z voxel' )
+        img.SetVoxelToAxis("Y", 8)
+        self.assertEqual( img.voxel.GetFromAxis("Y"), 8, 'wrong Y voxel' )
+        img.SetVoxelToAxis("X", 9)
+        self.assertEqual( img.voxel.GetFromAxis("X"), 9, 'wrong X voxel' )
+
     def test_SetArray(self):
-        img = ImageRaw(voxelSizeIn=self.testVoxel, imArrayIn = self.testArray)
+        img = ImageRaw(voxelSizeIn=self.testVoxel, intensitiesIn = self.testArray)
         newArray = np.random.randint(0, 100, size=(5, 10, 10))
-        img.SetArray(newArray)
+        img.intensities.Set(newArray)
         # using numpy.testing.assert_array_equal to avoid ambiguous ValueError
-        np.testing.assert_array_equal(img.imArray,newArray,'create from array error')
+        np.testing.assert_array_equal(img.GetIntensities(),newArray,'create from array error')
 
     def test_GetImageInfoStr(self):
-        img = ImageRaw(voxelSizeIn=self.testVoxel, imArrayIn = self.testArray)
+        img = ImageRaw(voxelSizeIn=self.testVoxel, intensitiesIn = self.testArray)
         tStr = "Image size(z,y,x)px: " + str(self.testArray.shape) + "  Voxel(\u03BCm): " + str(self.testVoxel)
         self.assertEqual( img.GetImageInfoStr(output = "full"), tStr, 'wrong full output' )
         tStr = str( self.testArray.shape ) + str(self.testVoxel)

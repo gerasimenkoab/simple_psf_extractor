@@ -3,8 +3,12 @@ import itertools
 from scipy.interpolate import RegularGridInterpolator
 from PIL import Image
 import json
-from common.voxel_class import Voxel
-from common.intensities_class import IntensityValues
+try:
+    from common.voxel_class import Voxel
+    from common.intensities_class import IntensityValues
+except:
+    from voxel_class import Voxel
+    from intensities_class import IntensityValues
 
 class ImageRaw:
     """
@@ -181,6 +185,12 @@ class ImageRaw:
         """
         return self.intensities.Get()
 
+    def GetVoxel(self)->list:
+        """
+            Getting list of voxel values
+        """
+        return self.voxel.Get()
+
     def SetVoxel(self, newVoxel: list):
         """
             Setting voxel with check
@@ -190,13 +200,7 @@ class ImageRaw:
         except:
             raise ValueError("Can not set voxel from the argument.","voxel_problem")
 
-
-    def GetVoxel(self)->list:
-        """
-            Getting list of voxel values
-        """
-        return self.voxel.Get()
-    
+ 
     def SetVoxelToAxis(self, axisName:str, newValue:float):
         """
             Setting voxel value by axis name
