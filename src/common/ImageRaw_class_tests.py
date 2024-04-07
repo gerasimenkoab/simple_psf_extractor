@@ -14,7 +14,8 @@ class ImageRawClassTests(unittest.TestCase):
         
 
     def test_ConstructorFromFile(self):
-        folderPath = os.getcwd()+'\\data\\image_array\\'
+        currentFileDir = os.path.dirname(os.path.abspath(__file__))
+        folderPath = currentFileDir + '\\data\\image_array\\'
         self.filelist = []
         self.filelist = [folderPath+name for name in os.listdir(path = folderPath)]
         with ImageRaw(fpath = self.filelist, voxelSizeIn=self.testVoxel) as img:
@@ -53,7 +54,7 @@ class ImageRawClassTests(unittest.TestCase):
         self.assertEqual(1, 1)
         pass
 
-    def test_SetVoxel(self):
+    def test_SetGetVoxel(self):
         img = ImageRaw(voxelSizeIn = [1, 2, 3], intensitiesIn = self.testArray)
         self.assertEqual( img.voxel.GetFromAxis("Z"), 1, 'wrong Z voxel' )
         self.assertEqual( img.voxel.GetFromAxis("Y"), 2, 'wrong Y voxel' )
@@ -94,7 +95,7 @@ def RunTests() -> None:
     print("===============================================\n",
           "Running tests for ImageRaw class.\n",
           "===============================================")
-    unittest.main()
+    unittest.main(verbosity=2)
 
 if __name__=="__main__":
     RunTests()

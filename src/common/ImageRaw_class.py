@@ -3,12 +3,12 @@ import itertools
 from scipy.interpolate import RegularGridInterpolator
 from PIL import Image
 import json
-try:
-    from common.voxel_class import Voxel
-    from common.intensities_class import IntensityValues
-except:
-    from voxel_class import Voxel
-    from intensities_class import IntensityValues
+try: # for running as package
+    from common.Voxel_class import Voxel
+    from common.Intensities_class import IntensityValues
+except: # for testing purposes
+    from Voxel_class import Voxel
+    from Intensities_class import IntensityValues
 
 class ImageRaw:
     """
