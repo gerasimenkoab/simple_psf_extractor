@@ -103,7 +103,7 @@ class DeconView(tk.Toplevel):
         return fName
 
 # ======= PSF deconvolution Widget Functions ===========
-    def SetVoxelValues(self, voxelInDict):
+    def SetVoxelValues(self, voxelInDict:dict):
         """Bead voxel size change"""
         if voxelInDict is None:
             raise ValueError("No voxel values recived", "voxel_is_none")

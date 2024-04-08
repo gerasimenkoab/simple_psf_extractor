@@ -205,6 +205,12 @@ class ImageRaw:
         Getting pixel array values
         """
         return self._intensities.Get()
+    
+    def GetIntensitiesLayer(self, layer:int)->np.ndarray:
+        """
+        Getting pixel array values for layer
+        """
+        return self._intensities.GetLayer(layer)
 
     def GetVoxel(self)->list:
         """
@@ -223,6 +229,12 @@ class ImageRaw:
             Getting voxel value by axis name
         """
         return self._voxel.GetFromAxis(axisName)
+    
+    def GetImageShape(self)->tuple:
+        """
+            Getting image shape
+        """
+        return self._intensities.GetShape()
         
     def RescaleZ(self, newZVoxelSize)->None:
         """

@@ -88,11 +88,11 @@ class DeconImageModel:
         doRescalePSF = True
         self.logger.debug("step 1: rescale PSF to match image voxel size. "+ str(doRescalePSF))
         if doRescalePSF:
-            rescaleCoefZ = self._deconPsf.voxel["Z"] / self._deconImage.voxel["Z"] 
-            rescaleCoefY = self._deconPsf.voxel["Y"] / self._deconImage.voxel["Y"] 
-            rescaleCoefX = self._deconPsf.voxel["X"] / self._deconImage.voxel["X"] 
+            rescaleCoefZ = self._deconPsf.GetVoxelFromAxis("Z") / self._deconImage.GetVoxelFromAxis("Z") 
+            rescaleCoefY = self._deconPsf.GetVoxelFromAxis("Y") / self._deconImage.GetVoxelFromAxis("Y") 
+            rescaleCoefX = self._deconPsf.GetVoxelFromAxis("X") / self._deconImage.GetVoxelFromAxis("X") 
             try:
-                kernell = zoom(self._deconPsf.imArray,[rescaleCoefZ, rescaleCoefY, rescaleCoefX])
+                kernell = zoom(self._deconPsf.GetIntensities(),[rescaleCoefZ, rescaleCoefY, rescaleCoefX])
                 # self.imagePSF.RescaleZ(self.img.voxelSize[1])
             except Exception as e:
                 self.logger.debug("rescale failed"+str(e))
@@ -101,8 +101,8 @@ class DeconImageModel:
         start_time = time.time()
         try:
             PSF = DeconMethods.DeconImage(
-                self._deconImage.imArray,
-                self._deconPsf.imArray,
+                self._deconImage.GetIntensities(),
+                self._deconPsf.GetIntensities(),
                 self._iterationNumber,
                 deconMethodIn,
                 self._regularizationParameter,
@@ -116,7 +116,7 @@ class DeconImageModel:
             return
         try:
             self._deconResult = ImageRaw(
-                None, list(self._deconImage.voxel.values()), PSF
+                None, list(self._deconImage.GetVoxel()), PSF
             )
         except Exception as e:
             print("Deconvolution result save failed" + str(e))

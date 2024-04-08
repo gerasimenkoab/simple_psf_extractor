@@ -1,16 +1,17 @@
-2024-04-07 16:26:30,186 __main__.main.app_main_controller INFO: Main App started.
-2024-04-07 16:26:30,186 __main__.main.app_main_model INFO: Image Editor opened
-2024-04-07 16:26:30,279 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-04-07 16:26:30,279 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-04-07 16:26:30,280 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-04-07 16:26:30,366 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
-2024-04-07 16:26:32,610 __main__.extractor.extractor_controller INFO: Initializing Bead Extractor module.
-2024-04-07 16:26:32,610 __main__.extractor.extractor_model INFO: Extractor object created
-2024-04-07 16:26:32,656 __main__.extractor.extractor_controller INFO: _bind: Binding buttons and entries is done.
-2024-04-07 16:26:39,943 __main__.extractor.extractor_controller INFO: File(s) load success. 
-2024-04-07 16:26:51,716 __main__.extractor.extractor_controller INFO: Beads processed.
-2024-04-07 16:27:15,373 __main__.common.ImageRaw_class INFO: Trying to save TIFF file. Type: uint8
-2024-04-07 16:27:15,388 __main__.common.ImageRaw_class INFO: File saved at D:/tmp/test_beads/bbb.tif
-2024-04-07 16:27:35,065 __main__.extractor.extractor_controller INFO: Bead Extractor Closed.
-2024-04-07 16:28:15,897 __main__.main.app_main_controller INFO: Application Closed.
-2024-04-07 16:28:15,898 __main__.main.app_main_controller INFO: Main App running.
+2024-04-08 21:34:06,672 __main__.main.app_main_controller INFO: Main App started.
+2024-04-08 21:34:06,672 __main__.main.app_main_model INFO: Image Editor opened
+2024-04-08 21:34:06,763 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-04-08 21:34:06,763 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-04-08 21:34:06,771 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-04-08 21:34:06,886 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-08 21:34:10,776 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
+2024-04-08 21:34:10,776 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
+2024-04-08 21:34:10,809 __main__.deconvolutor.decon_view INFO: Decon widget created
+2024-04-08 21:34:17,956 __main__.deconvolutor.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/image256x256.tif
+2024-04-08 21:34:21,691 __main__.deconvolutor.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
+2024-04-08 21:34:26,324 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RL
+2024-04-08 21:34:31,245 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 4.881241321563721 seconds 
+2024-04-08 21:34:31,253 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
+2024-04-08 21:34:46,730 __main__.editor.editor_controller INFO: Initializing Bead Extractor module.
+2024-04-08 21:34:46,730 __main__.editor.editor_model INFO: Image Editor opened
+2024-04-08 21:34:46,730 __main__.editor.editor_controller ERROR: Can't create model. 'ImageRaw' object has no attribute 'imArray'

@@ -29,7 +29,7 @@ class DeconController:
             self.logger.error("Can't create Deconvolution view. "+str(e))
             raise ValueError("Can't create Deconvolution view", "view-creation-failed")
         
-        self.viewDecon.SetVoxelValues(self.modelDeconPSF.PSFImage.voxel)
+        self.viewDecon.SetVoxelValues(self.modelDeconPSF.PSFImage.GetVoxelDict())
         self.viewDecon.SetBeadSize(self.modelDeconPSF.beadDiameter)
         # binding buttons and entries events
         self._bindDeconPSF()
@@ -101,8 +101,8 @@ class DeconController:
                 raise ValueError(vE.args[0], vE.args[1])
         # self.modelDeconPSF.PSFImage.ShowClassInfo()
         self.viewDecon.SetFileInfoDeconPSF(self.modelDeconPSF.PSFImage.GetImageInfoStr(output = "full") )
-        self.viewDecon.SetBeadImage(self.modelDeconPSF.PSFImage.imArray)
-        self.viewDecon.SetVoxelValues(self.modelDeconPSF.PSFImage.voxel)
+        self.viewDecon.SetBeadImage(self.modelDeconPSF.PSFImage.GetIntensities())
+        self.viewDecon.SetVoxelValues(self.modelDeconPSF.PSFImage.GetVoxelDict())
         self.logger.info("Bead File Loaded: " + fNames[0])
         
     def UpdateBeadSizeValue(self, event=None):
@@ -186,7 +186,7 @@ class DeconController:
             self.logger.info("Bead deconvolution failed with exception: " + str(e))
             return
         try:
-            self.viewDecon.SetPSFImage( self.modelDeconPSF.resultImage.imArray )
+            self.viewDecon.SetPSFImage( self.modelDeconPSF.resultImage.GetIntensities() )
         except:
             return
         self.logger.info("Bead image deconvolution finished.")
@@ -239,10 +239,10 @@ class DeconController:
                 self.logger.info("Image load failed. Unknown problem.")
                 return
         self.viewDecon.SetFileInfoImageDeconImage(self.modelDeconImage.deconImage.GetImageInfoStr(output = "full") )
-        upLim = self.modelDeconImage.deconImage.imArray.shape[0]-1
+        upLim = self.modelDeconImage.deconImage.GetImageShape()[0]-1
         self.viewDecon.deconImageView.imageLayer_spinbox.configure( from_=0, to = upLim )
         layerId = int(self.viewDecon.deconImageView.imageLayer_spinbox.get())
-        self.viewDecon.DrawDeconImage(self.modelDeconImage.deconImage.imArray[layerId,:,:])
+        self.viewDecon.DrawDeconImage(self.modelDeconImage.deconImage.GetIntensitiesLayer(layerId))
 
         self.logger.info("Bead File Loaded: " + fNames[0])
 
@@ -269,7 +269,7 @@ class DeconController:
             else:
                 raise ValueError(vE.args[0], vE.args[1])
         self.viewDecon.SetFileInfoPsfDeconImage(self.modelDeconImage.deconPsf.GetImageInfoStr(output = "full") )
-        self.viewDecon.DrawDeconPsf(self.modelDeconImage.deconPsf.imArray)
+        self.viewDecon.DrawDeconPsf(self.modelDeconImage.deconPsf.GetIntensities())
         self.logger.info("PSF File Loaded: " + fNames[0]) 
 
 
@@ -277,7 +277,7 @@ class DeconController:
         wgt = event.widget
         try:
             spValue = int(wgt.get())
-            arr = self.modelDeconImage.deconImage.imArray[spValue,:,:]
+            arr = self.modelDeconImage.deconImage.GetIntensitiesLayer(spValue)
         except:
             wgt.set("0")
             return
@@ -287,7 +287,7 @@ class DeconController:
         wgt = event.widget
         try:
             spValue = int(wgt.get())
-            arr = self.modelDeconImage.deconResult.imArray[spValue,:,:]
+            arr = self.modelDeconImage.deconResult.GetIntensitiesLayer(spValue)
         except:
             wgt.set("0")
             return
@@ -342,9 +342,9 @@ class DeconController:
 
 
         try:
-            self.viewDecon.deconImageView.resLayer_spinbox.configure( from_=0, to = decon_wgt.deconResult.imArray.shape[0]-1 )
+            self.viewDecon.deconImageView.resLayer_spinbox.configure( from_=0, to = decon_wgt.deconResult.GetImageShape()[0]-1 )
             layerId = int(self.viewDecon.deconImageView.resLayer_spinbox.get())
-            self.viewDecon.DrawResultImage(decon_wgt.deconResult.imArray[layerId,:,:])
+            self.viewDecon.DrawResultImage(decon_wgt.deconResult.GetIntensitiesLayer(layerId))
         except Exception as e:
             self.logger.debug("Can not draw deconvolution resulting image. " + str(e))
             return
