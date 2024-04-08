@@ -50,6 +50,14 @@ class IntensityValues:
             raise ValueError("No array Value.")
         return self._pointIntensities
     
+    def GetLayer(self, layer: int)->np.ndarray:
+        """
+            Getting pixel array layer
+        """
+        if self._pointIntensities is None:
+            raise ValueError("No array Value.")
+        return self._pointIntensities[layer,:,:]
+    
     def GetShape(self)->list:
         """
             Getting pixel array dimensions
@@ -57,6 +65,14 @@ class IntensityValues:
         if self._pointIntensities is None:
             raise ValueError("No array Value.")
         return self._pointIntensities.shape
+    
+    def GetSizeBytes(self)->int:
+        """
+            Getting pixel array size
+        """
+        if self._pointIntensities is None:
+            raise ValueError("No array Value.")
+        return self._pointIntensities.nbytes
 
     def ShowInfo(self)->None:
         """
