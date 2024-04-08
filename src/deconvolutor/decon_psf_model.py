@@ -38,7 +38,7 @@ class DeconPsfModel():
             raise ValueError("Wrong voxel value at " + axisName, "voxel-value-incorrect")
 
         if value > 0:
-            self._psfImage.voxel[axisName] = value
+            self._psfImage.SetVoxelToAxis(axisName, value)
         else:
             raise ValueError("Wrong voxel value at " + axisName, "voxel-value-incorrect")
 
@@ -119,10 +119,10 @@ class DeconPsfModel():
         start_time = time.time()
         try:
             PSF = DeconMethods.DeconPSF(
-                self._psfImage.imArray,
+                self._psfImage.GetIntensities(),
                 self._beadDiameter,
                 self._zoomFactor,
-                self._psfImage.voxel,
+                self._psfImage.GetVoxelDict(),
                 self._iterationNumber,
                 deconMethodIn,
                 self._regularizationParameter,
@@ -133,7 +133,7 @@ class DeconPsfModel():
             self.logger.debug(str(e))
             return
         try:
-            self._resultImage = ImageRaw( None, list(self._psfImage.voxel.values()), PSF )
+            self._resultImage = ImageRaw( None, list(self._psfImage.GetVoxel()), PSF )
         except Exception as e:
             self.logger.debug(str(e))
             return

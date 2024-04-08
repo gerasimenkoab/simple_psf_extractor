@@ -85,7 +85,9 @@ class DeconView(tk.Toplevel):
     def GetFileNamesList(self, widget, titleTxt = ""):
         self.logger.debug("GetFileNamesList called")
         try:
-            fNames = askopenfilenames(parent = widget, title = titleTxt)
+            fNames = askopenfilenames(parent = widget, title = titleTxt,
+                                      defaultextension=".tiff", 
+                                      filetypes=[("TIFF files", "*.tif?")])
         except:
             raise ValueError("Can not get file names","no-filenames-read")
         if fNames == "":
@@ -95,7 +97,9 @@ class DeconView(tk.Toplevel):
     def GetFileName(self, widget, titleTxt = ""):
         self.logger.debug("GetSaveAsFileName called")
         try:
-            fName = asksaveasfilename(parent = widget, title = titleTxt)
+            fName = asksaveasfilename(parent = widget, 
+                                      title = titleTxt,defaultextension=".tiff", 
+                                      filetypes=[("TIFF files", "*.tif?")] )
         except:
             raise ValueError("Can not get file names","no-filenames-read")
         if fName == "":

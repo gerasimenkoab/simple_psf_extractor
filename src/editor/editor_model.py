@@ -16,7 +16,7 @@ class EditorModel:
             self._mainImageRaw = image
         else:
             raise ValueError("ImageRaw object expected", "image-type-error")
-        self._mainImageRaw.imArray = self.NormalizeImageArray(self._mainImageRaw.imArray)
+        self._mainImageRaw.SetIntensities( self.NormalizeImageArray( self._mainImageRaw.GetIntensities() ) )
 
         self.imgVisibleLayer = None # visible layer of tiff frames as  Image objects 
         self.imgBeadsRawList = [] # list of all tiff frames as  Image objects
@@ -92,7 +92,7 @@ class EditorModel:
 
     def _ConvertMainImageRawToPILImage(self):
         """Loading raw beads photo from file"""
-        ArrayIn = self._mainImageRaw.imArray
+        ArrayIn = self._mainImageRaw.GetIntensities()
         if ArrayIn is None:
             raise ValueError("Main image array is None", "array-empty")
         self.imgBeadsRawList = []
