@@ -26,7 +26,8 @@ class ExtractorController:
         self._master = parentView
         self.model = ExtractorModel()
         self.view = ExtractorView(self._master)
-
+        # setting initial values
+        self.view.SetDenoiseOptionsList(self.model.GetDenoiseMethodsList())
         self.view.SetVoxelValues(self.model.mainImage.GetVoxelDict())
         self.view.SetBeadSize(self.model.beadDiameter)
         self.view.SetSelectionFrameSize(2 * self.model.selectionFrameHalf)

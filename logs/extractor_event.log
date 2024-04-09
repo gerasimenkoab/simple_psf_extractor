@@ -1,28 +1,16 @@
-2024-04-08 22:12:53,205 __main__.main.app_main_controller INFO: Main App started.
-2024-04-08 22:12:53,205 __main__.main.app_main_model INFO: Image Editor opened
-2024-04-08 22:12:53,295 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-04-08 22:12:53,295 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-04-08 22:12:53,295 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-04-08 22:12:53,401 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
-2024-04-08 22:12:57,617 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
-2024-04-08 22:12:57,617 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
-2024-04-08 22:12:57,655 __main__.deconvolutor.decon_view INFO: Decon widget created
-2024-04-08 22:13:12,761 __main__.deconvolutor.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/beads_average.tif
-2024-04-08 22:13:29,697 __main__.deconvolutor.decon_controller INFO: Starting bead deconvolution. Method code: RLTMR
-2024-04-08 22:13:38,269 __main__.deconvolutor.decon_psf_model INFO: Deconvolution time: 8.564540147781372 seconds 
-2024-04-08 22:13:38,374 __main__.deconvolutor.decon_controller INFO: Bead image deconvolution finished.
-2024-04-08 22:13:59,448 __main__.common.ImageRaw_class INFO: Trying to save TIFF file. Type: uint8
-2024-04-08 22:13:59,464 __main__.common.ImageRaw_class INFO: File saved at D:/tmp/test_beads/ccc.tif
-2024-04-08 22:13:59,464 __main__.deconvolutor.decon_controller INFO: PSF was saved as D:/tmp/test_beads/ccc.tif
-2024-04-08 22:14:15,409 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
-2024-04-08 22:14:15,411 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
-2024-04-08 22:14:15,460 __main__.deconvolutor.decon_view INFO: Decon widget created
-2024-04-08 22:14:24,476 __main__.deconvolutor.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/image256x256.tif
-2024-04-08 22:14:29,816 __main__.deconvolutor.decon_controller INFO: Bead File Loaded: D:/tmp/test_beads/test_crop1.tiff
-2024-04-08 22:14:33,800 __main__.deconvolutor.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
-2024-04-08 22:14:40,070 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RL
-2024-04-08 22:14:42,400 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 2.2971432209014893 seconds 
-2024-04-08 22:14:42,408 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
-2024-04-08 22:14:59,505 __main__.editor.editor_controller INFO: Initializing Bead Extractor module.
-2024-04-08 22:14:59,505 __main__.editor.editor_model INFO: Image Editor opened
-2024-04-08 22:14:59,603 __main__.editor.editor_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-09 21:42:07,039 __main__.main.app_main_controller INFO: Main App started.
+2024-04-09 21:42:07,039 __main__.main.app_main_model INFO: Image Editor opened
+2024-04-09 21:42:07,120 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-04-09 21:42:07,120 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-04-09 21:42:07,120 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-04-09 21:42:07,218 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-09 21:42:10,429 __main__.extractor.extractor_controller INFO: Initializing Bead Extractor module.
+2024-04-09 21:42:10,430 __main__.extractor.extractor_model INFO: Extractor object created
+2024-04-09 21:42:10,463 __main__.extractor.extractor_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-09 21:42:18,149 __main__.extractor.extractor_controller INFO: File(s) load success. 
+2024-04-09 21:42:39,909 __main__.extractor.extractor_controller INFO: Beads processed.
+2024-04-09 21:42:46,493 __main__.extractor.extractor_controller INFO: Beads processed.
+2024-04-09 21:42:52,850 __main__.extractor.extractor_controller INFO: Beads processed.
+2024-04-09 21:43:01,238 __main__.extractor.extractor_controller ERROR: ProcessBeads: can't process setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (2,) + inhomogeneous part.
+2024-04-09 21:43:09,195 __main__.extractor.extractor_controller INFO: Beads processed.
+2024-04-09 21:43:21,556 __main__.extractor.extractor_controller INFO: Beads processed.

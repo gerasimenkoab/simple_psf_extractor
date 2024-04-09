@@ -251,22 +251,22 @@ class ExtractorView(tk.Toplevel):
             font="Helvetica 10 bold",
         ).pack(side=TOP)
 
-        self.blurMenuTypeText = ["gauss", "none", "median"]
+        self.blurMenuTypeText = [ "none","gauss", "median"]
         self.blurApplyType = StringVar()
         self.blurApplyType.set(self.blurMenuTypeText[0])
 
         frameBlurTypeSelect = Frame(frameAvrageBeads)
-        ttk.Label(frameBlurTypeSelect, width=10, text=" Blur type:").pack(
+        ttk.Label(frameBlurTypeSelect, width=10, text=" Denoise:").pack(
             side=LEFT, padx=2, pady=2
         )
-        blurTypeSelect = ttk.Combobox(
+        self.blurTypeSelect = ttk.Combobox(
             frameBlurTypeSelect,
             textvariable=self.blurApplyType,
             values=self.blurMenuTypeText,
             state="readonly",
         )
-        blurTypeSelect.current(0)
-        blurTypeSelect.pack(side=LEFT)
+        self.blurTypeSelect.current(0)
+        self.blurTypeSelect.pack(side=LEFT)
         frameBlurTypeSelect.pack(side=TOP, padx=2, pady=2)
         self.precessBeadPrev = IntVar(value=0)
         ttk.Checkbutton(
@@ -334,10 +334,6 @@ class ExtractorView(tk.Toplevel):
 
         beadPreviewMenuFrame = ttk.Frame(beadPreviewFrame)
 
-        # self.viewBead2d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 2D")
-        # self.viewBead2d_btn.pack(side=LEFT)
-        # self.viewBead3d_btn = ttk.Button(beadPreviewMenuFrame, text="Bead 3D")
-        # self.viewBead3d_btn.pack(side=LEFT)
         beadPreviewMenuFrame.pack(side=TOP, padx=2, pady=2)
 
         beadPreviewFrame.grid(row=1, column=4, sticky="NSWE")
@@ -377,7 +373,17 @@ class ExtractorView(tk.Toplevel):
         # self.processBeads_btn.config(command=self.ProcessBeads)
 
 
-    def AdjustBrightness(self,scalerValue):
+    def SetDenoiseOptionsList(self, denoiseList: list)->None:
+        """Set list of denoise methods"""
+        if denoiseList is None:
+            raise ValueError("No denoise list provided", "denoise_list_is_none")
+        self.blurMenuTypeText = denoiseList
+        # update menu option for self.blurTypeSelect with denoiseList
+        self.blurTypeSelect["values"] = self.blurMenuTypeText
+        self.blurApplyType.set(self.blurMenuTypeText[0])
+
+
+    def AdjustBrightness(self,scalerValue)->None:
         """
         Callback for Redraw canvas with current  brightness scaler value.
         """
@@ -387,7 +393,7 @@ class ExtractorView(tk.Toplevel):
         self.brightnessValue = pow(2,float(scalerValue))
         self.AdjustImageBrightnessContrast()
 
-    def AdjustContrast(self, scalerValue):
+    def AdjustContrast(self, scalerValue)->None:
         """
         Callback for Redraw canvas with current  contrast scaler value.
         """
@@ -397,7 +403,7 @@ class ExtractorView(tk.Toplevel):
         self.contrastValue = pow(2,float(scalerValue))
         self.AdjustImageBrightnessContrast()
 
-    def AdjustImageBrightnessContrast(self):
+    def AdjustImageBrightnessContrast(self)->None:
         """
         Redraw canvas with current brightness and contrast scalers values.
         """
@@ -412,7 +418,7 @@ class ExtractorView(tk.Toplevel):
         self.DrawAllMarks()
 
 
-    def ShowNextLayer(self):
+    def ShowNextLayer(self)->None:
         """Change visible layer"""
         self.beadsPhotoLayerID += 1
         if self.beadsPhotoLayerID > len(self.imgBeadsRawList) - 1:
@@ -422,7 +428,7 @@ class ExtractorView(tk.Toplevel):
         self.imgBeadsRaw = self.imgBeadsRawList[self.beadsPhotoLayerID]
         self.AdjustImageBrightnessContrast()
 
-    def ShowPrevLayer(self):
+    def ShowPrevLayer(self)->None:
         """Change visible layer"""
         self.beadsPhotoLayerID += -1
         if self.beadsPhotoLayerID < 0:
