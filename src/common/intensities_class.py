@@ -73,7 +73,7 @@ class IntensityValues:
         if self._pointIntensities is None:
             raise ValueError("No array Value.")
         return self._pointIntensities.nbytes
-
+    
     def ShowInfo(self)->None:
         """
             Prints array parameters
