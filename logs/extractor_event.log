@@ -1,16 +1,12 @@
-2024-04-09 21:42:07,039 __main__.main.app_main_controller INFO: Main App started.
-2024-04-09 21:42:07,039 __main__.main.app_main_model INFO: Image Editor opened
-2024-04-09 21:42:07,120 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-04-09 21:42:07,120 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-04-09 21:42:07,120 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-04-09 21:42:07,218 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
-2024-04-09 21:42:10,429 __main__.extractor.extractor_controller INFO: Initializing Bead Extractor module.
-2024-04-09 21:42:10,430 __main__.extractor.extractor_model INFO: Extractor object created
-2024-04-09 21:42:10,463 __main__.extractor.extractor_controller INFO: _bind: Binding buttons and entries is done.
-2024-04-09 21:42:18,149 __main__.extractor.extractor_controller INFO: File(s) load success. 
-2024-04-09 21:42:39,909 __main__.extractor.extractor_controller INFO: Beads processed.
-2024-04-09 21:42:46,493 __main__.extractor.extractor_controller INFO: Beads processed.
-2024-04-09 21:42:52,850 __main__.extractor.extractor_controller INFO: Beads processed.
-2024-04-09 21:43:01,238 __main__.extractor.extractor_controller ERROR: ProcessBeads: can't process setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (2,) + inhomogeneous part.
-2024-04-09 21:43:09,195 __main__.extractor.extractor_controller INFO: Beads processed.
-2024-04-09 21:43:21,556 __main__.extractor.extractor_controller INFO: Beads processed.
+2024-04-09 22:11:26,295 __main__.main.app_main_controller INFO: Main App started.
+2024-04-09 22:11:26,295 __main__.main.app_main_model INFO: Image Editor opened
+2024-04-09 22:11:26,385 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-04-09 22:11:26,386 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-04-09 22:11:26,386 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-04-09 22:11:26,492 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-09 22:11:29,338 __main__.extractor.extractor_controller INFO: Initializing Bead Extractor module.
+2024-04-09 22:11:29,339 __main__.extractor.extractor_model INFO: Extractor object created
+2024-04-09 22:11:29,371 __main__.extractor.extractor_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-09 22:11:34,447 __main__.extractor.extractor_controller INFO: File(s) load success. 
+2024-04-09 22:11:46,073 __main__.extractor.extractor_controller INFO: Beads processed.
+2024-04-09 22:12:01,258 __main__.extractor.extractor_controller INFO: Beads processed.
