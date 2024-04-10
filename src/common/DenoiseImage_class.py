@@ -11,10 +11,10 @@ class DenoiseImage:
     """
     Class for image denoising methods
     """
-    _implementedMethodList = ['none','Bilateral', 'Median', 'Gaussian', 'Wiener', 'Total Variation', 'Non-Local Means', 'Wavelet']
+    _implementedMethodList = ['none', 'Gaussian', 'Wiener', 'Total Variation', 'Median', 'Non-Local Means', 'Bilateral', 'Wavelet']
 
     @staticmethod
-    def GetImplementedMethodsList()->list:
+    def getImplementedMethodsList()->list:
         """
         Get the list of implemented denoising methods
         """
@@ -27,7 +27,7 @@ class DenoiseImage:
         """
         return image
     
-    def DenoiseByMethodParam( image:np.ndarray, method:str, **kwargs)->np.ndarray:
+    def denoiseByMethodParam( image:np.ndarray, method:str, **kwargs)->np.ndarray:
         """
         Apply the denoising method by name
         """
@@ -51,7 +51,7 @@ class DenoiseImage:
             case _:
                 raise ValueError("Method not implemented")
 
-    def DenoiseByMethodDefault( image:np.ndarray, method:str)->np.ndarray:
+    def denoiseByMethodDefault( image:np.ndarray, method:str)->np.ndarray:
         """
         Apply the denoising method by name with default parameters
         """

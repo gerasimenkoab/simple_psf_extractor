@@ -196,7 +196,7 @@ class ExtractorModel:
                 bead.SaveAsTiff(fname, outtype=tiffBit)
 
     def GetDenoiseMethodsList(self):
-        return DenoiseImage.GetImplementedMethodsList()            
+        return DenoiseImage.getImplementedMethodsList()            
 
     def BlurBead(self, bead: ImageRaw, blurType):
         """

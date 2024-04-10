@@ -36,7 +36,18 @@ class MainAppModel:
         
         self.SetVisibleLayerNumber( int((len(self.imgBeadsRawList) + 1) / 2) )
         
-    def DenoiseImage(self, denoiseType:str, denoiseValue:float)->None:
+
+    def getDnoiseMethodsList(self):
+        return DenoiseImage.getImplementedMethodsList()
+
+    def denoiseImage(self, denoiseType:str)->None:
+        """Denoise main image by denoise type"""
+        try:
+            self._mainImageRaw.SetIntensities( DenoiseImage.denoiseByMethodDefault(self._mainImageRaw.GetIntensities(), denoiseType) )
+        except Exception as e:
+            self.logger.error("Can't denoise image. "+str(e))
+            raise ValueError("Can't denoise image", "image-denoising-failed")
+        self._ConvertMainImageRawToPILImage()
 
     def NormalizeImageArray(self, array):
         """Normalize array values to 0-255 range"""

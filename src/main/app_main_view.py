@@ -14,7 +14,7 @@ except ImportError:
 
 class MainAppView(tk.Tk):
 
-    def __init__(self, masterController = None,  wWidth = 600, wHeight = 600):
+    def __init__(self, masterController = None,  wWidth = 600, wHeight = 600, denoiseMethodList = None):
         self.beadsPhotoLayerID = 0  # default index of beads microscope photo
         self.brightnessValue = 1
         self.contrastValue = 1
@@ -191,9 +191,12 @@ class MainAppView(tk.Tk):
         self._cropBtn.pack(side=TOP, padx=2, pady=2)
         self._denoiseLabel = ttk.Label(editButtonsFrame, text="Denoise Method:")
         self._denoiseLabel.pack(side=TOP, padx=2, pady=2)
-        self._denoiseMethodList = ["Gaussian", "Wavelet", "Non-local Means"]
+        if denoiseMethodList is None:
+            self._denoiseMethodList = ["Gaussian", "Median"]
+        else:
+            self._denoiseMethodList = denoiseMethodList
         self._denoiseMethod = StringVar()
-        self._denoiseMethod.set("Gaussian")
+        self._denoiseMethod.set(self._denoiseMethodList[0])
         self._denoiseMethodMenu = ttk.OptionMenu(
             editButtonsFrame, 
             self._denoiseMethod, 
@@ -201,10 +204,9 @@ class MainAppView(tk.Tk):
             *self._denoiseMethodList
         )
         self._denoiseMethodMenu.configure(width=10)
-        self._denoiseMethod.set(self._denoiseMethodList[0])
         self._denoiseMethodMenu.pack(side=TOP, padx=2, pady=2)
 
-        self._denoiseBtn = ttk.Button(editButtonsFrame, text="Denosise")
+        self._denoiseBtn = ttk.Button(editButtonsFrame, text="Denosise", command=lambda: self.event_generate("<<DenoiseImage>>"))   
         self._denoiseBtn.pack(side=TOP, padx=2, pady=2)
         editButtonsFrame.grid(row=1, column=3, sticky="WENS")
         # ----------------------- End Edit Buttons Frame -----------------------------
@@ -224,18 +226,14 @@ class MainAppView(tk.Tk):
 
     # ---------------------- end __init__  ---------------------------------
 
-    def setDenoiseMethodList(self, denoiseMethodList:list = None):
-        if not isinstance(denoiseMethodList, list) or denoiseMethodList is None:
-            raise ValueError("denoiseMethodList must be a list")
-        self._denoiseMethodList = denoiseMethodList
 
     # functions to select crop area        
     def selectCrop(self):
         if not self._isCropSelected:
             self._isCropSelected = True
-            self.mainPhotoCanvas.bind("<Button-1>", self.crop_on_button_press)
-            self.mainPhotoCanvas.bind("<B1-Motion>", self.crop_on_drag)
-            self.mainPhotoCanvas.bind("<ButtonRelease-1>", self.crop_on_button_release)
+            self.mainPhotoCanvas.bind("<Button-1>", self.cropOnButtonRelease)
+            self.mainPhotoCanvas.bind("<B1-Motion>", self.cropOnDrag)
+            self.mainPhotoCanvas.bind("<ButtonRelease-1>", self.cropOnButtonRelease)
             self._cropBtn.state(['pressed'])
         else:
             self._isCropSelected = False
@@ -247,18 +245,18 @@ class MainAppView(tk.Tk):
         self.mainPhotoCanvas.unbind("<B1-Motion>")
         self.mainPhotoCanvas.unbind("<ButtonRelease-1>")
 
-    def crop_on_button_press(self, event):
+    def cropOnButtonRelease(self, event):
         # Save the initial position of the mouse
         self.start_x = event.x
         self.start_y = event.y
         # Create the rectangle
         self.rect = self.mainPhotoCanvas.create_rectangle(self.start_x, self.start_y, self.start_x, self.start_y, outline='red')
 
-    def crop_on_drag(self, event):
+    def cropOnDrag(self, event):
         # Update the position of the rectangle to follow the mouse
         self.mainPhotoCanvas.coords(self.rect, self.start_x, self.start_y, event.x, event.y)
 
-    def crop_on_button_release(self, event):
+    def cropOnButtonRelease(self, event):
         # Update the position of the rectangle one last time
         self.mainPhotoCanvas.coords(self.rect, self.start_x, self.start_y, event.x, event.y)
         # Get the coordinates of the rectangle
@@ -275,6 +273,8 @@ class MainAppView(tk.Tk):
     def GetCropBox(self):
         return self._cropBox
     
+    def getDenosieMethod(self):
+        return self._denoiseMethod.get()
 
 
     #set text message to the status bar

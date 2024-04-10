@@ -20,7 +20,7 @@ class MainAppController():
             raise ValueError("Can't create model", "model-creation-failed")
         
         try:
-            self.view = MainAppView()
+            self.view = MainAppView(denoiseMethodList=self.model.getDnoiseMethodsList())
         except Exception as e:
             self.logger.error("Can't create GUI. "+str(e))
             raise ValueError("Can't create GUI", "GUI-creation-failed")
@@ -55,6 +55,7 @@ class MainAppController():
         self.view.bind("<<LayerUp>>", self.VisibleLayerUp)
         self.view.bind("<<LayerDown>>", self.VisibleLayerDown)
         self.view.bind("<<CropSelected>>", self.CropSelected)
+        self.view.bind("<<DenoiseImage>>", self.denoiseImageOnClick)
 
         #options menu:
         self.view.bind("<<ImageColorChanged>>", self.OnImageColorChange)
@@ -82,6 +83,17 @@ class MainAppController():
         self.view.setLayerNumber(self.model.GetVisibleLayerNumber())
         self.view.SetStatusBarMessage(self.model.mainImageRaw.GetImageInfoStr(output = "full"))
         self.logger.info("Image cropped.")
+
+    def denoiseImageOnClick(self, event=None):
+        """Denoise image"""
+        method = self.view.getDenosieMethod()
+        try:
+            self.model.denoiseImage(method)
+        except Exception as e:
+            self.logger.error("Can't denoise image. "+str(e))
+            raise ValueError("Can't denoise image", "image-denoising-failed")
+        self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
+        self.logger.info("Image denoised.")
 
     def ShowExtractorHelp(self, event=None):
         """Show help window"""
