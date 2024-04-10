@@ -26,6 +26,54 @@ class DenoiseImage:
         No denoising applied
         """
         return image
+    
+    def DenoiseByMethodParam( image:np.ndarray, method:str, **kwargs)->np.ndarray:
+        """
+        Apply the denoising method by name
+        """
+        match method:
+            case 'none':
+                return DenoiseImage.none(image)
+            case 'Bilateral':
+                return DenoiseImage.bilateral(image, **kwargs)
+            case 'Median':
+                return DenoiseImage.median(image, **kwargs)
+            case 'Gaussian':
+                return DenoiseImage.gaussian(image, **kwargs)
+            case 'Wiener':
+                return DenoiseImage.wiener(image, **kwargs)
+            case 'Total Variation':
+                return DenoiseImage.totalVariation(image, **kwargs)
+            case 'Non-Local Means':
+                return DenoiseImage.nonLocalMeans(image, **kwargs)
+            case 'Wavelet':
+                return DenoiseImage.wavelet(image, **kwargs)
+            case _:
+                raise ValueError("Method not implemented")
+
+    def DenoiseByMethodDefault( image:np.ndarray, method:str)->np.ndarray:
+        """
+        Apply the denoising method by name with default parameters
+        """
+        match method:
+            case 'none':
+                return DenoiseImage.none(image)
+            case 'Bilateral':
+                return DenoiseImage.bilateral(image, sigma_color=0.05, sigma_spatial=15)
+            case 'Median':
+                return DenoiseImage.median(image, size=3)
+            case 'Gaussian':
+                return DenoiseImage.gaussian(image, sigma=1)
+            case 'Wiener':
+                return DenoiseImage.wiener(image, mysize=None)
+            case 'Total Variation':
+                return DenoiseImage.totalVariation(image, weight=0.1)
+            case 'Non-Local Means':
+                return DenoiseImage.nonLocalMeans(image, patchSize=7, patchDistance=11)
+            case 'Wavelet':
+                return DenoiseImage.wavelet(image, mode='soft')
+            case _:
+                raise ValueError("Method not implemented")
 
     @staticmethod
     def bilateral(image:np.ndarray, sigma_color: float, sigma_spatial: float)->np.ndarray:

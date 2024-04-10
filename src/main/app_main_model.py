@@ -2,6 +2,7 @@ import logging
 import copy
 import numpy as np
 from common.ImageRaw_class import ImageRaw
+from common.DenoiseImage_class import DenoiseImage
 
 from PIL import Image, ImageEnhance, ImageOps, TiffImagePlugin
 
@@ -35,7 +36,8 @@ class MainAppModel:
         
         self.SetVisibleLayerNumber( int((len(self.imgBeadsRawList) + 1) / 2) )
         
-        
+    def DenoiseImage(self, denoiseType:str, denoiseValue:float)->None:
+
     def NormalizeImageArray(self, array):
         """Normalize array values to 0-255 range"""
         array = array / np.amax(array) * np.iinfo(np.uint8).max

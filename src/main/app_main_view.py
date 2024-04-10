@@ -189,6 +189,23 @@ class MainAppView(tk.Tk):
         editButtonsFrame.grid_columnconfigure(3, minsize=100)  # Set minimum width for the first column
         self._cropBtn = ttk.Button(editButtonsFrame, text="Crop", command=self.selectCrop)
         self._cropBtn.pack(side=TOP, padx=2, pady=2)
+        self._denoiseLabel = ttk.Label(editButtonsFrame, text="Denoise Method:")
+        self._denoiseLabel.pack(side=TOP, padx=2, pady=2)
+        self._denoiseMethodList = ["Gaussian", "Wavelet", "Non-local Means"]
+        self._denoiseMethod = StringVar()
+        self._denoiseMethod.set("Gaussian")
+        self._denoiseMethodMenu = ttk.OptionMenu(
+            editButtonsFrame, 
+            self._denoiseMethod, 
+            self._denoiseMethod.get(),  # Add the current value to the values list (avoid error when changing the value)
+            *self._denoiseMethodList
+        )
+        self._denoiseMethodMenu.configure(width=10)
+        self._denoiseMethod.set(self._denoiseMethodList[0])
+        self._denoiseMethodMenu.pack(side=TOP, padx=2, pady=2)
+
+        self._denoiseBtn = ttk.Button(editButtonsFrame, text="Denosise")
+        self._denoiseBtn.pack(side=TOP, padx=2, pady=2)
         editButtonsFrame.grid(row=1, column=3, sticky="WENS")
         # ----------------------- End Edit Buttons Frame -----------------------------
 
@@ -206,6 +223,11 @@ class MainAppView(tk.Tk):
         self.grid_rowconfigure(2, weight=0)
 
     # ---------------------- end __init__  ---------------------------------
+
+    def setDenoiseMethodList(self, denoiseMethodList:list = None):
+        if not isinstance(denoiseMethodList, list) or denoiseMethodList is None:
+            raise ValueError("denoiseMethodList must be a list")
+        self._denoiseMethodList = denoiseMethodList
 
     # functions to select crop area        
     def selectCrop(self):
