@@ -231,7 +231,7 @@ class MainAppView(tk.Tk):
     def selectCrop(self):
         if not self._isCropSelected:
             self._isCropSelected = True
-            self.mainPhotoCanvas.bind("<Button-1>", self.cropOnButtonRelease)
+            self.mainPhotoCanvas.bind("<Button-1>", self.cropOnButtonPress)
             self.mainPhotoCanvas.bind("<B1-Motion>", self.cropOnDrag)
             self.mainPhotoCanvas.bind("<ButtonRelease-1>", self.cropOnButtonRelease)
             self._cropBtn.state(['pressed'])
@@ -245,7 +245,7 @@ class MainAppView(tk.Tk):
         self.mainPhotoCanvas.unbind("<B1-Motion>")
         self.mainPhotoCanvas.unbind("<ButtonRelease-1>")
 
-    def cropOnButtonRelease(self, event):
+    def cropOnButtonPress(self, event):
         # Save the initial position of the mouse
         self.start_x = event.x
         self.start_y = event.y
