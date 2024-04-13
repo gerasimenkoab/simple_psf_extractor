@@ -1,10 +1,10 @@
-2024-04-10 19:32:30,804 __main__.main.app_main_controller INFO: Main App started.
-2024-04-10 19:32:30,804 __main__.main.app_main_model INFO: Image Editor opened
-2024-04-10 19:32:30,897 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-04-10 19:32:30,897 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-04-10 19:32:30,898 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-04-10 19:32:30,992 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
-2024-04-10 19:32:37,028 __main__.main.app_main_controller INFO: File loaded. 
-2024-04-10 19:32:40,967 __main__.main.app_main_controller INFO: Image cropped.
-2024-04-10 19:32:52,420 __main__.main.app_main_controller INFO: Image denoised.
-2024-04-10 19:32:57,779 __main__.main.app_main_controller INFO: Main App running.
+2024-04-12 22:50:05,262 __main__.main.app_main_controller INFO: Main App started.
+2024-04-12 22:50:05,262 __main__.main.app_main_model INFO: Image Editor opened
+2024-04-12 22:50:05,359 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-04-12 22:50:05,359 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-04-12 22:50:05,359 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-04-12 22:50:05,475 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-12 22:50:09,316 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
+2024-04-12 22:50:09,316 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
+2024-04-12 22:50:09,351 __main__.deconvolutor.decon_view INFO: Decon widget created
+2024-04-12 22:52:01,530 __main__.main.app_main_controller INFO: Main App running.
