@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkinter.filedialog import askopenfilenames, asksaveasfilename
 from tkinter.simpledialog import askstring
 import logging
+from typing import Dict, List, Tuple
 
 
 try:
@@ -14,17 +15,14 @@ from deconvolutor.decon_view_psf import DeconvolvePSFFrame
 from deconvolutor.decon_view_image import DeconvolveImageFrame
 
 
-
-"""   TODO:
-        
-        - add  bead size to tiff tag
-"""
+# ======= Deconvolution View Class ====================
 
 
 class DeconView(tk.Toplevel):
     def __init__(self, master=None, wwidth=950, wheight=600):
         self.logger = logging.getLogger('__main__.'+__name__)
         super().__init__(master)
+        self.widgets: Dict[str, tk.Widget] = {}
 
         self.geometry(str(wwidth)+"x"+str(wheight))
         # self.maxsize(1920, 1080)
@@ -40,7 +38,7 @@ class DeconView(tk.Toplevel):
         self.deconPsfView = DeconvolvePSFFrame(self.deconNotebook)
         self.deconNotebook.add(self.deconPsfView, text = "PSF deconvolution")
 
-        self.deconImageView = DeconvolveImageFrame(self.deconNotebook)
+        self.deconImageView = DeconvolveImageFrame(master = self.deconNotebook, widgets = self.widgets)
         self.deconNotebook.add(self.deconImageView, text = "Image deconvolution")
 
         self.logOutputLabel = ttk.Label(self)
@@ -106,7 +104,14 @@ class DeconView(tk.Toplevel):
             raise ValueError("Can not get file names","no-filenames-read")
         return fName
 
+    def bindWidget(self, widgetName, event:tk.Event, func:callable)->None:
+        try:
+            self.widgets[widgetName].bind(event, func)
+        except KeyError:
+            raise ValueError("No such widget", "no-widget")
 # ======= PSF deconvolution Widget Functions ===========
+    
+
     def SetVoxelValues(self, voxelInDict:dict):
         """Bead voxel size change"""
         if voxelInDict is None:
@@ -152,36 +157,36 @@ class DeconView(tk.Toplevel):
 # ======= Image deconvolution Widget Functions ===========
 
     def SetFileInfoImageDeconImage(self, infoStr:str):
-        self.deconImageView.imageInfoStr.set(infoStr)
+        self.widgets["ImageInfoStringVar"].set(infoStr)
         self.deconImageView.update()
        
     def SetFileInfoPsfDeconImage(self, infoStr:str):
-        self.deconImageView.psfInfoStr.set(infoStr)
+        self.widgets["PSFInfoStringVar"].set(infoStr)
 
 
     def DrawDeconImage(self,arrayIn):
         """Draw input image for deconvolution."""
-        CnvPlot.Draw2DArrayOnCanvasPIL(arrayIn, self.deconImageView.image_cnv)
+        CnvPlot.Draw2DArrayOnCanvasPIL(arrayIn, self.widgets["ImageCanvas"])
 
     def DrawResultImage(self,arrayIn):
         """Draw deconvolution result image"""
-        CnvPlot.Draw2DArrayOnCanvasPIL(arrayIn, self.deconImageView.result_cnv)
+        CnvPlot.Draw2DArrayOnCanvasPIL(arrayIn, self.widgets["ResultCanvas"])
 
     
     def DrawDeconPsf(self,arrayIn):
         """Draw selected PSF on canvas at image deconvolution frame """
-        cnv = self.deconImageView.psf_cnv
+        cnv = self.widgets["PSFCanvas"]
         cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, cnv, " ",150,350)
         cnvTmp.get_tk_widget().grid(column=0, row=0, sticky="n")
 
     def GetImageDeconMethod(self):
-        return self.deconImageView.deconMethod
+        return self.widgets["ResultMethodStringVar"].get()
     
     def GetImageDeconIterationNumber(self):
-        return int(self.deconImageView.deconIter_entry.get())
+        return int(self.widgets["ResultIterationEntry"].get())
 
     def GetImageDeconRegularisation(self):
-        return int(self.deconImageView.deconReg_entry.get())
+        return int(self.widgets["ResultRegularisationEntry"].get())
     
     def SetImageDeconIterationNumber(self,value):
         try:
@@ -190,7 +195,7 @@ class DeconView(tk.Toplevel):
             raise ValueError("Wrong iteration number value", "value-not-int")
         if value <= 0:
             raise ValueError("Wrong iteration number value", "value-negative")
-        self.SetValueWidgetNormal(self.deconImageView.deconIter_entry, value)
+        self.SetValueWidgetNormal(self.widgets["ResultIterationEntry"], value)
 
     def SetImageDeconRegularisation(self,value):
         try:
@@ -198,15 +203,15 @@ class DeconView(tk.Toplevel):
         except:
             raise ValueError("Wrong iteration number value", "value-not-float")
         if 0 < value < 1:
-            self.SetValueWidgetNormal(self.deconImageView.deconReg_entry, value)
+            self.SetValueWidgetNormal(self.widgets["ResultRegularisationEntry"], value)
         else:
             raise ValueError("Wrong iteration number value", "not-allowed-value")
 
     def GetDeconImageProgressbar(self):
-        return self.deconImageView.decon_progbar
+        return self.widgets["ResultProgressBar"]
 
     def GetImageDeconMethod(self):
-        return self.deconImageView._deconMethodsDict[self.deconImageView.deconMethod.get()]
+        return self.deconImageView._deconMethodsDict[self.widgets["ResultMethodStringVar"].get()]
     
 
 

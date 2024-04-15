@@ -60,23 +60,22 @@ class DeconController:
         """
         Binding events for Image deconvolution 
         """
-        self.viewDecon.deconImageView.imageLoad_btn.bind("<1>", self.DeconLoadImage_clb, add="")
-        self.viewDecon.deconImageView.psfLoad_btn.bind("<1>", self.DeconPSFLoad_clb, add="")
+        self.viewDecon.widgets["ImageLoadButton"].bind("<1>", self.DeconLoadImage_clb, add="")
+        self.viewDecon.widgets["PSFLoadButton"].bind("<1>", self.DeconPSFLoad_clb, add="")
 
-        self.viewDecon.deconImageView.deconIter_entry.bind("<Return>", self.UpdateImageIterlValue, add="")
-        self.viewDecon.deconImageView.deconIter_entry.bind("<FocusOut>", self.UpdateImageIterlValue, add="")
-        self.viewDecon.deconImageView.deconReg_entry.bind("<Return>", self.UpdateImageReglValue, add="")
-        self.viewDecon.deconImageView.deconReg_entry.bind("<FocusOut>", self.UpdateImageReglValue, add="")
+        self.viewDecon.widgets["ResultIterationEntry"].bind("<Return>", self.UpdateImageIterlValue, add="")
+        self.viewDecon.widgets["ResultIterationEntry"].bind("<FocusOut>", self.UpdateImageIterlValue, add="")
+        self.viewDecon.widgets["ResultRegularisationEntry"].bind("<Return>", self.UpdateImageReglValue, add="")
+        self.viewDecon.widgets["ResultRegularisationEntry"].bind("<FocusOut>", self.UpdateImageReglValue, add="")
 
-        self.viewDecon.deconImageView.imageLayer_spinbox.bind("<<Decrement>>", self.ImageLayerChange_clb, add="")
-        self.viewDecon.deconImageView.imageLayer_spinbox.bind("<<Increment>>", self.ImageLayerChange_clb, add="")
-        self.viewDecon.deconImageView.imageLayer_spinbox.bind("<Return>", self.ImageLayerChange_clb, add="")
-        self.viewDecon.deconImageView.deconStart_btn.bind("<1>", self.DeconStart_clb, add="")
-        # self.viewDecon.deconImageView.resSave_btn.bind("<1>", self.SaveDeconImage_clb, add="")
-        self.viewDecon.deconImageView.resSave_btn.bind("<1>", self.DeconImageEditor_clb, add="")
-        self.viewDecon.deconImageView.resLayer_spinbox.bind("<<Decrement>>", self.ResLayerChange_clb, add="")
-        self.viewDecon.deconImageView.resLayer_spinbox.bind("<<Increment>>", self.ResLayerChange_clb, add="")
-        self.viewDecon.deconImageView.imageLayer_spinbox.bind("<Return>", self.ResLayerChange_clb, add="")
+        self.viewDecon.widgets["ImageLayerSpinbox"].bind("<<Decrement>>", self.ImageLayerChange_clb, add="")
+        self.viewDecon.widgets["ImageLayerSpinbox"].bind("<<Increment>>", self.ImageLayerChange_clb, add="")
+        self.viewDecon.widgets["ImageLayerSpinbox"].bind("<Return>", self.ImageLayerChange_clb, add="")
+        self.viewDecon.widgets["ResultStartButton"].bind("<1>", self.DeconStart_clb, add="")
+        self.viewDecon.widgets["ResultSaveButton"].bind("<1>", self.DeconImageEditor_clb, add="")
+        self.viewDecon.widgets["ResultLayerSpinbox"].bind("<<Decrement>>", self.ResLayerChange_clb, add="")
+        self.viewDecon.widgets["ResultLayerSpinbox"].bind("<<Increment>>", self.ResLayerChange_clb, add="")
+        self.viewDecon.widgets["ResultLayerSpinbox"].bind("<Return>", self.ResLayerChange_clb, add="")
 
     # ======= Decon PSF Callbacks ===============
     def LoadBead_btn_click(self,event):
@@ -240,8 +239,8 @@ class DeconController:
                 return
         self.viewDecon.SetFileInfoImageDeconImage(self.modelDeconImage.deconImage.GetImageInfoStr(output = "full") )
         upLim = self.modelDeconImage.deconImage.GetImageShape()[0]-1
-        self.viewDecon.deconImageView.imageLayer_spinbox.configure( from_=0, to = upLim )
-        layerId = int(self.viewDecon.deconImageView.imageLayer_spinbox.get())
+        self.viewDecon.widgets["ImageLayerSpinbox"].configure( from_=0, to = upLim )
+        layerId = int(self.viewDecon.widgets["ImageLayerSpinbox"].get())
         self.viewDecon.DrawDeconImage(self.modelDeconImage.deconImage.GetIntensitiesLayer(layerId))
 
         self.logger.info("Bead File Loaded: " + fNames[0])
@@ -342,8 +341,8 @@ class DeconController:
 
 
         try:
-            self.viewDecon.deconImageView.resLayer_spinbox.configure( from_=0, to = decon_wgt.deconResult.GetImageShape()[0]-1 )
-            layerId = int(self.viewDecon.deconImageView.resLayer_spinbox.get())
+            self.viewDecon.widgets["ResultLayerSpinbox"].configure( from_=0, to = decon_wgt.deconResult.GetImageShape()[0]-1 )
+            layerId = int(self.viewDecon.widgets["ResultLayerSpinbox"].get())
             self.viewDecon.DrawResultImage(decon_wgt.deconResult.GetIntensitiesLayer(layerId))
         except Exception as e:
             self.logger.debug("Can not draw deconvolution resulting image. " + str(e))
