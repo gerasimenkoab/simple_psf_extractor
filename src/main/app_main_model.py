@@ -1,6 +1,6 @@
 import logging
 from common.ImageRaw_class import ImageRaw
-from common.base_model_class import BaseModel
+from common.BaseModel_class import BaseModel
 
 class MainAppModel(BaseModel):
     def __init__(self, image: ImageRaw = None):

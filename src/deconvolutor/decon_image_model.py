@@ -2,7 +2,7 @@ import numpy as np
 from scipy.ndimage import zoom
 from common.ImageRaw_class import ImageRaw
 from .decon_methods import DeconMethods
-from common.base_model_class import BaseModel
+from common.BaseModel_class import BaseModel
 
 import logging
 import time
