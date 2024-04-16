@@ -169,9 +169,9 @@ class DeconvolveImageFrame(ttk.Frame):
 
         self.rowconfigure(0, uniform=1)
         self.rowconfigure(1, weight=1)
-        self.columnconfigure(0, pad=1, uniform=1, weight=2)
+        self.columnconfigure(0, pad=1, uniform=1, weight=3)
         self.columnconfigure(2, pad=1, uniform=1, weight=1)
-        self.columnconfigure(4, pad=1, uniform=1, weight=2)
+        self.columnconfigure(4, pad=1, uniform=1, weight=3)
 
     def DeconLoadImage_clb(self, event=None):
         pass

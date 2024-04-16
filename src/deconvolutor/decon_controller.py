@@ -3,8 +3,11 @@ from deconvolutor.decon_image_model import DeconImageModel
 from deconvolutor.decon_view import DeconView
 from editor.editor_controller import EditorController
 import logging
-
+from common.LogTextHandler_class import LogTextHandler
 # TODO: log string output
+
+
+
 class DeconController:
     def __init__(self, parentView) -> None:
         # super().__init__()
@@ -28,33 +31,49 @@ class DeconController:
         except Exception as e:
             self.logger.error("Can't create Deconvolution view. "+str(e))
             raise ValueError("Can't create Deconvolution view", "view-creation-failed")
-        
+
+        self.SetLogOutput()
+
         self.viewDecon.SetVoxelValues(self.modelDeconPSF.PSFImage.GetVoxelDict())
         self.viewDecon.SetBeadSize(self.modelDeconPSF.beadDiameter)
         # binding buttons and entries events
-        self._bindDeconPSF()
-        self._bindDeconImage()
-        self.logger.debug("PSF and Image deconvolution controller initialized")
+        try:
+            self._bindDeconPSF()
+            self._bindDeconImage()
+        except Exception as e:
+            self.logger.error("Can't bind events for deconvolution widget. "+str(e))
+            raise RuntimeError("Can't bind events for deconvolution widget", "binding-failed")
+        self.logger.info("Deconvolution winget inititalized. Select images.")
+
+    def SetLogOutput(self):
+        handler =  LogTextHandler(self.viewDecon.GetLogWidget())  
+        handler.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(asctime)s - %(message)s')
+        handler.setFormatter(formatter)    
+        self.logger.addHandler(handler)
 
     def _bindDeconPSF(self):
         """
         Binding events for PSF deconvolution 
         """
-        self.viewDecon.deconPsfView.loadPSF_btn.bind("<1>", self.LoadBead_btn_click, add="")
-        self.viewDecon.deconPsfView.beadSize_entry.bind("<Return>", self.UpdateBeadSizeValue, add="")
-        self.viewDecon.deconPsfView.beadSize_entry.bind("<FocusOut>", self.UpdateBeadSizeValue, add="")
-        for key in ["X","Y","Z"]:
-            self.viewDecon.deconPsfView.voxel_entry[key].bind("<Return>", self.UpdateBeadVoxelValues, add="")
-            self.viewDecon.deconPsfView.voxel_entry[key].bind("<FocusOut>", self.UpdateBeadVoxelValues, add="")
-        self.viewDecon.deconPsfView.psfIterNum_entry.bind("<Return>", self.UpdatePsfIterlValue, add="")
-        self.viewDecon.deconPsfView.psfIterNum_entry.bind("<FocusOut>", self.UpdatePsfIterlValue, add="")
-        self.viewDecon.deconPsfView.psfReg_entry.bind("<Return>", self.UpdatePsfReglValue, add="")
-        self.viewDecon.deconPsfView.psfReg_entry.bind("<FocusOut>", self.UpdatePsfReglValue, add="")
-        self.viewDecon.deconPsfView.calcPSF_btn.bind("<1>", self.CalcPSF_btn_click, add="")
-        self.viewDecon.deconPsfView.savePsf_btn.bind("<1>", self.SavePSF_btn_click, add="")
-        self.viewDecon.deconPsfView.zoomFactor_entry.bind("<Return>", self.UpdateZoomFactorValue, add="")
-        self.viewDecon.deconPsfView.zoomFactor_entry.bind("<FocusOut>", self.UpdateZoomFactorValue, add="")
-
+        try:
+            self.viewDecon.deconPsfView.loadPSF_btn.bind("<1>", self.LoadBead_btn_click, add="")
+            self.viewDecon.deconPsfView.beadSize_entry.bind("<Return>", self.UpdateBeadSizeValue, add="")
+            self.viewDecon.deconPsfView.beadSize_entry.bind("<FocusOut>", self.UpdateBeadSizeValue, add="")
+            for key in ["X","Y","Z"]:
+                self.viewDecon.deconPsfView.voxel_entry[key].bind("<Return>", self.UpdateBeadVoxelValues, add="")
+                self.viewDecon.deconPsfView.voxel_entry[key].bind("<FocusOut>", self.UpdateBeadVoxelValues, add="")
+            self.viewDecon.deconPsfView.psfIterNum_entry.bind("<Return>", self.UpdatePsfIterlValue, add="")
+            self.viewDecon.deconPsfView.psfIterNum_entry.bind("<FocusOut>", self.UpdatePsfIterlValue, add="")
+            self.viewDecon.deconPsfView.psfReg_entry.bind("<Return>", self.UpdatePsfReglValue, add="")
+            self.viewDecon.deconPsfView.psfReg_entry.bind("<FocusOut>", self.UpdatePsfReglValue, add="")
+            self.viewDecon.deconPsfView.calcPSF_btn.bind("<1>", self.CalcPSF_btn_click, add="")
+            self.viewDecon.deconPsfView.savePsf_btn.bind("<1>", self.SavePSF_btn_click, add="")
+            self.viewDecon.deconPsfView.zoomFactor_entry.bind("<Return>", self.UpdateZoomFactorValue, add="")
+            self.viewDecon.deconPsfView.zoomFactor_entry.bind("<FocusOut>", self.UpdateZoomFactorValue, add="")
+        except Exception as e:
+            self.logger.debug("Can't bind events for PSF deconvolution. "+str(e))
+            raise ValueError("Can't bind events for PSF deconvolution", "binding-failed")
 
     def _bindDeconImage(self):
         """
@@ -80,7 +99,7 @@ class DeconController:
                 self.viewDecon.widgets[target+"LayerSpinbox"].bind("<<Increment>>", 
                                                                 lambda event: self.LayerChangeSpinbox(event, "up", target))
         except Exception as e:
-            self.logger.error("Can't bind events for Image deconvolution. "+str(e))
+            self.logger.debug("Can't bind events for Image deconvolution. "+str(e))
             raise ValueError("Can't bind events for Image deconvolution", "binding-failed")
         
     # ======= Decon PSF Callbacks ===============
@@ -123,6 +142,7 @@ class DeconController:
             self.viewDecon.SetValueWidgetNormal( eventWgt, self.modelDeconPSF.beadDiameter )
             return
         self.viewDecon.SetValueWidgetNormal( eventWgt, newValue )
+        self.logger.info("Bead size set to: " + str(newValue) + " \u03BCm")
 
 
     def UpdateZoomFactorValue(self, event=None):
@@ -133,6 +153,7 @@ class DeconController:
             self.viewDecon.SetValueWidgetNormal( eventWgt, self.modelDeconPSF.zoomFactor )
             return
         self.viewDecon.SetValueWidgetNormal( eventWgt, newValue )
+        self.logger.info("Zoom factor set to: " + str(newValue) )
 
     def UpdateBeadVoxelValues(self, event=None):
         eventWgt = event.widget
@@ -148,8 +169,8 @@ class DeconController:
             self.viewDecon.SetValueWidgetNormal( eventWgt, self.modelDeconPSF.voxel[axisName] )
             return
         self.viewDecon.SetValueWidgetNormal( eventWgt, newValue )
-
-        pass
+        elf.logger.info("Voxel size set to: " + str(newValue) + " \u03BCm")
+        
 
 
 
@@ -166,6 +187,7 @@ class DeconController:
             self.viewDecon.SetValueWidgetNormal( eventWgt, self.modelDeconPSF.iterationNumber )
             return
         self.viewDecon.SetValueWidgetNormal( eventWgt, newValue )
+        self.logger.info("Iteration number set to: " + str(newValue) )
 
     def UpdatePsfReglValue(self, event=None):
         eventWgt = event.widget
@@ -180,15 +202,16 @@ class DeconController:
             self.viewDecon.SetValueWidgetNormal( eventWgt, self.modelDeconPSF.regularizationParameter )
             return
         self.viewDecon.SetValueWidgetNormal( eventWgt, newValue )
+        self.logger.info("Regularization parameter set to: " + str(newValue) )
 
     def CalcPSF_btn_click(self, event=None):
         progBar = self.viewDecon.GetPsfDeconProgressbar()
         method = self.viewDecon.GetPsfDeconMethod()
-        self.logger.info("Starting bead deconvolution. Method code: " + method)
+        self.logger.info("Bead image started. Method code: " + method)
         try:
             self.modelDeconPSF.CalculatePSF( method, progBar, self.viewDecon )
         except Exception as e:
-            self.logger.info("Bead deconvolution failed with exception: " + str(e))
+            self.logger.info("Bead image deconvolution failed with exception: " + str(e))
             return
         try:
             self.viewDecon.SetPSFImage( self.modelDeconPSF.resultImage.GetIntensities() )
@@ -246,7 +269,7 @@ class DeconController:
         self.viewDecon.widgets["ImageLayerSpinbox"].set(self.modelDeconImage.GetVisibleLayerNumberFor("Image"))
         self.viewDecon.SetFileInfoImageDeconImage(self.modelDeconImage.GetInfoStringFor("Image") )
         self.viewDecon.DrawImageOnCanvas(canvasName = "Image",img = self.modelDeconImage.GetVisibleLayerImageFor("Image"))
-        self.logger.info("Bead File Loaded: " + fNames[0])
+        self.logger.info("Image File Loaded: " + fNames[0])
 
 
 
@@ -305,27 +328,6 @@ class DeconController:
 
 
 
-    # def ImageLayerChange(self, wgt = None, name:str = "Image"):
-    #     try:
-    #         spValue = int(wgt.get())
-    #         self.modelDeconImage.SetVisibleLayerNumberFor(name, spValue)      
-    #         self.viewDecon.DrawImageOnCanvas(canvasName = name,image = self.modelDeconImage.GetVisibleLayerImageFor(name) )
-    #     except:
-    #         wgt.set(str(self.modelDeconImage.GetVisibleLayerNumberFor(name)))
-    #         return
-
-    # def ImageLayerChange_clb(self,event = None):
-    #     wgt = event.widget
-    #     self.ImageLayerChange(self, wgt, name = "Image")
-
-    # def PSFLayerChange_clb(self,event = None):
-    #     wgt = event.widget
-    #     self.ImageLayerChange(self, wgt, name = "PSF")
-
-    # def ResLayerChange_clb(self,event = None):
-    #     wgt = event.widget
-    #     self.ImageLayerChange(self, wgt, name = "Result")
-
     def UpdateImageIterlValue(self, event=None):
         eventWgt = event.widget
         try:
@@ -339,6 +341,7 @@ class DeconController:
             self.viewDecon.SetValueWidgetNormal( eventWgt, self.modelDeconImage.iterationNumber )
             return
         self.viewDecon.SetValueWidgetNormal( eventWgt, newValue )
+        self.logger.info("Iteration number set to: " + str(newValue) )
 
     def UpdateImageReglValue(self, event=None):
         eventWgt = event.widget
@@ -353,6 +356,7 @@ class DeconController:
             self.viewDecon.SetValueWidgetNormal( eventWgt, self.modelDeconImage.regularizationParameter )
             return
         self.viewDecon.SetValueWidgetNormal( eventWgt, newValue )
+        self.logger.info("Regularization parameter set to: " + str(newValue) )
 
 
 
@@ -362,7 +366,7 @@ class DeconController:
             progBar = self.viewDecon.GetDeconImageProgressbar()
             method = self.viewDecon.GetImageDeconMethod()
         except Exception as e:
-            self.logger.debug("Can not get parameters for deconvolution. " + str(e))
+            self.logger.info("Can not get parameters for deconvolution. " + str(e))
             return
         decon_wgt = self.modelDeconImage
         self.logger.info("Starting image deconvolution. Method code: " + method)
@@ -370,12 +374,11 @@ class DeconController:
         try:
             self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon )
         except Exception as e:
-            self.logger.info("Image deconvolution failed."+str(e))
+            self.logger.error("Image deconvolution failed."+str(e))
             return
 
 
         try:
-
             self.viewDecon.widgets["ResultLayerSpinbox"].set(self.modelDeconImage.GetVisibleLayerNumberFor("Result"))
             self.viewDecon.SetFileInfoPsfDeconImage(self.modelDeconImage.GetInfoStringFor("Result") )
             self.viewDecon.DrawImageOnCanvas(canvasName = "Result",img = self.modelDeconImage.GetVisibleLayerImageFor("Result"))
@@ -383,13 +386,13 @@ class DeconController:
             # layerId = int(self.viewDecon.widgets["ResultLayerSpinbox"].get())
             # self.viewDecon.DrawResultImage(decon_wgt.deconResult.GetIntensitiesLayer(layerId))
         except Exception as e:
-            self.logger.debug("Can not draw deconvolution resulting image. " + str(e))
+            self.logger.error("Can not draw deconvolution resulting image. " + str(e))
             return
         self.logger.info("Image deconvolution finished.")
         
     def SaveDeconImage_clb(self, event=None):
         if self.modelDeconImage.deconResult == None:
-            self.logger.info("File not saved. Deconvolution result image was not created.")
+            self.logger.error("File not saved. Deconvolution result image was not created.")
             return
         try:
             fName = self.viewDecon.GetFileName(event.widget,"Select file name")
@@ -404,11 +407,11 @@ class DeconController:
 
     def DeconImageEditor_clb(self, event=None):
         if self.modelDeconImage.deconResult == None:
-            self.logger.info("File not saved. Deconvolution result image was not created.")
+            self.logger.error("File not saved. Deconvolution result image was not created.")
             return
         # Open Image Editor with deconResult ImageRaw object
         try:
             self.editor = EditorController(self.viewDecon, self.modelDeconImage.deconResult.mainImageRaw)
         except Exception as e:
-            self.logger.debug("Can not open image editor. " + str(e))
+            self.logger.error("Can not open image editor. " + str(e))
             return

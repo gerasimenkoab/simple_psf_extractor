@@ -1,6 +1,6 @@
 from tkinter import *
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, scrolledtext
 from tkinter.filedialog import askopenfilenames, asksaveasfilename
 from tkinter.simpledialog import askstring
 import logging
@@ -12,9 +12,10 @@ try:
     from ..common.AuxTkPlot_class import AuxCanvasPlot as CnvPlot
 except ImportError:
     from common.AuxTkPlot_class import AuxCanvasPlot as CnvPlot
-    
+
 from deconvolutor.decon_view_psf import DeconvolvePSFFrame
 from deconvolutor.decon_view_image import DeconvolveImageFrame
+
 
 
 # ======= Deconvolution View Class ====================
@@ -35,7 +36,7 @@ class DeconView(tk.Toplevel):
         
         # setting up tabs for PSF and Image deconvolution
         self.deconNotebook = ttk.Notebook(self)
-        self.deconNotebook.configure(height=700, width=900)
+        # self.deconNotebook.configure(height=700, width=900)
         self.deconNotebook.pack(expand=True, fill="both", side="top")
 
         self.deconPsfView = DeconvolvePSFFrame(self.deconNotebook)
@@ -44,13 +45,9 @@ class DeconView(tk.Toplevel):
         self.deconImageView = DeconvolveImageFrame(master = self.deconNotebook, widgets = self.widgets)
         self.deconNotebook.add(self.deconImageView, text = "Image deconvolution")
 
-        self.logOutputLabel = ttk.Label(self)
-        self.logOutStringVar = tk.StringVar(value = 'Log Output')
-        self.logOutputLabel.configure(
-            compound = "top",
-            text = 'Log Output',
-            textvariable = self.logOutStringVar)
-        self.logOutputLabel.pack(fill="x", side = "bottom")
+        self.logWidget =tk.scrolledtext.ScrolledText(self, wrap = tk.WORD, height = 2)
+        self.logWidget.configure(state = "disabled")
+        self.logWidget.pack(fill="x", side = "bottom",padx=2, pady=2)
 
         self.logger.info("Decon widget created")
         # focus on the widget
@@ -59,6 +56,11 @@ class DeconView(tk.Toplevel):
         
 
 # ======= Auxilary Functions ==========================
+    def GetLogWidget(self):
+        return self.logWidget
+
+    def SetLogOutput(self, logStr:str):
+        self.logger.info(logStr)
 
     def SetValueWidgetNormal(self, widget, value):
         widget.delete(0, END)
@@ -167,15 +169,14 @@ class DeconView(tk.Toplevel):
         self.widgets["PSFInfoStringVar"].set(infoStr)
 
 
-    def DrawDeconImage(self,arrayIn):
-        """Draw input image for deconvolution."""
-        CnvPlot.Draw2DArrayOnCanvasPIL(arrayIn, self.widgets["ImageCanvas"])
+    # def DrawDeconImage(self,arrayIn):
+    #     """Draw input image for deconvolution."""
+    #     CnvPlot.Draw2DArrayOnCanvasPIL(arrayIn, self.widgets["ImageCanvas"])
 
-    def DrawResultImage(self,arrayIn):
-        """Draw deconvolution result image"""
-        CnvPlot.Draw2DArrayOnCanvasPIL(arrayIn, self.widgets["ResultCanvas"])
+    # def DrawResultImage(self,arrayIn):
+    #     """Draw deconvolution result image"""
+    #     CnvPlot.Draw2DArrayOnCanvasPIL(arrayIn, self.widgets["ResultCanvas"])
 
-    # TODO: rework this function for current class
     def DrawImageOnCanvas(self, canvasName:str = "Image", img:Image = None):
         """Draw image on canvas"""
         if img is None:
