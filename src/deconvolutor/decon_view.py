@@ -5,12 +5,14 @@ from tkinter.filedialog import askopenfilenames, asksaveasfilename
 from tkinter.simpledialog import askstring
 import logging
 from typing import Dict, List, Tuple
+from PIL import Image, ImageTk
 
 
 try:
     from ..common.AuxTkPlot_class import AuxCanvasPlot as CnvPlot
 except ImportError:
     from common.AuxTkPlot_class import AuxCanvasPlot as CnvPlot
+    
 from deconvolutor.decon_view_psf import DeconvolvePSFFrame
 from deconvolutor.decon_view_image import DeconvolveImageFrame
 
@@ -23,6 +25,7 @@ class DeconView(tk.Toplevel):
         self.logger = logging.getLogger('__main__.'+__name__)
         super().__init__(master)
         self.widgets: Dict[str, tk.Widget] = {}
+        self.imgCnv: Dict[str,tk.Image] = {}
 
         self.geometry(str(wwidth)+"x"+str(wheight))
         # self.maxsize(1920, 1080)
@@ -172,7 +175,36 @@ class DeconView(tk.Toplevel):
         """Draw deconvolution result image"""
         CnvPlot.Draw2DArrayOnCanvasPIL(arrayIn, self.widgets["ResultCanvas"])
 
-    
+    # TODO: rework this function for current class
+    def DrawImageOnCanvas(self, canvasName:str = "Image", img:Image = None):
+        """Draw image on canvas"""
+        if img is None:
+            return
+        _imageScaleFactor = 1.0 # no use for now
+        canvas = self.widgets[canvasName+"Canvas"]
+        print("canvas", canvasName+"Canvas")
+        canvas.delete("all")
+        self._img_width, self._img_height = img.size
+
+        if self._img_width > self._img_height:
+            aspect_ratio = self._img_height / self._img_width
+            canvas_height = int(canvas.winfo_height() * _imageScaleFactor)
+            # Calculate the new height while keeping the aspect ratio constant
+            canvas_width = int(canvas_height / aspect_ratio)
+        else:
+            aspect_ratio = self._img_width / self._img_height
+            canvas_width = int(canvas.winfo_width() * _imageScaleFactor)
+            canvas_height = int(canvas_width / aspect_ratio)
+
+        # Resize the image to the size of the canvas
+        imgResized = img.resize((canvas_width, canvas_height))
+        self.imgCnv[canvasName] = ImageTk.PhotoImage(image=imgResized, master=canvas)
+        canvas.create_image((0, 0), image=self.imgCnv[canvasName], state="normal", anchor=NW)
+        # updating scrollers
+        canvas.configure(scrollregion = canvas.bbox("all"))
+
+
+
     def DrawDeconPsf(self,arrayIn):
         """Draw selected PSF on canvas at image deconvolution frame """
         cnv = self.widgets["PSFCanvas"]

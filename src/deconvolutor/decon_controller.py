@@ -60,23 +60,29 @@ class DeconController:
         """
         Binding events for Image deconvolution 
         """
-        self.viewDecon.widgets["ImageLoadButton"].bind("<1>", self.DeconLoadImage_clb, add="")
-        self.viewDecon.widgets["PSFLoadButton"].bind("<1>", self.DeconPSFLoad_clb, add="")
-
-        self.viewDecon.widgets["ResultIterationEntry"].bind("<Return>", self.UpdateImageIterlValue, add="")
-        self.viewDecon.widgets["ResultIterationEntry"].bind("<FocusOut>", self.UpdateImageIterlValue, add="")
-        self.viewDecon.widgets["ResultRegularisationEntry"].bind("<Return>", self.UpdateImageReglValue, add="")
-        self.viewDecon.widgets["ResultRegularisationEntry"].bind("<FocusOut>", self.UpdateImageReglValue, add="")
-
-        self.viewDecon.widgets["ImageLayerSpinbox"].bind("<<Decrement>>", self.ImageLayerChange_clb, add="")
-        self.viewDecon.widgets["ImageLayerSpinbox"].bind("<<Increment>>", self.ImageLayerChange_clb, add="")
-        self.viewDecon.widgets["ImageLayerSpinbox"].bind("<Return>", self.ImageLayerChange_clb, add="")
-        self.viewDecon.widgets["ResultStartButton"].bind("<1>", self.DeconStart_clb, add="")
-        self.viewDecon.widgets["ResultSaveButton"].bind("<1>", self.DeconImageEditor_clb, add="")
-        self.viewDecon.widgets["ResultLayerSpinbox"].bind("<<Decrement>>", self.ResLayerChange_clb, add="")
-        self.viewDecon.widgets["ResultLayerSpinbox"].bind("<<Increment>>", self.ResLayerChange_clb, add="")
-        self.viewDecon.widgets["ResultLayerSpinbox"].bind("<Return>", self.ResLayerChange_clb, add="")
-
+        try:
+            #buttons click events
+            self.viewDecon.widgets["ImageLoadButton"].bind("<1>", self.DeconLoadImage_clb, add="")
+            self.viewDecon.widgets["PSFLoadButton"].bind("<1>", self.DeconPSFLoad_clb, add="")
+            self.viewDecon.widgets["ResultStartButton"].bind("<1>", self.DeconStart_clb, add="")
+            self.viewDecon.widgets["ResultSaveButton"].bind("<1>", self.DeconImageEditor_clb, add="")
+            # Entry change events
+            self.viewDecon.widgets["ResultIterationEntry"].bind("<Return>", self.UpdateImageIterlValue, add="")
+            self.viewDecon.widgets["ResultIterationEntry"].bind("<FocusOut>", self.UpdateImageIterlValue, add="")
+            self.viewDecon.widgets["ResultRegularisationEntry"].bind("<Return>", self.UpdateImageReglValue, add="")
+            self.viewDecon.widgets["ResultRegularisationEntry"].bind("<FocusOut>", self.UpdateImageReglValue, add="")
+            # Spinbox change events
+            for target in ["Image","PSF","Result"]:
+                self.viewDecon.widgets[target+"LayerSpinbox"].bind("<Return>", 
+                                                                lambda event: self.LayerChangeSpinbox(event, "enter", target))
+                self.viewDecon.widgets[target+"LayerSpinbox"].bind("<<Decrement>>", 
+                                                                lambda event: self.LayerChangeSpinbox(event, "down", target))
+                self.viewDecon.widgets[target+"LayerSpinbox"].bind("<<Increment>>", 
+                                                                lambda event: self.LayerChangeSpinbox(event, "up", target))
+        except Exception as e:
+            self.logger.error("Can't bind events for Image deconvolution. "+str(e))
+            raise ValueError("Can't bind events for Image deconvolution", "binding-failed")
+        
     # ======= Decon PSF Callbacks ===============
     def LoadBead_btn_click(self,event):
         """Loading bead photo from file"""
@@ -237,12 +243,9 @@ class DeconController:
             else:
                 self.logger.info("Image load failed. Unknown problem.")
                 return
-        self.viewDecon.SetFileInfoImageDeconImage(self.modelDeconImage.deconImage.GetImageInfoStr(output = "full") )
-        upLim = self.modelDeconImage.deconImage.GetImageShape()[0]-1
-        self.viewDecon.widgets["ImageLayerSpinbox"].configure( from_=0, to = upLim )
-        layerId = int(self.viewDecon.widgets["ImageLayerSpinbox"].get())
-        self.viewDecon.DrawDeconImage(self.modelDeconImage.deconImage.GetIntensitiesLayer(layerId))
-
+        self.viewDecon.widgets["ImageLayerSpinbox"].set(self.modelDeconImage.GetVisibleLayerNumberFor("Image"))
+        self.viewDecon.SetFileInfoImageDeconImage(self.modelDeconImage.GetInfoStringFor("Image") )
+        self.viewDecon.DrawImageOnCanvas(canvasName = "Image",img = self.modelDeconImage.GetVisibleLayerImageFor("Image"))
         self.logger.info("Bead File Loaded: " + fNames[0])
 
 
@@ -267,30 +270,61 @@ class DeconController:
                 raise ValueError(vE.args[0], vE.args[1])
             else:
                 raise ValueError(vE.args[0], vE.args[1])
-        self.viewDecon.SetFileInfoPsfDeconImage(self.modelDeconImage.deconPsf.GetImageInfoStr(output = "full") )
-        self.viewDecon.DrawDeconPsf(self.modelDeconImage.deconPsf.GetIntensities())
+        self.viewDecon.widgets["PSFLayerSpinbox"].set(self.modelDeconImage.GetVisibleLayerNumberFor("PSF"))
+        self.viewDecon.SetFileInfoPsfDeconImage(self.modelDeconImage.GetInfoStringFor("PSF") )
+        self.viewDecon.DrawImageOnCanvas(canvasName = "PSF",img = self.modelDeconImage.GetVisibleLayerImageFor("PSF"))
         self.logger.info("PSF File Loaded: " + fNames[0]) 
 
 
-    def ImageLayerChange_clb(self,event = None):
-        wgt = event.widget
+    def LayerChangeSpinbox(self, event = None, action:str = "", canvasName:str = "Image")->None:
+        """Change visible layer number for Image, PSF or Result canvas 
+            at action 'up', 'down' or 'enter' 
+            on corresponding spinbox widget."""
+        
+        if action not in ["up", "down","enter"] :
+            raise ValueError("Wrong action", "action-incorrect")
+        
+        if action in [ "up","down"]:
+            self.logger.debug("Action up/down at " + canvasName)
+            self.modelDeconImage.VisibleLayerChange(action,canvasName)
+        else:
+            self.logger.debug("Action enter at " + canvasName)
+            wgt = event.widget
+            try:
+                spValue = int(wgt.get())
+                self.modelDeconImage.SetVisibleLayerNumberFor(canvasName, spValue)      
+            except:
+                self.logger.debug("Can't change layer number at " + canvasName)
+                wgt.set(str(self.modelDeconImage.GetVisibleLayerNumberFor(canvasName)))
+                raise            
         try:
-            spValue = int(wgt.get())
-            arr = self.modelDeconImage.deconImage.GetIntensitiesLayer(spValue)
+            self.viewDecon.DrawImageOnCanvas(canvasName = canvasName,img = self.modelDeconImage.GetVisibleLayerImageFor(canvasName) )
         except:
-            wgt.set("0")
-            return
-        self.viewDecon.DrawDeconImage(arr)       
+            self.logger.debug("Can't draw image at " + canvasName)
+            raise
 
-    def ResLayerChange_clb(self,event = None):
-        wgt = event.widget
-        try:
-            spValue = int(wgt.get())
-            arr = self.modelDeconImage.deconResult.GetIntensitiesLayer(spValue)
-        except:
-            wgt.set("0")
-            return
-        self.viewDecon.DrawResultImage(arr)       
+
+
+    # def ImageLayerChange(self, wgt = None, name:str = "Image"):
+    #     try:
+    #         spValue = int(wgt.get())
+    #         self.modelDeconImage.SetVisibleLayerNumberFor(name, spValue)      
+    #         self.viewDecon.DrawImageOnCanvas(canvasName = name,image = self.modelDeconImage.GetVisibleLayerImageFor(name) )
+    #     except:
+    #         wgt.set(str(self.modelDeconImage.GetVisibleLayerNumberFor(name)))
+    #         return
+
+    # def ImageLayerChange_clb(self,event = None):
+    #     wgt = event.widget
+    #     self.ImageLayerChange(self, wgt, name = "Image")
+
+    # def PSFLayerChange_clb(self,event = None):
+    #     wgt = event.widget
+    #     self.ImageLayerChange(self, wgt, name = "PSF")
+
+    # def ResLayerChange_clb(self,event = None):
+    #     wgt = event.widget
+    #     self.ImageLayerChange(self, wgt, name = "Result")
 
     def UpdateImageIterlValue(self, event=None):
         eventWgt = event.widget
@@ -341,9 +375,13 @@ class DeconController:
 
 
         try:
-            self.viewDecon.widgets["ResultLayerSpinbox"].configure( from_=0, to = decon_wgt.deconResult.GetImageShape()[0]-1 )
-            layerId = int(self.viewDecon.widgets["ResultLayerSpinbox"].get())
-            self.viewDecon.DrawResultImage(decon_wgt.deconResult.GetIntensitiesLayer(layerId))
+
+            self.viewDecon.widgets["ResultLayerSpinbox"].set(self.modelDeconImage.GetVisibleLayerNumberFor("Result"))
+            self.viewDecon.SetFileInfoPsfDeconImage(self.modelDeconImage.GetInfoStringFor("Result") )
+            self.viewDecon.DrawImageOnCanvas(canvasName = "Result",img = self.modelDeconImage.GetVisibleLayerImageFor("Result"))
+            # self.viewDecon.widgets["ResultLayerSpinbox"].configure( from_=0, to = decon_wgt.deconResult.GetImageShape()[0]-1 )
+            # layerId = int(self.viewDecon.widgets["ResultLayerSpinbox"].get())
+            # self.viewDecon.DrawResultImage(decon_wgt.deconResult.GetIntensitiesLayer(layerId))
         except Exception as e:
             self.logger.debug("Can not draw deconvolution resulting image. " + str(e))
             return
@@ -370,7 +408,7 @@ class DeconController:
             return
         # Open Image Editor with deconResult ImageRaw object
         try:
-            self.editor = EditorController(self.viewDecon, self.modelDeconImage.deconResult)
+            self.editor = EditorController(self.viewDecon, self.modelDeconImage.deconResult.mainImageRaw)
         except Exception as e:
             self.logger.debug("Can not open image editor. " + str(e))
             return
