@@ -1,20 +1,15 @@
-2024-04-16 13:05:23,567 __main__.main.app_main_controller INFO: Main App started.
-2024-04-16 13:05:23,568 __main__.main.app_main_model INFO: Image Editor opened
-2024-04-16 13:05:23,568 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-16 13:05:23,653 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-04-16 13:05:23,653 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-04-16 13:05:23,654 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-04-16 13:05:23,732 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
-2024-04-16 13:05:26,262 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
-2024-04-16 13:05:26,262 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
-2024-04-16 13:05:26,262 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-16 13:05:26,262 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-16 13:05:26,271 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-16 13:05:26,299 __main__.deconvolutor.decon_view INFO: Decon widget created
-2024-04-16 13:05:26,302 __main__.deconvolutor.decon_controller INFO: Deconvolution winget inititalized. Select images.
-2024-04-16 13:05:31,242 __main__.deconvolutor.decon_controller INFO: Image File Loaded: D:/tmp/test_beads/image256x256.tif
-2024-04-16 13:05:38,883 __main__.deconvolutor.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
-2024-04-16 13:05:42,230 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RL
-2024-04-16 13:05:45,486 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-16 13:05:45,551 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 3.28176212310791 seconds 
-2024-04-16 13:05:45,557 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
+2024-04-17 09:14:12,069 __main__.main.app_main_controller INFO: Main App started.
+2024-04-17 09:14:12,070 __main__.main.app_main_model INFO: Image Editor opened
+2024-04-17 09:14:12,071 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-17 09:14:12,147 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-04-17 09:14:12,148 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-04-17 09:14:12,148 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-04-17 09:14:12,215 __main__.main.app_main_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-17 09:14:14,677 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
+2024-04-17 09:14:14,677 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
+2024-04-17 09:14:14,677 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-17 09:14:14,677 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-17 09:14:14,685 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-17 09:14:14,707 __main__.deconvolutor.decon_view INFO: Decon widget created
+2024-04-17 09:14:14,713 __main__.deconvolutor.decon_controller INFO: Deconvolution widget inititalized. Select images.
+2024-04-17 09:14:27,243 __main__.deconvolutor.decon_controller INFO: Deconvolution widget closed.

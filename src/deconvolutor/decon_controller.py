@@ -4,8 +4,6 @@ from deconvolutor.decon_view import DeconView
 from editor.editor_controller import EditorController
 import logging
 from common.LogTextHandler_class import LogTextHandler
-# TODO: log string output
-
 
 
 class DeconController:
@@ -43,16 +41,24 @@ class DeconController:
         except Exception as e:
             self.logger.error("Can't bind events for deconvolution widget. "+str(e))
             raise RuntimeError("Can't bind events for deconvolution widget", "binding-failed")
-        self.logger.info("Deconvolution winget inititalized. Select images.")
+        # self.viewDecon.bind("<Destroy>", lambda event: self.onCloseWidget(event))
+        self.viewDecon.protocol("WM_DELETE_WINDOW", self.onCloseWidget)
+        self.logger.info("Deconvolution widget inititalized. Select images.")
+
+    def onCloseWidget(self):
+        self.logger.info("Deconvolution widget closed.")
+        self.logger.removeHandler(self.handler)
+        self.viewDecon.destroy()
 
     def SetLogOutput(self):
-        handler =  LogTextHandler(self.viewDecon.GetLogWidget())  
-        handler.setLevel(logging.INFO)
+        self.handler =  LogTextHandler(self.viewDecon.GetLogWidget())  
+        self.handler.setLevel(logging.INFO)
         formatter = logging.Formatter('%(asctime)s - %(message)s')
-        handler.setFormatter(formatter)    
-        self.logger.addHandler(handler)
+        self.handler.setFormatter(formatter)    
+        self.logger.addHandler(self.handler)
 
     def _bindDeconPSF(self):
+
         """
         Binding events for PSF deconvolution 
         """
