@@ -370,35 +370,48 @@ class DeconController:
     def DeconStart_clb(self, event=None):
         button = event.widget
         button.config(text = "Processing", state = "disabled")
+
+        self.deconvolutionInProgress = True
+        self.viewDecon.after(100, self.startDeconvolution)
+        self.waitForExectionEnd(button)
+
+    def waitForExectionEnd(self, button):
+        if self.deconvolutionInProgress:
+            # If deconvolution is still in progress, check again after 100 ms
+            self.viewDecon.after(500, self.waitForExectionEnd, button)
+        else:
+            # If deconvolution is finished, update the button
+            button.config(text = "Start", state = "normal")
+
+    def startDeconvolution(self):
         try:
             progBar = self.viewDecon.GetDeconImageProgressbar()
             method = self.viewDecon.GetImageDeconMethod()
         except Exception as e:
             self.logger.info("Can not get parameters for deconvolution. " + str(e))
-            return
-        decon_wgt = self.modelDeconImage
+            self.deconvolutionInProgress = True
+            return 
+       
         self.logger.info("Starting image deconvolution. Method code: " + method)
         
         try:
             self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon )
         except Exception as e:
             self.logger.error("Image deconvolution failed."+str(e))
-            return
-
+            self.deconvolutionInProgress = True
+            return  
 
         try:
             self.viewDecon.widgets["ResultLayerSpinbox"].set(self.modelDeconImage.GetVisibleLayerNumberFor("Result"))
             self.viewDecon.SetFileInfoPsfDeconImage(self.modelDeconImage.GetInfoStringFor("Result") )
             self.viewDecon.DrawImageOnCanvas(canvasName = "Result",img = self.modelDeconImage.GetVisibleLayerImageFor("Result"))
-            # self.viewDecon.widgets["ResultLayerSpinbox"].configure( from_=0, to = decon_wgt.deconResult.GetImageShape()[0]-1 )
-            # layerId = int(self.viewDecon.widgets["ResultLayerSpinbox"].get())
-            # self.viewDecon.DrawResultImage(decon_wgt.deconResult.GetIntensitiesLayer(layerId))
         except Exception as e:
             self.logger.error("Can not draw deconvolution resulting image. " + str(e))
-            return
+            self.deconvolutionInProgress = True
+            return 
         self.logger.info("Image deconvolution finished.")
-        button.config(text = "Start", state = "normal")
-        
+        self.deconvolutionInProgress = False
+
     def SaveDeconImage_clb(self, event=None):
         if self.modelDeconImage.deconResult == None:
             self.logger.error("File not saved. Deconvolution result image was not created.")
