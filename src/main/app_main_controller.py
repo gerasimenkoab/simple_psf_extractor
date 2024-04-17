@@ -66,7 +66,7 @@ class MainAppController():
         self.view.bind("<<ImageScaleChanged>>", self.OnScaleChangeEventHandler)
 
         # entries bind at two events:
-        self.logger.info("_bind: Binding buttons and entries is done.")
+        self.logger.debug("_bind: Binding buttons and entries is done.")
 
     def Run(self):
         self.view.mainloop()
