@@ -27,6 +27,7 @@ class DeconView(tk.Toplevel):
         super().__init__(master)
         self.widgets: Dict[str, tk.Widget] = {}
         self.imgCnv: Dict[str,tk.Image] = {}
+        self.sourceCanvasImage: Dict[str, tk.Image] = {}
 
         self.geometry(str(wwidth)+"x"+str(wheight))
         # self.maxsize(1920, 1080)
@@ -48,6 +49,11 @@ class DeconView(tk.Toplevel):
         self.logWidget =tk.scrolledtext.ScrolledText(self, wrap = tk.WORD, height = 2)
         self.logWidget.configure(state = "disabled")
         self.logWidget.pack(fill="x", side = "bottom",padx=2, pady=2)
+
+        # binding events for canvas resize
+        self.widgets["ImageCanvas"].bind("<Configure>", self.onCanvasSizeChange)
+        self.widgets["PSFCanvas"].bind("<Configure>", self.onCanvasSizeChange)
+        self.widgets["ResultCanvas"].bind("<Configure>", self.onCanvasSizeChange)
 
         self.logger.info("Decon widget created")
         # focus on the widget
@@ -179,11 +185,11 @@ class DeconView(tk.Toplevel):
 
     def DrawImageOnCanvas(self, canvasName:str = "Image", img:Image = None):
         """Draw image on canvas"""
+        self.sourceCanvasImage[canvasName] = img
         if img is None:
             return
         _imageScaleFactor = 1.0 # no use for now
         canvas = self.widgets[canvasName+"Canvas"]
-        print("canvas", canvasName+"Canvas")
         canvas.delete("all")
         self._img_width, self._img_height = img.size
 
@@ -205,12 +211,13 @@ class DeconView(tk.Toplevel):
         canvas.configure(scrollregion = canvas.bbox("all"))
 
 
-
-    def DrawDeconPsf(self,arrayIn):
-        """Draw selected PSF on canvas at image deconvolution frame """
-        cnv = self.widgets["PSFCanvas"]
-        cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, cnv, " ",150,350)
-        cnvTmp.get_tk_widget().grid(column=0, row=0, sticky="n")
+    def onCanvasSizeChange(self, event):
+        """Resize image on canvas"""
+        if len(self.sourceCanvasImage) == 0:
+            return
+        for canvasName in self.sourceCanvasImage.keys():
+            self.DrawImageOnCanvas(canvasName, self.sourceCanvasImage[canvasName])
+ 
 
     def GetImageDeconMethod(self):
         return self.widgets["ResultMethodStringVar"].get()

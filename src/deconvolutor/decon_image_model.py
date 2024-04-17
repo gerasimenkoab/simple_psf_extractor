@@ -3,10 +3,32 @@ from scipy.ndimage import zoom
 from common.ImageRaw_class import ImageRaw
 from .decon_methods import DeconMethods
 from common.BaseModel_class import BaseModel
+from common.AuxTkPlot_class import AuxCanvasPlot
 
 import logging
 import time
 
+class ImageModel(BaseModel):
+    """Image Model class"""
+
+    def __init__(self):
+        self.logger = logging.getLogger("__main__." + __name__)
+        self.logger.debug("Image Model object created")
+        super().__init__()
+
+class PSFModel(BaseModel):
+    """PSF Model class"""
+
+    def __init__(self):
+        self.logger = logging.getLogger("__main__." + __name__)
+        self.logger.debug("PSF Model object created")
+        super().__init__()
+    # Overrides base method
+    def GetVisibleLayerImage(self)->ImageRaw:
+        array3D = self.mainImageRaw.GetIntensities()
+        return AuxCanvasPlot.FigurePILImagekFrom3DArray(array3D, widthPt=400, heightPt = 1200, dpiIn = 400)
+
+    
 class DeconImageModel:
     """Image Deconvolution module"""
 
@@ -14,42 +36,35 @@ class DeconImageModel:
         self.logger = logging.getLogger("__main__." + __name__)
         self.logger.info("Decon Image Model object created")
 
-        # self._deconImage = ImageRaw(None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)))
-        # self._deconPsf = ImageRaw(None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)))
-        # self._deconResult = ( None  # ImageRaw( None, [0.2, 0.089, 0.089], np.zeros((10, 200, 200)) )
-        self._deconImage = BaseModel()
-        self._deconPsf = BaseModel()
-        self._deconResult = BaseModel()
-        
+        # self._deconImage = BaseModel()
+        # self._deconPsf = BaseModel()
+        # self._deconResult = BaseModel()
+        self._model = {}
+        self._model["Image"] = ImageModel()
+        self._model["PSF"] = PSFModel()
+        self._model["Result"] = ImageModel()        
 
         self._iterationNumber = 1
         self._regularizationParameter = 0.00001
 
     @property
     def deconImage(self):
-        return self._deconImage
-
-    @deconImage.setter
-    def deconImage(self, value: ImageRaw):
-        self._deconImage = value
+        return self._model["Image"]
 
     def SetDeconImage(self, fname=None, voxel=None, array=None):
-        self._deconImage.SetMainImage(fname, voxel, array)
+        self._model["Image"].SetMainImage(fname, voxel, array)
 
     @property
     def deconPsf(self):
-        return self._deconPsf
+        return self._model["PSF"]
 
     def SetDeconPsf(self, fname=None, voxel=None, array=None):
-        self._deconPsf.SetMainImage(fname, voxel, array)
+        self._model["PSF"].SetMainImage(fname, voxel, array)
 
     @property
     def deconResult(self):
-        return self._deconResult
+        return self._model["Result"]
 
-    @deconResult.setter
-    def deconResult(self, value: ImageRaw):
-        self._deconResult = BaseModel(value)
 
     @property
     def iterationNumber(self):
@@ -87,90 +102,86 @@ class DeconImageModel:
                 "regularization-parameter-incorrect",
             )
 
-    def _getTargetModel(self, canvasName):
-        """Auxilary function to get target model by canvas name"""
-        match canvasName:
-            case "Image":
-                target = self._deconImage
-            case "PSF":
-                target = self._deconPsf
-            case "Result":
-                target = self._deconResult
-            case _:
-                self.logger.error("Wrong canvas name: "+canvasName)
-                raise ValueError("Wrong canvas name", "canvas-name-incorrect")
-        return target
+    # def _getTargetModel(self, canvasName):
+    #     """Auxilary function to get target model by canvas name"""
+    #     match canvasName:
+    #         case "Image":
+    #             target = self._deconImage
+    #         case "PSF":
+    #             target = self._deconPsf
+    #         case "Result":
+    #             target = self._deconResult
+    #         case _:
+    #             self.logger.error("Wrong canvas name: "+canvasName)
+    #             raise ValueError("Wrong canvas name", "canvas-name-incorrect")
+    #     return target
 
     def SetVisibleLayerNumberFor(self, canvasName:str = "Image", layerNumber:int = 0 )->None:
         try:
-            target = self._getTargetModel(canvasName)
-        except:
-            raise
+            target = self._model[canvasName]
+        except KeyError:
+            self.logger.error("Wrong canvas name: "+canvasName)
+            raise 
         try:
             target.SetVisibleLayerNumber(layerNumber)
-        except:
+        except ValueError:
+            self.logger.error("Wrong layer number: "+str(layerNumber))
             raise
 
     def GetVisibleLayerNumberFor(self, canvasName:str = "Image")->int:
         try:
-            target = self._getTargetModel(canvasName)
-        except:
+            target = self._model[canvasName]
+        except KeyError:
+            self.logger.error("Wrong canvas name: "+canvasName)
             raise
-        try:
-            return target.GetVisibleLayerNumber()
-        except:
-            raise
+        return target.GetVisibleLayerNumber()
 
     def GetInfoStringFor(self,canvasName:str = "Image")->str:
         try:
-            target = self._getTargetModel(canvasName)
-        except:
+            target = self._model[canvasName]
+        except KeyError:
+            self.logger.error("Wrong canvas name: "+canvasName)
             raise
-        try:
-            return target.GetInfoString("full")
-        except:
-            raise
+        return target.GetInfoString("full")
 
     def GetVisibleLayerImageFor(self, canvasName:str = "Image")->ImageRaw:
         try:
-            target = self._getTargetModel(canvasName)
-        except:
+            target = self._model[canvasName]
+        except KeyError:
             raise
-        try:
-            return target.GetVisibleLayerImage()
-        except:
-            raise
+        return target.GetVisibleLayerImage()
 
     def VisibleLayerChange(self, direction:str, canvasName:str = "Image")->None:
         if direction not in ["up", "down"] :
             raise ValueError("Wrong direction", "direction-incorrect")
-        target = self._getTargetModel(canvasName)
+        try:
+            target = self._model[canvasName]
+        except KeyError:
+            self.logger.error("Wrong canvas name: "+canvasName)
+            raise
         if direction == "up":
             target.VisibleLayerNumberUp()
-            print("up "+canvasName)
         else:
             target.VisibleLayerNumberDown()
-            print("down "+canvasName)
-
+ 
     def DeconvolveImage(self, deconMethodIn: str, progBarIn, masterWidget):
         doRescalePSF = True
         self.logger.debug("step 1: rescale PSF to match image voxel size. "+ str(doRescalePSF))
-        image = self._deconImage.mainImageRaw
-        psf = self._deconPsf.mainImageRaw
+        image = self._model["Image"].mainImageRaw
+        psf = self._model["PSF"].mainImageRaw
         if doRescalePSF:
             rescaleCoefZ = psf.GetVoxelFromAxis("Z") / image.GetVoxelFromAxis("Z") 
             rescaleCoefY = psf.GetVoxelFromAxis("Y") / image.GetVoxelFromAxis("Y") 
             rescaleCoefX = psf.GetVoxelFromAxis("X") / image.GetVoxelFromAxis("X") 
             try:
                 kernell = zoom(psf.GetIntensities(),[rescaleCoefZ, rescaleCoefY, rescaleCoefX])
-                # self.imagePSF.RescaleZ(self.img.voxelSize[1])
-            except Exception as e:
-                self.logger.debug("rescale failed"+str(e))
-                raise
+            except (RuntimeError, ValueError, MemoryError) as e:
+                self.logger.debug("PSF Rescale failed"+str(e))
+                raise RuntimeError("PSF Rescale failed", "psf-rescale-failed")
         self.logger.debug("step 2: deconvolution")
         start_time = time.time()
         try:
-            PSF = DeconMethods.DeconImage(
+            PSFArray = DeconMethods.DeconImage(
                 image.GetIntensities(),
                 kernell, # psf.GetIntensities(),
                 self._iterationNumber,
@@ -181,13 +192,12 @@ class DeconImageModel:
             )
 
         except Exception as e:
-            print("Deconvolution failed" + str(e))
-            self.logger.debug(str(e))
+            self.logger.error("Image Deconvolution failed" + str(e))
             raise
         try:
-            self._deconResult = BaseModel(ImageRaw( None, list(self._deconImage.mainImageRaw.GetVoxel()), PSF ))
-        except Exception as e:
-            print("Deconvolution result save failed" + str(e))
+            self._model["Result"] = BaseModel(ImageRaw( None, list(self._model["Image"].mainImageRaw.GetVoxel()), PSFArray ))
+        except ValueError as e:
+            print("Deconvolution result assign failed" + str(e))
             self.logger.debug(str(e))
-            raise
+            raise RuntimeError("Deconvolution result assign failed", "deconvolution-result-assign-failed")
         self.logger.info("Deconvolution time: %s seconds " % (time.time() - start_time))

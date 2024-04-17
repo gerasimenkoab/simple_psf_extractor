@@ -1,4 +1,5 @@
 import numpy as np
+import io
 import tkinter as tk
 from tkinter import Canvas
 from PIL import Image
@@ -9,8 +10,10 @@ import matplotlib.ticker as plticker
 import matplotlib.cm as cm
 import itertools
 
+
 class AuxCanvasPlot():
     """Class for creation image for tkinter with matplotlib and PIL """
+
     def Draw2DArrayOnCanvasPIL(arrayIn, canvas: Canvas):
          # need to call widget.update to get correct values for winfo_width/height
         canvas.update()
@@ -42,15 +45,15 @@ class AuxCanvasPlot():
         return FigureCanvasTkAgg(fig, cnv)#.get_tk_widget()
         # .pack( side=TOP, fill=BOTH, expand=True )
 
-    def FigureCanvasTkFrom3DArray(arr3D: np.ndarray, cnv:Canvas, plotName="Plot", widthPt=100, heightPt = 300, dpiIn = 100):
-        """Function create FigureCanvasTk  object of figure with 3 slices of 3D array using matplotlib.
-        this object can be used to get widget for Tkinter object.get_tk_widget()
+    @staticmethod
+    def FigureFrom3DArray(arr3D: np.ndarray, plotName:str = None, widthPt=100, heightPt = 300, dpiIn = 100)->plt.Figure:
+        """Function create matplotlib.figure.Figure  object of figure with 3 slices of 3D array using matplotlib.
+        
         Input: arr3d - 3d ndarray
-                cnv - canvas
-                plotName - plot header name. if plotName= " " then no plotName.
+               plotName - plot header name
         Returns:
-                FigureCanvasTk  object
-                hint: use FigureCanvasTk.get_tk_widget().pack/grid() after to plot
+                matplotlib.figure.Figure  object
+                
         """
         if arr3D.ndim != 3:
             raise ValueError("Not a 3D array recieved.", "wrong-array-dimensions")
@@ -61,8 +64,8 @@ class AuxCanvasPlot():
         # heightInch = 4.5
         # creating figure with matplotlib
         fig, axs = plt.subplots(nrows=3, sharex=False, figsize=(widthInch, heightInch),dpi = dpiSet, layout="constrained")
-        # if plotName != " ":
-        #     fig.suptitle(plotName)
+        if plotName is not None:
+           fig.suptitle(plotName)
         cmap = cm.jet
         loc = plticker.MultipleLocator(base=10.0)  # ticks step setup
         i = 0
@@ -98,10 +101,47 @@ class AuxCanvasPlot():
         axs[2].pcolormesh(arr3D[:, :, arr3D.shape[2] // 2], cmap=cmap)
         # plt.subplots_adjust(hspace=0.0)
         # plt.show()
-        # Instead of plt.show creating Tkwidget from figure on the canvas self.cnvImg
+        return fig
+    
+    def FigureCanvasTkFrom3DArray(arr3D: np.ndarray, cnv:Canvas, plotName:str=None, widthPt=100, heightPt = 300, dpiIn = 100):
+        """Function create FigureCanvasTk  object of figure with 3 slices of 3D array using matplotlib.
+        this object can be used to get widget for Tkinter object.get_tk_widget()
+        Input: arr3d - 3d ndarray
+                cnv - canvas
+                plotName - plot header name. if plotName= " " then no plotName.
+        Returns:
+                FigureCanvasTk  object
+                hint: use FigureCanvasTk.get_tk_widget().pack/grid() after to plot
+        """
+        fig = AuxCanvasPlot.FigureFrom3DArray(arr3D = arr3D, plotName=plotName, widthPt=widthPt, heightPt = heightPt, dpiIn = dpiIn)
         return FigureCanvasTkAgg(fig, cnv)
+    
+    @staticmethod
+    def FigureToImage(fig:plt.Figure)->Image:
+        """
+        Convert a Matplotlib figure object into a PIL Image object.
+        Args:
+            fig (matplotlib.figure.Figure): The figure to convert.
+        Returns:
+            PIL.Image.Image: The converted image.
+        """
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        buf.seek(0)
+        img = Image.open(buf)
+        return img
 
-
+    def FigurePILImagekFrom3DArray(arr3D: np.ndarray, plotName:str=None, widthPt=100, heightPt = 300, dpiIn = 100)->Image:
+        """Function create PIL.Image  object of figure with 3 slices of 3D array using matplotlib.
+        
+        Input: arr3d - 3d ndarray
+               plotName - plot header name.
+        Returns:
+                PIL.Image object
+        """
+        fig = AuxCanvasPlot.FigureFrom3DArray(arr3D = arr3D,  plotName=plotName, widthPt=widthPt, heightPt = heightPt, dpiIn = dpiIn)
+        return AuxCanvasPlot.FigureToImage(fig)
+    
     def FigureCanvasTk3DFrom3DArray(arr3D: np.ndarray, cnv:Canvas, treshold=np.exp(-1) * 255.0):
         """Function create FigureCanvasTk  object 3D view of a given  3D array  using matplotlib.
         this object can be used to get widget for Tkinter object.get_tk_widget()

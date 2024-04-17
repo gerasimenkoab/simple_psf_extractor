@@ -368,6 +368,8 @@ class DeconController:
 
 
     def DeconStart_clb(self, event=None):
+        button = event.widget
+        button.config(text = "Processing", state = "disabled")
         try:
             progBar = self.viewDecon.GetDeconImageProgressbar()
             method = self.viewDecon.GetImageDeconMethod()
@@ -395,6 +397,7 @@ class DeconController:
             self.logger.error("Can not draw deconvolution resulting image. " + str(e))
             return
         self.logger.info("Image deconvolution finished.")
+        button.config(text = "Start", state = "normal")
         
     def SaveDeconImage_clb(self, event=None):
         if self.modelDeconImage.deconResult == None:

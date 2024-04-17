@@ -163,7 +163,9 @@ class BaseModel:
         if number < 0 or number >= len(self.imgBeadsRawList):
             raise ValueError("Layer number out of range", "layer-number-out-of-range")
         self._visibleLayerNumber = number
-
+    def GetVisibleLayerArray(self):
+        self.mainImageRaw.GetIntensitiesLayer(self.GetVisibleLayerNumber())
+        
     def GetVisibleLayerImage(self):
         img = self._AdjustImageLayerBrightnessContrast( self.GetVisibleLayerNumber() )
         return img
