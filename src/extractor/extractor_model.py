@@ -5,7 +5,7 @@ from common.ImageRaw_class import ImageRaw
 
 import logging
 
-from common.DenoiseImage_class import DenoiseImage
+from common.DenoiseImage_class import ImageDenoiser
 
 class ExtractorModel:
     def __init__(self, image: ImageRaw = None):
@@ -18,11 +18,12 @@ class ExtractorModel:
             raise TypeError("image must be an ImageRaw object") 
         else:
             self._mainImage = image
-        self._averageBead = None
-        self._beadCoords = None  # Coordinates of beads on the canvas
+        self._averageBead:ImageRaw = None
+        self._beadCoords:list = None  # Coordinates of beads on the canvas
         self._extractedBeads = []
         self._beadDiameter = 0.2
-        self._selectionFrameHalf = 18
+        self._selectionFrameHalf:int = 18
+        self._denoiser = ImageDenoiser()
 
 
     @property
@@ -196,47 +197,16 @@ class ExtractorModel:
                 bead.SaveAsTiff(fname, outtype=tiffBit)
 
     def GetDenoiseMethodsList(self):
-        return DenoiseImage.getImplementedMethodsList()            
+        # return DenoiseImage.getImplementedMethodsList()            
+        return self._denoiser.getDnoiseMethodsList()
 
-    def BlurBead(self, bead: ImageRaw, blurType):
-        """
-        Blur bead with selected filter
-        In:
-            bead : ImageRaw  - image to blur
-        Out:
-            bead : ImageRaw - blured image
-        """
-        
-
-        if bead is None:
-            raise ValueError("No bead to blur", "bead_empty")
-
-        if not isinstance(bead, ImageRaw):
-            raise TypeError("bead must be an ImageRaw object")
-        targetImage = bead.GetIntensities()
-        match blurType:
-            case "none":
-                return bead
-            case "Gaussian":
-                return DenoiseImage.gaussian(image = targetImage, sigma=1)
-                # return gaussian_filter(bead.GetIntensities(), sigma=1)
-            case "Median":
-                return DenoiseImage.median(image = targetImage, size=3)
-                # return median_filter(bead.GetIntensities(), size=3)
-            case "Wiener":
-                return DenoiseImage.wiener(image = targetImage, )
-            case "Bilateral":
-                return DenoiseImage.bilateral(image = targetImage, sigma_color=0.05, sigma_spatial=15)
-            case "Total Variation":
-                return DenoiseImage.totalVariation(image = targetImage, weight=0.1)
-            case "NN":
-                raise ValueError("NN model not implemented", "nn_not_implemented")
-            case "Non-Local Means":
-                return DenoiseImage.nonLocalMeans(image = targetImage)
-            case "Wavelet":
-                return DenoiseImage.wavelet(image = targetImage)
-            case _:
-                raise ValueError("Unknown blur type", "blur_type_unknown")
+    
+    def BlurAveragedBead(self, blurType):
+        try:
+            self._denoiser.setDenoiseMethod(blurType)
+            self._averageBead.SetIntensities( self._denoiser.denoise(self._averageBead.GetIntensities()) )
+        except ValueError as e:
+            self.logger.error("Can't blur bead. "+str(e))
 
     def BeadsArithmeticMean(self):
         #            print("blurtype", self.blurApplyType.get(), "rescale Z", self.doRescaleOverZ.get() )
@@ -260,8 +230,6 @@ class ExtractorModel:
             except:
                 raise RuntimeError("Failed to create bead object")
 
-    def BlurAveragedBead(self, blurType):
-        self.BlurBead(self._averageBead, blurType)
 
     def SaveAverageBead(self, fname, tiffBit="uint8"):
         """

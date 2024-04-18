@@ -84,16 +84,19 @@ class MainAppController():
         self.view.SetStatusBarMessage(self.model.mainImageRaw.GetImageInfoStr(output = "full"))
         self.logger.info("Image cropped.")
 
+
+
     def denoiseImageOnClick(self, event=None):
         """Denoise image"""
-        method = self.view.getDenosieMethod()
         try:
-            self.model.denoiseImage(method)
+            self.model.setDenoiseMethod(self.view.getDenosieMethod())
+            self.model.performDenoise()
         except Exception as e:
             self.logger.error("Can't denoise image. "+str(e))
             raise ValueError("Can't denoise image", "image-denoising-failed")
         self.view.DrawImageOnCanvas(self.model.GetVisibleLayerImage())
         self.logger.info("Image denoised.")
+
 
     def ShowExtractorHelp(self, event=None):
         """Show help window"""

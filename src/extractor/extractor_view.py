@@ -343,8 +343,8 @@ class ExtractorView(tk.Toplevel):
         # bring widget in the center of the screen
         # self.attributes("-topmost", True)
         # OR
-        self.update_idletasks()
-        self.lift()
+        # self.update_idletasks()
+        # self.lift()
 
 
         # ---------------------- end __init__  ---------------------------------
@@ -595,13 +595,37 @@ class ExtractorView(tk.Toplevel):
 
     def PlotCanvasInWindow(self, arrayIn: np.ndarray):
         top = Toplevel(self)
-        top.geometry("600x600")
-        cnvCompare = Canvas(top, width=590, height=590, bg="white")
+        top.geometry("300x900")
+        top.title("Bead Preview")
+        cnvCompare = Canvas(top, width=290, height=870, bg="white")
         cnvCompare.pack(side=TOP, fill=BOTH, expand=True)
-        figImg = AuxCanvasPlot.FigureCanvasTkFrom3DArray(
-            arrayIn, cnvCompare, plotName=""
-        )
-        figImg.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
+
+        figImg = AuxCanvasPlot.FigurePILImagekFrom3DArray(arr3D = arrayIn)
+         # Calculate the aspect ratio of the original image
+        original_aspect_ratio = figImg.width / figImg.height
+
+        # Calculate the new width and height while keeping the aspect ratio
+        canvas_width = cnvCompare.winfo_reqwidth()
+        canvas_height = cnvCompare.winfo_reqheight()
+        canvas_aspect_ratio = canvas_width / canvas_height
+
+        if canvas_aspect_ratio > original_aspect_ratio:
+            # Canvas is wider than image, so set height to canvas height and scale width
+            new_height = canvas_height
+            new_width = int(new_height * original_aspect_ratio)
+        else:
+            # Canvas is taller than image, so set width to canvas width and scale height
+            new_width = canvas_width
+            new_height = int(new_width / original_aspect_ratio)
+
+        # Resize the image
+        figImg = figImg.resize((new_width, new_height))
+
+        # Convert the PIL image to a PhotoImage
+        self.tk_image = ImageTk.PhotoImage(figImg)
+
+        # Draw the image on the canvas
+        cnvCompare.create_image(0, 0, image=self.tk_image, anchor='nw')
         tk.Button(top, text="Close", command=lambda: top.destroy()).pack(side=TOP)
 
     def PlotBeadPreview2D(self, beadArray, winTitle="2D Plot"):

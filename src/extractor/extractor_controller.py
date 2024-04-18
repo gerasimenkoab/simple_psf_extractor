@@ -85,7 +85,7 @@ class ExtractorController:
 
     def LoadsBeadPhoto(self, event=None):
         """Loading raw beads photo from file"""
-        fNames = askopenfilenames( title="Load Beads Photo")
+        fNames = askopenfilenames(parent=self.view, title="Load Beads Photo")
         if fNames is None:
             self.logger.debug("File list from dialog is empty. "+fNames[0])
             raise ValueError("No file name recieved", "filename_empty")

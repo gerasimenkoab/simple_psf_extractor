@@ -71,10 +71,12 @@ class AuxCanvasPlot():
         
         #fig.subplots_adjust(left=0.01, right=0.1)  # Adjust subplot position not compatible with  layout="constrained"
         if plotName is not None:
-           fig.suptitle(plotName)
+            fig.suptitle(plotName)
+        else:
+            fig.suptitle(" ")
         loc = plticker.MultipleLocator(base=10.0)  # ticks step setup
         labelFontSize = int(dpiIn /50)
-        tickFontSize = labelFontSize -1
+        tickFontSize = labelFontSize - 1
         i = 0
         axs[i].set_xlabel("x(pt)",fontsize = labelFontSize)
         axs[i].set_ylabel("y(pt)",fontsize = labelFontSize, rotation=0)
@@ -120,7 +122,7 @@ class AuxCanvasPlot():
         # plt.show()
         return fig
     
-    def FigureCanvasTkFrom3DArray(arr3D: np.ndarray, cnv:Canvas, plotName:str=None, widthPt=100, heightPt = 300, dpiIn = 100):
+    def FigureCanvasTkFrom3DArray(arr3D: np.ndarray, cnv:Canvas, plotName:str=None, widthPt=400, heightPt = 1200, dpiIn = 400):
         """Function create FigureCanvasTk  object of figure with 3 slices of 3D array using matplotlib.
         this object can be used to get widget for Tkinter object.get_tk_widget()
         Input: arr3d - 3d ndarray
@@ -148,7 +150,7 @@ class AuxCanvasPlot():
         img = Image.open(buf)
         return img
 
-    def FigurePILImagekFrom3DArray(arr3D: np.ndarray, plotName:str=None, widthPt=100, heightPt = 300, dpiIn = 100)->Image:
+    def FigurePILImagekFrom3DArray(arr3D: np.ndarray, plotName:str=None, widthPt=300, heightPt = 900, dpiIn = 300)->Image:
         """Function create PIL.Image  object of figure with 3 slices of 3D array using matplotlib.
         
         Input: arr3d - 3d ndarray

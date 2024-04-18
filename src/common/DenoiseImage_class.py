@@ -6,34 +6,83 @@ from skimage.restoration import denoise_tv_chambolle, denoise_nl_means, denoise_
 import pywt
 #from keras.models import load_model
 
-
-
-
-
+# implementation of denoiser as interface
 class ImageDenoiser:
-    """Interface  class for denoising"""
-    def __init__(self, methodName:str = None):
-        if methodName is not None:
-            self._method = Gaussian()
-        else:
-            self.setMethod(methodName)
+    """Interface class for denoising
     
-    def denoise(self, image:np.ndarray)->np.ndarray:
-        return self._method.run(image)
+    The class provides a method to denoise an image array
+    To add new method 
+    """
 
-    def setMethod(self, methodName:str, **kwargs):
-        if methodName == 'Gaussian':
-            sigma = kwargs.get('sigma', 1)  # replace default_value with a default sigma value
-            self._method = Gaussian(sigma)
-        elif methodName == 'Median':
-            size = kwargs.get('size', 3)  # replace default_value with a default size value
-            self._method = Median(size)
+    _implementedMethodList = ['none', 
+                              'Gaussian', 
+                              'Wiener', 
+                              'Total Variation', 
+                              'Median', 
+                              'Non-Local Means', 
+                              'Bilateral', 
+                              'Wavelet']
+   
+    def __init__(self, methodName:str = None):
+        if methodName is None:
+            self._method = Nothing()
         else:
-            raise ValueError("Method not implemented")
-        
+            self.setDenoiseMethod(methodName)
+    
+    @staticmethod
+    def getDnoiseMethodsList()->list:
+        """
+        Get the list of implemented denoising methods
+        """
+        return DenoiseImage._implementedMethodList
+
+    def denoise(self, imageArray:np.ndarray)->np.ndarray:
+        """ Apply the denoising method to the image array
+        Input:
+            imageArray: np.ndarray  Image array to be denoised
+        Output:
+            np.ndarray: Denoised image array
+        """
+        try:
+            return self._method.run(imageArray)
+        except:
+            raise RuntimeError("Denoising failed")
+
+    def setDenoiseMethod(self, methodName:str, **kwargs):
+
+        print("methodName", methodName)
+        match methodName:
+            case 'none':
+                self._method = Nothing()
+            case 'Gaussian':
+                sigma = kwargs.get('sigma', 1.0)  
+                self._method = Gaussian(sigma)
+            case 'Wiener':
+                size = kwargs.get('size', 3)  
+                self._method = Wiener(size)
+            case 'Total Variation':
+                weight = kwargs.get('weight', 0.1)  
+                self._method = TotalVariation(weight)
+            case 'Non-Local Means':
+                patchSize = kwargs.get('patchSize', 7)  
+                patchDistance = kwargs.get('patchDistance', 11) 
+                self._method = NonLocalMeans(patchSize, patchDistance)
+            case 'Bilateral':
+                sigma_color = kwargs.get('sigma_color', 0.05)  
+                sigma_spatial = kwargs.get('sigma_spatial', 15) 
+                self._method = Bilateral(sigma_color, sigma_spatial)
+            case 'Median':
+                size = kwargs.get('size', 3) 
+                self._method = Median(size)
+            case 'Wavelet':
+                mode = kwargs.get('mode', 'soft')  
+                self._method = Wavelet(mode)
+            case _:
+                raise ValueError("Method not known")
+            
 class Nothing:
     """Do nothing with image"""
-    def run(image:np.ndarray) -> np.ndarray:
+    def run(self,image:np.ndarray) -> np.ndarray:
         return image
 
 class Gaussian:
@@ -45,7 +94,7 @@ class Gaussian:
         else:
             self._sigma = sigma
     
-    def run(image:np.ndarray, sigma: float)->np.ndarray:
+    def run(self, image:np.ndarray)->np.ndarray:
         """
         Apply Gaussian filter to denoise the image series
         """
@@ -58,19 +107,114 @@ class Median:
     def __init__(self, size:int = None) -> None:
         if size is None:
             self._size = 3
+        else:
+            self._size = size
 
-    def run(image:np.ndarray, size: int)->np.ndarray:
+    def run(self, image:np.ndarray)->np.ndarray:
         """
         Apply median filter to denoise the image series
         """
         resultImages = np.zeros_like(image)
         for i in range(image.shape[0]):
-            resultImages[i] = median_filter(image[i], size=size)
+            resultImages[i] = median_filter(image[i], size=self._size)
         return resultImages
     
+class Wiener:
+    def __init__(self, size = None) -> None:
+        if size is None:
+            self._size = 3
+        else:
+            self._size = size
+
+    def run(self, image:np.ndarray)->np.ndarray:
+        """
+        Apply Wiener filter to denoise the image series
+        """
+        resultImages = np.zeros_like(image)
+        for i in range(image.shape[0]):
+            resultImages[i] = wiener(image[i], mysize=self._size)
+        return resultImages
+    
+class TotalVariation:
+    def __init__(self, weight:float = None) -> None:
+        if weight is None:
+            self._weight = 0.1
+        else:
+            self._weight = weight
+
+    def run(self, image:np.ndarray)->np.ndarray:
+        """
+        Apply Total Variation filter to denoise the image series
+        """
+        resultImages = np.zeros_like(image)
+        for i in range(image.shape[0]):
+            resultImages[i] = denoise_tv_chambolle(image[i], weight=self._weight)
+        return resultImages
+    
+class NonLocalMeans:
+    def __init__(self, patchSize:int = None, patchDistance:int = None) -> None:
+        if patchSize is None:
+            self._patchSize = 7
+        else:
+            self._patchSize = patchSize
+        if patchDistance is None:
+            self._patchDistance = 11
+        else:
+            self._patchDistance = patchDistance
+
+    def run(self, image:np.ndarray)->np.ndarray:
+        """
+        Apply Non-Local Means filter to denoise the image series
+        """
+        resultImages = np.zeros_like(image)
+        for i in range(image.shape[0]):
+            resultImages[i] = denoise_nl_means(image[i], patch_size=self._patchSize, patch_distance=self._patchDistance)
+        return resultImages
+    
+class Bilateral:
+    def __init__(self, sigma_color:float = None, sigma_spatial:float = None) -> None:
+        if sigma_color is None:
+            self._sigma_color = 0.05
+        else:
+            self._sigma_color = sigma_color
+        if sigma_spatial is None:
+            self._sigma_spatial = 15
+        else:
+            self._sigma_spatial = sigma_spatial
+
+    def run(self, image:np.ndarray)->np.ndarray:
+        """
+        Apply bilateral filter to denoise the image series
+        """
+        resultImages = np.zeros_like(image)
+        for i in range(image.shape[0]):
+            resultImages[i] = denoise_bilateral(image[i], sigma_color=self._sigma_color, sigma_spatial=self._sigma_spatial)
+        return resultImages
+    
+class Wavelet:
+    def __init__(self, mode:str = None) -> None:
+        if mode is None:
+            self._mode = 'soft'
+        else:
+            self._mode = mode
+
+    def run(self, image:np.ndarray)->np.ndarray:
+        """
+        Apply Wavelet filter to denoise the image series
+        """
+        resultImages = np.zeros_like(image)
+        for i in range(image.shape[0]):
+            array2D = image[i,:,:].reshape((image.shape[1],image.shape[2]))
+            coeffs = pywt.wavedec2(array2D, 'db8')
+            coeffs[0] = pywt.threshold(coeffs[0], value=np.std(coeffs[0])/2, mode=self._mode)
+            for j in range(1, len(coeffs)):
+                coeffs[j] = tuple(pywt.threshold(detail_coeff, value=np.std(detail_coeff)/2, mode=self._mode) for detail_coeff in coeffs[j])
+            resultImages[i] = pywt.waverec2(coeffs, 'db8')
+        return resultImages
 
 
 
+# implementation of denoiser as class (obsolete)
 
 class DenoiseImage:
     """
