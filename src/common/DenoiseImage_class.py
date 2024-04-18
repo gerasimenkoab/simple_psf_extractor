@@ -11,7 +11,7 @@ class ImageDenoiser:
     """Interface class for denoising
     
     The class provides a method to denoise an image array
-    To add new method 
+    To add new method add class and add it to the implementedMethodList as well as to the setDenoiseMethod method
     """
 
     _implementedMethodList = ['none', 
@@ -214,7 +214,7 @@ class Wavelet:
 
 
 
-# implementation of denoiser as class (obsolete)
+# implementation of denoiser as class (depricated)
 
 class DenoiseImage:
     """
