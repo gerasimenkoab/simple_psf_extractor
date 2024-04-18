@@ -26,7 +26,7 @@ class PSFModel(BaseModel):
     # Overrides base method
     def GetVisibleLayerImage(self)->ImageRaw:
         array3D = self.mainImageRaw.GetIntensities()
-        return AuxCanvasPlot.FigurePILImagekFrom3DArray(array3D, widthPt=400, heightPt = 1200, dpiIn = 400)
+        return AuxCanvasPlot.FigurePILImagekFrom3DArray(array3D, widthPt=800, heightPt = 2400, dpiIn = 400)
 
     
 class DeconImageModel:
