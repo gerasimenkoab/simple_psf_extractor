@@ -63,7 +63,7 @@ class AuxCanvasPlot():
         cmap = cm.gist_earth #plasma, gnuplot, gist_earth, CMRmap, inferno, magma, viridis
         dpiSet = dpiIn
         widthInch = widthPt / dpiSet
-        heightInch = heightPt * 1.05 / dpiSet
+        heightInch = heightPt * 1.02 / dpiSet
         # widthInch = 1.5
         # heightInch = 4.5
         # creating figure with matplotlib

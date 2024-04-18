@@ -7,6 +7,71 @@ import pywt
 #from keras.models import load_model
 
 
+
+
+
+class ImageDenoiser:
+    """Interface  class for denoising"""
+    def __init__(self, methodName:str = None):
+        if methodName is not None:
+            self._method = Gaussian()
+        else:
+            self.setMethod(methodName)
+    
+    def denoise(self, image:np.ndarray)->np.ndarray:
+        return self._method.run(image)
+
+    def setMethod(self, methodName:str, **kwargs):
+        if methodName == 'Gaussian':
+            sigma = kwargs.get('sigma', 1)  # replace default_value with a default sigma value
+            self._method = Gaussian(sigma)
+        elif methodName == 'Median':
+            size = kwargs.get('size', 3)  # replace default_value with a default size value
+            self._method = Median(size)
+        else:
+            raise ValueError("Method not implemented")
+        
+class Nothing:
+    """Do nothing with image"""
+    def run(image:np.ndarray) -> np.ndarray:
+        return image
+
+class Gaussian:
+    def __init__(self, sigma:float = None):
+        if not isinstance(sigma, float):
+            raise ValueError("Sigma should be float")
+        if sigma is None:
+            self._sigma = 1
+        else:
+            self._sigma = sigma
+    
+    def run(image:np.ndarray, sigma: float)->np.ndarray:
+        """
+        Apply Gaussian filter to denoise the image series
+        """
+        resultImages = np.zeros_like(image)
+        for i in range(image.shape[0]):
+            resultImages[i] = gaussian_filter(image[i], sigma=self._sigma)
+        return resultImages
+
+class Median:
+    def __init__(self, size:int = None) -> None:
+        if size is None:
+            self._size = 3
+
+    def run(image:np.ndarray, size: int)->np.ndarray:
+        """
+        Apply median filter to denoise the image series
+        """
+        resultImages = np.zeros_like(image)
+        for i in range(image.shape[0]):
+            resultImages[i] = median_filter(image[i], size=size)
+        return resultImages
+    
+
+
+
+
 class DenoiseImage:
     """
     Class for image denoising methods
