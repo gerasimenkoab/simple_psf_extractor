@@ -1,6 +1,6 @@
 import numpy as np
 from common.ImageRaw_class import ImageRaw
-from .decon_methods import DeconMethods
+from common.DeconMethods_class import DeconMethods
 
 import logging
 import time

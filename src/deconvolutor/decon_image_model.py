@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.ndimage import zoom
 from common.ImageRaw_class import ImageRaw
-from .decon_methods import DeconMethods
+from common.DeconMethods_class import DeconMethods
 from common.BaseModel_class import BaseModel
 from common.AuxTkPlot_class import AuxCanvasPlot
 
