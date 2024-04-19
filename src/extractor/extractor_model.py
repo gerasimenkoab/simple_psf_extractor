@@ -240,7 +240,8 @@ class ExtractorModel:
         try:
             self._averageBead.SaveAsTiff(fname)
         except IOError as e:
-            raise IOError(e[0], e[1])
+            self.logger.error("Can't save averaged bead. "+str(e))
+            raise 
 
     def LoadManyBeads(self, fileList):
         """Loading many raw bead photos from files"""

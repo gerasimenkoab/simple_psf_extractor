@@ -168,8 +168,13 @@ class ExtractorController:
             self.view.PlotCanvasInWindow(self.model.averageBead.GetIntensities())
 
     def SaveAverageBead(self, event=None):
-        self.model.SaveAverageBead(asksaveasfilename())
-        pass
+        try:
+            fname = asksaveasfilename(parent=self.view, title="Save Average Bead"  )
+        except:
+            self.logger.error("Can not get file name.")
+            raise ValueError("Can not get file name", "filename_empty")
+        self.model.SaveAverageBead(fname)
+        
 
     def AverageSeveralBeads(self, event=None):
         raise NotImplementedError("will do it soon")
@@ -177,7 +182,7 @@ class ExtractorController:
         self.model.AverageManyBeads(
             askopenfilenames(title="Load Beads"), asksaveasfilename()
         )
-        pass
+        
 
 
     def CloseExtractor(self, event=None):
@@ -222,5 +227,9 @@ class ExtractorController:
 
     def PreviewBeads(self, event=None):
         # ExtractorBeadPreviewController(self._master, self.model)
-        ExtractorBeadPreviewController(self.view, self.model)
+        try:
+            self.preview = ExtractorBeadPreviewController(self.view, self.model)
+        except Exception as e:
+            self.logger.error("PreviewBeads: can't preview " + str(e))
+             
 
