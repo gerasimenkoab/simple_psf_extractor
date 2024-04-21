@@ -22,7 +22,7 @@ class MainAppModel(BaseModel):
             
     def performDenoise(self)->None:
         try:
-            self._denoiser.denoise(self._mainImageRaw.GetIntensities())
+            self.setMainImageIntensities(self._denoiser.denoise(self.getMainImageIntensities()))
         except RuntimeError as e:
             self.logger.error("Can't denoise image. "+str(e))
             raise

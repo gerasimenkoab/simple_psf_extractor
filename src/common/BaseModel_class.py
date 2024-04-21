@@ -37,20 +37,6 @@ class BaseModel:
         self.SetVisibleLayerNumber( int((len(self.imgBeadsRawList) + 1) / 2) )
         
 
-    # def getDnoiseMethodsList(self):
-    #     return DenoiseImage.getImplementedMethodsList()
-    
-
-
-    # def denoiseImage(self, denoiseType:str)->None:
-    #     """Denoise main image by denoise type"""
-    #     try:
-    #         self._mainImageRaw.SetIntensities( DenoiseImage.denoiseByMethodDefault(self._mainImageRaw.GetIntensities(), denoiseType) )
-    #     except Exception as e:
-    #         self.logger.error("Can't denoise image. "+str(e))
-    #         raise ValueError("Can't denoise image", "image-denoising-failed")
-    #     self._ConvertMainImageRawToPILImage()
-
     def NormalizeImageArray(self, array):
         """Normalize array values to 0-255 range"""
         array = array / np.amax(array) * np.iinfo(np.uint8).max
@@ -74,6 +60,19 @@ class BaseModel:
             raise ValueError("Can't convert raw image to PIL", "image-conversion-failed")
         self._visibleLayerNumber = int((len(self.imgBeadsRawList) + 1) / 2)
 
+    def setMainImageIntensities(self, array:np.ndarray)->None:
+        # check if array is not empty and has same shape as previous array
+        if array is None or array.shape != self._mainImageRaw.GetIntensities().shape:
+            raise ValueError("Array is empty or has wrong shape", "array-empty")
+        try:
+            self._mainImageRaw.SetIntensities(array)
+            self._ConvertMainImageRawToPILImage()
+        except ValueError as e:
+            self.logger.error("Can't set main image intensities. "+str(e))
+            raise ValueError("Can't set main image intensities", "image-intensities-setting-failed")
+
+    def getMainImageIntensities(self)->np.ndarray:
+        return self._mainImageRaw.GetIntensities()
 
     def _AdjustImageBrightnessContrast(self)->None:
         """
