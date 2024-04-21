@@ -206,7 +206,7 @@ class ExtractorModel:
             self._denoiser.setDenoiseMethod(blurType)
             self._averageBead.SetIntensities( self._denoiser.denoise(self._averageBead.GetIntensities()) )
         except ValueError as e:
-            self.logger.error("Can't blur bead. "+str(e))
+            self.logger.error("Can't blur bead with "+ blurType +str(e))
 
     def BeadsArithmeticMean(self):
         #            print("blurtype", self.blurApplyType.get(), "rescale Z", self.doRescaleOverZ.get() )
