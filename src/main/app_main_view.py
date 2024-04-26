@@ -14,7 +14,7 @@ except ImportError:
 
 class MainAppView(tk.Tk):
 
-    def __init__(self, masterController = None,  wWidth = 600, wHeight = 600, denoiseMethodList = None):
+    def __init__(self, masterController = None,  wWidth = 600, wHeight = 600, denoiseMethodList = None, availablePackages = None):
         self.beadsPhotoLayerID = 0  # default index of beads microscope photo
         self.brightnessValue = 1
         self.contrastValue = 1
@@ -51,8 +51,9 @@ class MainAppView(tk.Tk):
 
 
         # ----------------------------- Menu Bar ----------------------------
+        self.availablePackages = availablePackages
         try:        
-            self.menubar = AppMainMenu(self)
+            self.menubar = AppMainMenu(self, self.availablePackages)
             self.config(menu=self.menubar)
         except Exception as e:
             raise ValueError("Can't create menu bar", "menu-creation-failed")

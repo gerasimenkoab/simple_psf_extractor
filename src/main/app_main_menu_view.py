@@ -1,11 +1,9 @@
-import pkgutil
-import os
 import tkinter as tk
 from tkinter import ttk
-import importlib
+import common.PackageManager as PackageManager
 
 class AppMainMenu(tk.Menu):
-    def __init__(self, parentWindow):
+    def __init__(self, parentWindow,availablePackages = []):
         super().__init__(parentWindow)
         self.parentWindow = parentWindow
         # Create a submenu for the File section
@@ -18,26 +16,21 @@ class AppMainMenu(tk.Menu):
         self.add_cascade(label="File", menu=self.file_menu)
 
         # Create a submenu for the Modules section
-        self.modules_menu = tk.Menu(self, tearoff=0)
-        self.add_cascade(label="Modules", menu=self.modules_menu)
-
-       # Get the path to the project directory where your packages are located
-        project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-        # Define the packages you want to include
-        allowed_packages = ['deconvolutor',  'extractor']
-
-        # Get a list of all available packages in the project directory
-        available_packages = [name for _, name, is_pkg in pkgutil.iter_modules([project_dir]) if is_pkg and name in allowed_packages]
+        self.modulesMenu = tk.Menu(self, tearoff=0)
+        self.add_cascade(label="Modules", menu=self.modulesMenu)
 
         # Add each package to the menu
-        for package in available_packages:
-            self.modules_menu.add_command(label=package, command=lambda pkg=package: self.load_module(pkg))
+        for package in availablePackages:
+            self.addModuleMenuEntry(package)
 
         # Create a submenu for the Help section
         self.help_menu = tk.Menu(self, tearoff=0)
         self.help_menu.add_command(label="About", command=self.show_about)
         self.add_cascade(label="Help", menu=self.help_menu)
+
+
+    def addModuleMenuEntry(self, package):
+        self.modulesMenu.add_command(label=package, command=lambda: self.parentWindow.event_generate(f"<<Module-{package}>>"))
 
     def close_application(self):
         print("Closing App...")
@@ -55,8 +48,3 @@ class AppMainMenu(tk.Menu):
         print("Showing about...")
         tk.messagebox.showinfo("About", "This is a simple application")
         self.parentWindow.event_generate("<<Main-Help>>")
-
-    def load_module(self, package_name):
-        print(f"Loading module: {package_name}")
-        main_module = importlib.import_module(f"{package_name}.main")
-        main_module.Run(self.parentWindow)

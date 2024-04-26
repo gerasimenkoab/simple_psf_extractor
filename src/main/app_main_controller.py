@@ -8,6 +8,8 @@ from main.app_main_view import MainAppView
 from main.app_main_model import MainAppModel
 # from cnn.cnn_deconvolution_gui import *
 import logging
+from common.PackageManager import PackageManager
+
 
 class MainAppController():
     def __init__(self, master=None):
@@ -18,9 +20,12 @@ class MainAppController():
         except Exception as e:
             self.logger.error("Can't create model. "+str(e))
             raise ValueError("Can't create model", "model-creation-failed")
-        
+
+        self.packageManager = PackageManager()
+
         try:
-            self.view = MainAppView(denoiseMethodList=self.model.getDnoiseMethodsList())
+            self.view = MainAppView(denoiseMethodList = self.model.getDnoiseMethodsList(),
+                                    availablePackages = self.packageManager.getAvailablePackages())   
         except Exception as e:
             self.logger.error("Can't create GUI. "+str(e))
             raise ValueError("Can't create GUI", "GUI-creation-failed")
@@ -48,6 +53,9 @@ class MainAppController():
         self.view.bind("<<Main-SaveFiler>>",self.SaveImage)
         self.view.bind("<<Control-s>>",self.SaveImage)
         self.view.bind("<<CloseApp>>",self.CloseApplication)
+        # Packages:
+        for package in self.packageManager.getAvailablePackages():
+            self.view.bind(f"<<Module-{package}>>", lambda event, pkg=package: self.packageManager.loadModule(pkg,self.view))
         # Help:
         self.view.bind("<<ShowHelp>>",self.ShowExtractorHelp)
 
