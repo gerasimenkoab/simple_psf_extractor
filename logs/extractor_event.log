@@ -1,15 +1,10 @@
-2024-04-26 18:56:36,309 __main__.main.app_main_controller INFO: Main App started.
-2024-04-26 18:56:36,316 __main__.main.app_main_model INFO: Image Editor opened
-2024-04-26 18:56:36,316 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-26 18:56:36,447 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-04-26 18:56:36,447 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-04-26 18:56:36,447 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-04-26 18:56:45,063 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
-2024-04-26 18:56:45,063 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
-2024-04-26 18:56:45,063 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-26 18:56:45,072 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-26 18:56:45,072 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-26 18:56:45,107 __main__.deconvolutor.decon_view INFO: Decon widget created
-2024-04-26 18:56:45,115 __main__.deconvolutor.decon_controller INFO: Deconvolution widget inititalized. Select images.
-2024-04-26 18:56:47,206 __main__.deconvolutor.decon_controller INFO: Deconvolution widget closed.
-2024-04-26 18:56:48,372 __main__.main.app_main_controller INFO: Main App running.
+2024-04-26 19:01:14,533 __main__.main.app_main_controller INFO: Main App started.
+2024-04-26 19:01:14,533 __main__.main.app_main_model INFO: Image Editor opened
+2024-04-26 19:01:14,533 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-26 19:01:14,623 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-04-26 19:01:14,623 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-04-26 19:01:14,631 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-04-26 19:01:30,463 __main__.main.app_main_controller INFO: File loaded. 
+2024-04-26 19:01:40,416 __main__.main.app_main_controller INFO: Image denoised.
+2024-04-26 19:02:26,248 __main__.main.app_main_controller INFO: Application Closed.
+2024-04-26 19:02:26,249 __main__.main.app_main_controller INFO: Main App running.

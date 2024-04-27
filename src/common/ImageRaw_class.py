@@ -88,7 +88,7 @@ class ImageRaw:
             self.path =  fpath[0] 
     # -------------------- constructor end ----------------------------
 
-    # methods
+
 
     def LoadImageFile(self, fileNameList: tuple, tagID = 270)->tuple:
         """
@@ -103,74 +103,95 @@ class ImageRaw:
         
         if len(fileNameList) < 1:
             raise ValueError("Empty file name list")
+        
         elif len(fileNameList) == 1:
-
-            try:
-                with Image.open(fileNameList[0]) as image_tiff:
-                    ncols, nrows = image_tiff.size
-                    nlayers = image_tiff.n_frames
-                    imgArray = np.ndarray([nlayers, nrows, ncols]) # Z,Y,X
-                    if image_tiff.mode == "I" or image_tiff.mode == "L":
-                        for i in range(nlayers):
-                            image_tiff.seek(i)
-                            imgArray[i, :, :] = np.array(image_tiff)
-                    elif image_tiff.mode == "RGB":
-                        for i in range(nlayers):
-                            image_tiff.seek(i)
-                            image_tiff.getdata()
-                            r, g, b = image_tiff.split()
-                            ra = np.array(r)
-                            ga = np.array(g)
-                            ba = np.array(b)
-                            #recalculate greyscale intensity from rgb values
-                            grayImgArr = 0.299 * ra + 0.587 * ga + 0.114 * ba
-                            imgArray[i, :, :] = grayImgArr
-                    else:
-                        raise ValueError( "Unsupported tiff file mode: {}".format( str(image_tiff.mode) ) )          
-            except :
-                raise FileNotFoundError("Can't load file: {} ".format(fileNameList[0]) )
+            imgArray = self.LoadMultiframeTiff(fileNameList[0])
         else:
             # multi file load
             try:
-                with Image.open(fileNameList[0]) as image_preread:
-                    # print("color_mode:", image_preread.mode, ".......", end=" ")
-                    nlayers = len(fileNameList)
-                    ncols, nrows = image_preread.size
-                    imgArray = np.ndarray([nlayers, nrows, ncols])
-                    # checking file color mode and convert to grayscale
-                    if image_preread.mode == "RGB":
-                        # convert to Grayscale
-                        for i, fileName in enumerate(fileNameList):
-                            try: 
-                                with Image.open(fileName) as image_tiff:
-                                    if image_tiff.n_frames != 1:
-                                        raise ValueError( "Not singleframe tif file in list of files: {}".format( fileName ) )
-                                    image_tiff.getdata()
-                                    r, g, b = image_tiff.split()
-
-                            except :
-                                raise FileNotFoundError( "Can't load file: {} ".format( fileName ) )
-                            ra = np.array(r)
-                            ga = np.array(g)
-                            ba = np.array(b)
-                            grayImgArr = 0.299 * ra + 0.587 * ga + 0.114 * ba
-                            imgArray[i, :, :] = grayImgArr
-                    elif image_preread.mode == "I" or image_preread.mode == "L":
-                        for i, fileName in enumerate(fileNameList):
-                            try:
-                                with Image.open(fileName) as imageFile:
-                                    imgArray[i, :, :] = np.array(imageFile)
-                            except:
-                                raise FileNotFoundError("Can't load file: {} ".format( fileName ))
-                    else:
-                        raise ValueError( "Unsupported tiff file mode: {}".format( str(image_tiff.mode) ) )
-
+                imgArray = self.LoadSingleFrameTiffArray(fileNameList)
             except:
                 raise FileNotFoundError("Can't load file: {} ".format(fileNameList[0]) )
         try:
             return imgArray, image_tiff.tag[tagID][0]
         except:
             return imgArray, ""
+
+    def LoadProjectSeriesParameters(self, currentFilePath: str):
+        # load parameters from xml file stored in MetaData subfolder of current folder in file with a file name ended with"Propertires.xml"
+        # return dictionary with parameters
+        
+        # get path to metadata folder from current file path
+        metadataPath = currentFilePath.split("\\")[:-1]+["\\MetaData"]
+        return metadataPath;
+
+
+    def LoadMultiframeTiff(self,fileName)->np.ndarray:
+        """Load single multiframe tiff file and return numpy array with pixel values."""
+
+        try:
+            with Image.open(fileName) as image_tiff:
+                ncols, nrows = image_tiff.size
+                nlayers = image_tiff.n_frames
+                imgArray = np.ndarray([nlayers, nrows, ncols]) # Z,Y,X
+                if image_tiff.mode == "I" or image_tiff.mode == "L":
+                    for i in range(nlayers):
+                        image_tiff.seek(i)
+                        imgArray[i, :, :] = np.array(image_tiff)
+                elif image_tiff.mode == "RGB":
+                    for i in range(nlayers):
+                        image_tiff.seek(i)
+                        image_tiff.getdata()
+                        r, g, b = image_tiff.split()
+                        ra = np.array(r)
+                        ga = np.array(g)
+                        ba = np.array(b)
+                        #recalculate greyscale intensity from rgb values
+                        grayImgArr = 0.299 * ra + 0.587 * ga + 0.114 * ba
+                        imgArray[i, :, :] = grayImgArr
+                else:
+                    raise ValueError( "Unsupported tiff file mode: {}".format( str(image_tiff.mode) ) )          
+        except :
+            raise FileNotFoundError("Can't load file: {} ".format(fileName) )
+        return imgArray
+
+    def LoadSingleFrameTiffArray(self, fileNameList)->np.ndarray:
+        """Load multiple singleframe tiff files and return numpy array with pixel values."""
+
+        with Image.open(fileNameList[0]) as image_preread:
+            nlayers = len(fileNameList)
+            ncols, nrows = image_preread.size
+            imgArray = np.ndarray([nlayers, nrows, ncols])
+            
+            if image_preread.mode == "RGB":
+                for i, fileName in enumerate(fileNameList):
+                    try: 
+                        with Image.open(fileName) as image_tiff:
+                            if image_tiff.n_frames != 1:
+                                raise ValueError("Not singleframe tif file in list of files: {}".format(fileName))
+                            image_tiff.getdata()
+                            r, g, b = image_tiff.split()
+                    except:
+                        raise FileNotFoundError("Can't load file: {} ".format(fileName))
+                    
+                    ra = np.array(r)
+                    ga = np.array(g)
+                    ba = np.array(b)
+                    grayImgArr = 0.299 * ra + 0.587 * ga + 0.114 * ba
+                    imgArray[i, :, :] = grayImgArr
+            elif image_preread.mode == "I" or image_preread.mode == "L":
+                for i, fileName in enumerate(fileNameList):
+                    try:
+                        with Image.open(fileName) as imageFile:
+                            imgArray[i, :, :] = np.array(imageFile)
+                    except:
+                        raise FileNotFoundError("Can't load file: {} ".format(fileName))
+            else:
+                raise ValueError("Unsupported tiff file mode: {}".format(str(image_tiff.mode)))
+        return imgArray
+
+
+
 
     def SetIntensities(self, newArray: np.ndarray)->None:
         """
