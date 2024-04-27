@@ -1,10 +1,8 @@
-2024-04-26 19:01:14,533 __main__.main.app_main_controller INFO: Main App started.
-2024-04-26 19:01:14,533 __main__.main.app_main_model INFO: Image Editor opened
-2024-04-26 19:01:14,533 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-26 19:01:14,623 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-04-26 19:01:14,623 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-04-26 19:01:14,631 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-04-26 19:01:30,463 __main__.main.app_main_controller INFO: File loaded. 
-2024-04-26 19:01:40,416 __main__.main.app_main_controller INFO: Image denoised.
-2024-04-26 19:02:26,248 __main__.main.app_main_controller INFO: Application Closed.
-2024-04-26 19:02:26,249 __main__.main.app_main_controller INFO: Main App running.
+2024-04-27 23:31:06,123 __main__.main.app_main_controller INFO: Main App started.
+2024-04-27 23:31:06,124 __main__.main.app_main_model INFO: Image Editor opened
+2024-04-27 23:31:06,124 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-27 23:31:06,319 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-04-27 23:31:06,319 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-04-27 23:31:06,320 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-04-27 23:31:27,239 __main__.main.app_main_controller INFO: File loaded. 
+2024-04-27 23:32:31,049 __main__.main.app_main_controller INFO: Image denoised.

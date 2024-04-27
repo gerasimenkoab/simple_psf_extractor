@@ -29,22 +29,19 @@ class ImageRawClassTests(unittest.TestCase):
             self.testArray[:,18:]=self.testArray[:,18:] * 0
             np.testing.assert_array_equal(img.GetIntensities()[3,:,:], self.testArray, 'create from file 255 error')
 
-    def test_XMLFromFile(self):
+    def test_extractParametersDictFromXMLFile(self):
         currentFileDir = os.path.dirname(os.path.abspath(__file__))
         folderPath = currentFileDir + '\\data\\tiff_series_project\\'
-        self.filelist = []
-        self.filelist = [folderPath+name for name in os.listdir(path = folderPath)]
-        print("fileList:"+self.fileList)
-        # with ImageRaw(fpath = self.filelist, voxelSizeIn=self.testVoxel) as img:
-        #     # metadataPath test
-        #     self.assertEqual()
-        #     np.testing.assert_array_equal(img.GetIntensities()[0,:,:], self.testArray, 'create from file 0 error')
-        #     #black layer test
-        #     self.testArray = np.ones((36,36)) * 255
-        #     np.testing.assert_array_equal(img.GetIntensities()[1,:,:], self.testArray, 'create from file 255 error')
-        #     #halfblack
-        #     self.testArray[:,18:]=self.testArray[:,18:] * 0
-        #     np.testing.assert_array_equal(img.GetIntensities()[3,:,:], self.testArray, 'create from file 255 error')
+        self.fileList = []
+        self.fileList = [folderPath+name for name in os.listdir(path = folderPath)if os.path.isfile(os.path.join(folderPath, name))]
+        # print(self.fileList[0])
+        etalonDict = {'voxel': {'X': 0.044, 'Y': 0.044, 'Z': 0.1}, 'NumericalAperture': 1.4, 
+                      'RefractionIndex': 1.518, 'Zoom': 2.56, 'Pinhole': '151.7 µm', 
+                      'PinholeAiry': '1.00 AU', 'EmissionWavelengthForPinholeAiryCalculation': '580.0 nm'}
+        with ImageRaw(fpath = self.fileList) as img:
+            testDict = img.LoadProjectSeriesParameters(currentFilePath = self.fileList[0])
+            self.assertEqual(etalonDict, testDict, 'XML parsing error')
+            img.ShowClassInfo()
 
 
     def test_ConstructorFromArray(self):

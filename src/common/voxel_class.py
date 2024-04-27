@@ -27,6 +27,16 @@ class Voxel:
         else:
             self._voxelValues = newVoxel
 
+    def SetFromDict(self, newVoxel: dict)->None:
+        """
+            Setting voxel from dict
+        """
+        if newVoxel is not None:
+            try:
+                self._voxelValues = [newVoxel[axisName] for axisName in self._axisNames]
+            except KeyError:
+                raise ValueError("Wrong Voxel Value.")
+
     def Get(self)->list:
         """
             Getting list of voxel values

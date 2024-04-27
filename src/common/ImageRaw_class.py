@@ -1,6 +1,9 @@
 import numpy as np
 import logging
 import itertools
+import os
+import glob
+import xml.etree.ElementTree as ET
 from scipy.interpolate import RegularGridInterpolator
 from PIL import Image
 import json
@@ -47,24 +50,25 @@ class ImageRaw:
         else:
             if intensitiesIn is None:
                 intensitiesFile,tagString = self.LoadImageFile(fpath, 270)
+                try:
+                    self._intensities.Set(intensitiesFile)
+                except:
+                    raise ValueError("Can not set array from file.","data_problem")
+
                 if tagString == "" :
                     if voxelSizeIn is None:
-                        raise ValueError("No voxel recieved from file or as argument","voxel_problem")
-                    else:
                         try:
-                            self._intensities.Set(intensitiesFile)
+                            parameters = self.LoadProjectSeriesParameters(fpath[0])
+                            self._voxel.SetFromDict(parameters["voxel"])
                         except:
-                            raise ValueError("Can not set array from file.","data_problem")
+                            raise ValueError("No voxel recieved from file or as argument","voxel_problem")
+                    else:
                         try:
                             self._voxel.Set(voxelSizeIn)
                         except:
                             raise ValueError("Can not set voxel from argument.","voxel_problem")
                 else:
                     if voxelSizeIn is None:
-                        try:
-                            self._intensities.Set(intensitiesFile)
-                        except:
-                            raise ValueError("Can not set array from file.","data_problem")
                         try:
                             try:
                                 voxelSizeIn = json.loads(tagString)
@@ -74,10 +78,6 @@ class ImageRaw:
                         except:
                             raise ValueError("Can not set voxel from tag. Check tag format.","voxel_problem")
                     else:
-                        try:
-                            self._intensities.Set(intensitiesFile)
-                        except:
-                            raise ValueError("Can not set array from file.","data_problem")
                         try:
                             self._voxel.Set(voxelSizeIn)
                         except:
@@ -118,12 +118,37 @@ class ImageRaw:
             return imgArray, ""
 
     def LoadProjectSeriesParameters(self, currentFilePath: str):
-        # load parameters from xml file stored in MetaData subfolder of current folder in file with a file name ended with"Propertires.xml"
+        # load parameters from xml file stored in MetaData subfolder of current folder
+        #  in file with a file name ended with"Propertires.xml"
         # return dictionary with parameters
         
-        # get path to metadata folder from current file path
-        metadataPath = currentFilePath.split("\\")[:-1]+["\\MetaData"]
-        return metadataPath;
+        metadataPath = os.path.dirname(currentFilePath)+"\\MetaData"
+        # Find the "Properties.xml" file in the metadata directory
+        propertiesFile = glob.glob(os.path.join(metadataPath, "*Properties.xml"))
+        if propertiesFile:
+            properties_file = propertiesFile[0]
+        else:
+            raise FileNotFoundError("No 'Properties.xml' file found in the metadata directory")
+
+        # Parse the XML file
+        tree = ET.parse(properties_file)
+        root = tree.getroot()
+        parameters = {}
+        voxel = {}
+        # Iterate over all elements in the XML file
+        for element in root.iter():
+            if element.tag == "DimensionDescription" :
+                voxel[element.attrib['DimID']] = float(element.attrib['Voxel'])
+                parameters['voxel'] = voxel
+            if element.tag == "ATLConfocalSettingDefinition":
+                for attr in element.attrib:
+                    if attr in ["Zoom", "NumericalAperture", "RefractionIndex",
+                                "Pinhole", "PinholeAiry", "EmissionWavelengthForPinholeAiryCalculation"]:
+                        try:
+                            parameters[attr] = float(element.attrib[attr])
+                        except:
+                            parameters[attr] = element.attrib[attr] 
+        return parameters
 
 
     def LoadMultiframeTiff(self,fileName)->np.ndarray:
@@ -304,6 +329,7 @@ class ImageRaw:
         """
             Prints class attributes. 
         """
+        print(" ")
         print( " ImageClassInfo: " )
         print( " path: ", self.path )
         print( " voxel(micrometres): ", self._voxel.GetValuesStr() )
