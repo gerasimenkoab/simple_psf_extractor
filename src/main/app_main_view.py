@@ -207,7 +207,7 @@ class MainAppView(tk.Tk):
         self._denoiseMethodMenu.configure(width=10)
         self._denoiseMethodMenu.pack(side=TOP, padx=2, pady=2)
 
-        self._denoiseBtn = ttk.Button(editButtonsFrame, text="Denosise", command=lambda: self.event_generate("<<DenoiseImage>>"))   
+        self._denoiseBtn = ttk.Button(editButtonsFrame, text="Denoise", command=lambda: self.event_generate("<<DenoiseImage>>"))   
         self._denoiseBtn.pack(side=TOP, padx=2, pady=2)
         editButtonsFrame.grid(row=1, column=3, sticky="WENS")
         # ----------------------- End Edit Buttons Frame -----------------------------
