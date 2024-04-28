@@ -1,11 +1,31 @@
-2024-04-28 10:35:15,810 __main__.main.app_main_controller INFO: Main App started.
-2024-04-28 10:35:15,810 __main__.main.app_main_model INFO: Image Editor opened
-2024-04-28 10:35:15,810 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-28 10:35:15,944 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-04-28 10:35:15,945 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-04-28 10:35:15,945 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-04-28 10:35:27,455 __main__.main.app_main_controller INFO: File loaded. 
-2024-04-28 10:35:41,230 __main__.main.app_main_controller INFO: Image saved as tiff. D:/tmp/test_beads/tester1.tiff
-2024-04-28 10:36:38,563 __main__.common.BaseModel_class ERROR: Can't save image as tiff. unknown file extension: 
-2024-04-28 10:36:38,564 __main__.main.app_main_controller ERROR: Can't save image. ("Can't save image as tiff", 'image-saving-failed')
-2024-04-28 10:36:56,524 __main__.main.app_main_controller INFO: Main App running.
+2024-04-28 22:22:19,843 __main__.main.app_main_controller INFO: Main App started.
+2024-04-28 22:22:19,843 __main__.main.app_main_model INFO: Image Editor opened
+2024-04-28 22:22:19,844 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-28 22:22:19,983 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-04-28 22:22:19,984 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-04-28 22:22:19,985 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-04-28 22:22:22,776 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
+2024-04-28 22:22:22,780 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
+2024-04-28 22:22:22,782 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-28 22:22:22,785 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-28 22:22:22,789 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-28 22:22:22,841 __main__.deconvolutor.decon_view INFO: Decon widget created
+2024-04-28 22:22:22,854 __main__.deconvolutor.decon_controller INFO: Deconvolution widget inititalized. Select images.
+2024-04-28 22:22:27,200 __main__.deconvolutor.decon_controller INFO: Image File Loaded: D:/tmp/test_beads/image256x256.tif
+2024-04-28 22:22:37,329 __main__.deconvolutor.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
+2024-04-28 22:23:20,836 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RLTMR
+2024-04-28 22:23:27,811 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-28 22:23:27,908 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 7.034701824188232 seconds 
+2024-04-28 22:23:27,919 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
+2024-04-28 22:23:36,063 __main__.editor.editor_controller INFO: Initializing Bead Extractor module.
+2024-04-28 22:23:36,064 __main__.editor.editor_model INFO: Image Editor opened
+2024-04-28 22:23:36,237 __main__.editor.editor_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-28 22:23:43,051 __main__.deconvolutor.decon_controller INFO: Image File Loaded: D:/tmp/test_beads/test_crop1.tiff
+2024-04-28 22:23:46,261 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RLTMR
+2024-04-28 22:23:50,200 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-28 22:23:50,244 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 3.9433648586273193 seconds 
+2024-04-28 22:23:50,262 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
+2024-04-28 22:23:53,883 __main__.editor.editor_controller INFO: Initializing Bead Extractor module.
+2024-04-28 22:23:53,884 __main__.editor.editor_model INFO: Image Editor opened
+2024-04-28 22:23:53,976 __main__.editor.editor_controller INFO: _bind: Binding buttons and entries is done.
+2024-04-28 22:24:34,864 __main__.deconvolutor.decon_controller INFO: Deconvolution widget closed.

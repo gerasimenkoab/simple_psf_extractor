@@ -99,11 +99,11 @@ class DeconController:
             # Spinbox change events
             for target in ["Image","PSF","Result"]:
                 self.viewDecon.widgets[target+"LayerSpinbox"].bind("<Return>", 
-                                                                lambda event: self.LayerChangeSpinbox(event, "enter", target))
+                                                                lambda event,target=target: self.LayerChangeSpinbox(event, "enter", target))
                 self.viewDecon.widgets[target+"LayerSpinbox"].bind("<<Decrement>>", 
-                                                                lambda event: self.LayerChangeSpinbox(event, "down", target))
+                                                                lambda event,target=target: self.LayerChangeSpinbox(event, "down", target))
                 self.viewDecon.widgets[target+"LayerSpinbox"].bind("<<Increment>>", 
-                                                                lambda event: self.LayerChangeSpinbox(event, "up", target))
+                                                                lambda event,target=target: self.LayerChangeSpinbox(event, "up", target))
         except Exception as e:
             self.logger.debug("Can't bind events for Image deconvolution. "+str(e))
             raise ValueError("Can't bind events for Image deconvolution", "binding-failed")
@@ -309,7 +309,6 @@ class DeconController:
         """Change visible layer number for Image, PSF or Result canvas 
             at action 'up', 'down' or 'enter' 
             on corresponding spinbox widget."""
-        
         if action not in ["up", "down","enter"] :
             raise ValueError("Wrong action", "action-incorrect")
         
