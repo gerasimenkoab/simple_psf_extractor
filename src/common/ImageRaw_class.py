@@ -5,14 +5,16 @@ import os
 import glob
 import xml.etree.ElementTree as ET
 from scipy.interpolate import RegularGridInterpolator
-from PIL import Image
+
 import json
 try: # for running as package
     from common.Voxel_class import Voxel
     from common.Intensities_class import IntensityValues
+    from common.FileManipulation_class import FileManipulation
 except: # for testing purposes
     from Voxel_class import Voxel
     from Intensities_class import IntensityValues
+    from FileManipulation_class import FileManipulation
 
 class ImageRaw:
     """
@@ -47,42 +49,46 @@ class ImageRaw:
                         self._voxel.Set(voxelSizeIn)
                     except:
                         raise ValueError("Can not set voxel from the argument.","voxel_problem")
-        else:
+        else: #if fpath is not None
             if intensitiesIn is None:
-                intensitiesFile,tagString = self.LoadImageFile(fpath, 270)
                 try:
+                    intensitiesFile,tagString = self.LoadImageFile(fpath, 270)
                     self._intensities.Set(intensitiesFile)
-                except:
+                except IOError:
+                    raise ValueError("Can not load array from file.","data_problem")
+                except ValueError:
                     raise ValueError("Can not set array from file.","data_problem")
 
-                if tagString == "" :
-                    if voxelSizeIn is None:
-                        try:
-                            parameters = self.LoadProjectSeriesParameters(fpath[0])
-                            self._voxel.SetFromDict(parameters["voxel"])
-                        except:
-                            raise ValueError("No voxel recieved from file or as argument","voxel_problem")
-                    else:
-                        try:
-                            self._voxel.Set(voxelSizeIn)
-                        except:
-                            raise ValueError("Can not set voxel from argument.","voxel_problem")
-                else:
-                    if voxelSizeIn is None:
+                if voxelSizeIn is None:
+
+                    if tagString == None:
                         try:
                             try:
-                                voxelSizeIn = json.loads(tagString)
-                            except :
-                                raise ValueError("Can not convert tag. Check tag format.","voxel_problem")
-                            self._voxel.Set( [voxelSizeIn["Z"], voxelSizeIn["X"], voxelSizeIn["Y"]] ) 
+                                parameters = self.LoadProjectSeriesParameters(fpath[0])
+                                self._voxel.SetFromDict(parameters["voxel"])
+                            except:
+                                raise ValueError("No voxel recieved from file or as argument","voxel_problem")
                         except:
-                            raise ValueError("Can not set voxel from tag. Check tag format.","voxel_problem")
+                            raise ValueError("Can not set voxel from file.","voxel_problem")
                     else:
                         try:
-                            self._voxel.Set(voxelSizeIn)
-                        except:
-                            raise ValueError("Can not set voxel from argument.","voxel_problem")
-            else:
+                            try:
+                                voxelSizeDict = json.loads(tagString)
+                            except TypeError:
+                                raise ValueError("json.loads() was called with a non-string argument")
+                            except json.JSONDecodeError:
+                                raise ValueError("json.loads() was called with an invalid JSON string")
+                            self._voxel.SetFromDict( voxelSizeDict ) 
+                        except ValueError:
+                            raise ValueError("Can not set voxel from tag. Check tag format.","voxel_problem")
+                        
+                else:
+                    try:
+                        self._voxel.Set(voxelSizeIn)
+                    except:
+                        raise ValueError("Can not set voxel from argument.","voxel_problem")
+                    
+            else: #if intensitiesIn is not None and fpath is not None
                 raise ValueError("Only one source of data for pixel values allowed","data_problem")
 
             self.path =  fpath[0] 
@@ -105,17 +111,20 @@ class ImageRaw:
             raise ValueError("Empty file name list")
         
         elif len(fileNameList) == 1:
-            imgArray = self.LoadMultiframeTiff(fileNameList[0])
+            try:
+                imgArray, tagDict = FileManipulation.LoadMultiframeTiff(fileNameList[0])
+            except IOError:
+                raise 
         else:
             # multi file load
             try:
-                imgArray = self.LoadSingleFrameTiffArray(fileNameList)
-            except:
-                raise FileNotFoundError("Can't load file: {} ".format(fileNameList[0]) )
+                imgArray,tagDict = FileManipulation.LoadSingleFrameTiffArray(fileNameList)
+            except IOError:
+                raise
         try:
-            return imgArray, image_tiff.tag[tagID][0]
+            return imgArray, tagDict[tagID][0]
         except:
-            return imgArray, ""
+            return imgArray, None
 
     def LoadProjectSeriesParameters(self, currentFilePath: str):
         # load parameters from xml file stored in MetaData subfolder of current folder
@@ -149,74 +158,6 @@ class ImageRaw:
                         except:
                             parameters[attr] = element.attrib[attr] 
         return parameters
-
-
-    def LoadMultiframeTiff(self,fileName)->np.ndarray:
-        """Load single multiframe tiff file and return numpy array with pixel values."""
-
-        try:
-            with Image.open(fileName) as image_tiff:
-                ncols, nrows = image_tiff.size
-                nlayers = image_tiff.n_frames
-                imgArray = np.ndarray([nlayers, nrows, ncols]) # Z,Y,X
-                if image_tiff.mode == "I" or image_tiff.mode == "L":
-                    for i in range(nlayers):
-                        image_tiff.seek(i)
-                        imgArray[i, :, :] = np.array(image_tiff)
-                elif image_tiff.mode == "RGB":
-                    for i in range(nlayers):
-                        image_tiff.seek(i)
-                        image_tiff.getdata()
-                        r, g, b = image_tiff.split()
-                        ra = np.array(r)
-                        ga = np.array(g)
-                        ba = np.array(b)
-                        #recalculate greyscale intensity from rgb values
-                        grayImgArr = 0.299 * ra + 0.587 * ga + 0.114 * ba
-                        imgArray[i, :, :] = grayImgArr
-                else:
-                    raise ValueError( "Unsupported tiff file mode: {}".format( str(image_tiff.mode) ) )          
-        except :
-            raise FileNotFoundError("Can't load file: {} ".format(fileName) )
-        return imgArray
-
-    def LoadSingleFrameTiffArray(self, fileNameList)->np.ndarray:
-        """Load multiple singleframe tiff files and return numpy array with pixel values."""
-
-        with Image.open(fileNameList[0]) as image_preread:
-            nlayers = len(fileNameList)
-            ncols, nrows = image_preread.size
-            imgArray = np.ndarray([nlayers, nrows, ncols])
-            
-            if image_preread.mode == "RGB":
-                for i, fileName in enumerate(fileNameList):
-                    try: 
-                        with Image.open(fileName) as image_tiff:
-                            if image_tiff.n_frames != 1:
-                                raise ValueError("Not singleframe tif file in list of files: {}".format(fileName))
-                            image_tiff.getdata()
-                            r, g, b = image_tiff.split()
-                    except:
-                        raise FileNotFoundError("Can't load file: {} ".format(fileName))
-                    
-                    ra = np.array(r)
-                    ga = np.array(g)
-                    ba = np.array(b)
-                    grayImgArr = 0.299 * ra + 0.587 * ga + 0.114 * ba
-                    imgArray[i, :, :] = grayImgArr
-            elif image_preread.mode == "I" or image_preread.mode == "L":
-                for i, fileName in enumerate(fileNameList):
-                    try:
-                        with Image.open(fileName) as imageFile:
-                            imgArray[i, :, :] = np.array(imageFile)
-                    except:
-                        raise FileNotFoundError("Can't load file: {} ".format(fileName))
-            else:
-                raise ValueError("Unsupported tiff file mode: {}".format(str(image_tiff.mode)))
-        return imgArray
-
-
-
 
     def SetIntensities(self, newArray: np.ndarray)->None:
         """
@@ -341,23 +282,14 @@ class ImageRaw:
         Input: filename - path to file, including file name
                outtype - bit type for output
         """
-        # filename end with .tiff or .tif then do nothing else add .tif
-        if not filename.endswith(".tiff") and not filename.endswith(".tif"):
-            filename = filename + ".tif"
-        self.logger.info("Trying to save TIFF file. Type: "+outtype)
         try:
-            tagID = 270
-            strVoxel = json.dumps(self._voxel.GetDict())
-            imlist = []
-            for tmp in self._intensities:
-                imlist.append(Image.fromarray(tmp.astype(outtype)))
-            #imlist[0].tag[270] = strVoxel
-            imlist[0].save(
-                filename, tiffinfo={tagID:strVoxel}, save_all=True, append_images=imlist[1:]
-            )
-        except:
+            FileManipulation.SaveAsTiff(imageArray =  self._intensities.Get(),
+                                        fileName = filename, 
+                                        tagString = json.dumps(self._voxel.GetDict()),
+                                        outType = outtype)
+        except IOError as e:
             self.logger.error("Can't save file "+filename)
-            raise IOError("Cannot save file "+filename,"file_not_saved")
+            raise IOError("File save failed: "+filename,"file_not_saved")
         self.logger.info("File saved at "+filename)
 
     # context manager support.........
