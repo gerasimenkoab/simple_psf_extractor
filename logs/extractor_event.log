@@ -26,3 +26,4 @@
 2024-04-29 20:12:55,247 __main__.deconvolutor.decon_psf_model INFO: Deconvolution time: 78.0372531414032 seconds 
 2024-04-29 20:12:55,640 __main__.deconvolutor.decon_controller INFO: Bead image deconvolution finished.
 2024-04-29 20:12:55,641 __main__.deconvolutor.decon_controller INFO: Iteration number set to: 40
+2024-04-29 20:14:05,366 __main__.deconvolutor.decon_controller INFO: Deconvolution widget closed.
