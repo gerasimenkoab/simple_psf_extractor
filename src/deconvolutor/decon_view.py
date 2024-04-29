@@ -1,6 +1,7 @@
 from tkinter import *
 import tkinter as tk
-from tkinter import ttk, scrolledtext
+from tkinter import ttk
+from tkinter.scrolledtext import ScrolledText
 from tkinter.filedialog import askopenfilenames, asksaveasfilename
 from tkinter.simpledialog import askstring
 import logging
@@ -46,7 +47,7 @@ class DeconView(tk.Toplevel):
         self.deconImageView = DeconvolveImageFrame(master = self.deconNotebook, widgets = self.widgets)
         self.deconNotebook.add(self.deconImageView, text = "Image deconvolution")
 
-        self.logWidget =tk.scrolledtext.ScrolledText(self, wrap = tk.WORD, height = 2)
+        self.logWidget = ScrolledText(self, wrap = tk.WORD, height = 2)
         self.logWidget.configure(state = "disabled")
         self.logWidget.pack(fill="x", side = "bottom",padx=2, pady=2)
 
