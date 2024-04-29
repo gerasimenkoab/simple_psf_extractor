@@ -23,7 +23,7 @@ from deconvolutor.decon_view_image import DeconvolveImageFrame
 
 
 class DeconView(tk.Toplevel):
-    def __init__(self, master=None, wwidth=950, wheight=600):
+    def __init__(self, master=None, wwidth=950, wheight=640):
         self.logger = logging.getLogger('__main__.'+__name__)
         super().__init__(master)
         self.widgets: Dict[str, tk.Widget] = {}
@@ -41,7 +41,7 @@ class DeconView(tk.Toplevel):
         # self.deconNotebook.configure(height=700, width=900)
         self.deconNotebook.pack(expand=True, fill="both", side="top")
 
-        self.deconPsfView = DeconvolvePSFFrame(self.deconNotebook)
+        self.deconPsfView = DeconvolvePSFFrame(self.deconNotebook, self.widgets)
         self.deconNotebook.add(self.deconPsfView, text = "PSF deconvolution")
 
         self.deconImageView = DeconvolveImageFrame(master = self.deconNotebook, widgets = self.widgets)
@@ -147,18 +147,20 @@ class DeconView(tk.Toplevel):
         cnv = self.deconPsfView.canvasBead
         if cnv: 
             cnv.pack_forget() # remove old canvas
-        #cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconPsfView.deconPSF_plot, plotName="Bead")
-        cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, cnv, "Bead",250,450)
-        cnvTmp.get_tk_widget().grid(column=0, padx=2, pady=2, row=1)
+        imageTmp = CnvPlot.FigurePILImagekFrom3DArray(arrayIn, widthPt=800, heightPt = 2400, dpiIn = 400)
+        self.DrawImageOnCanvas( canvasName = "beadImage", img = imageTmp)
+        # cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, cnv, "Bead",250,450)
+        # cnvTmp.get_tk_widget().grid(column=0, padx=2, pady=2, row=1)
 
     def SetPSFImage(self,arrayIn):
         """Draw canvas with result of deconvolution (PSF)"""
         cnv = self.deconPsfView.canvasPSF
         if cnv: 
             cnv.pack_forget() # remove old canvas
-        # cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, self.deconPsfView.deconPSF_plot, plotName=" ")
-        cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, cnv, "PSF",250,450)
-        cnvTmp.get_tk_widget().grid(column=1, padx=2, pady=2, row=1)
+        imageTmp = CnvPlot.FigurePILImagekFrom3DArray(arrayIn, widthPt=800, heightPt = 2400, dpiIn = 400)
+        self.DrawImageOnCanvas( canvasName = "beadPSF", img = imageTmp)
+        # cnvTmp = CnvPlot.FigureCanvasTkFrom3DArray(arrayIn, cnv, "PSF",250,450)
+        # cnvTmp.get_tk_widget().grid(column=1, padx=2, pady=2, row=1)
 
     def GetPsfDeconMethod(self):
         return self.deconPsfView._deconMethodsDict[self.deconPsfView.deconMethod.get()]

@@ -10,8 +10,9 @@ class DeconvolvePSFFrame(ttk.Frame):
         "Richardson-Lucy TV Reg":"RLTVR"
         }
      
-    def __init__(self, master=None, **kw):
-        super(DeconvolvePSFFrame, self).__init__(master, **kw)
+    def __init__(self, master=None, widgets:dict = None):
+        # super(DeconvolvePSFFrame, self).__init__(master, **kw)
+        super().__init__(master)
         self.master = master
         self.voxel_entry = {}
         self.deconPSF_settings = ttk.Frame(self)
@@ -163,12 +164,17 @@ class DeconvolvePSFFrame(ttk.Frame):
         self.deconPSF_settings.pack(expand=True, fill="both", side="left")
         self.deconPSF_plot = ttk.Frame(self)
         self.deconPSF_plot.configure(height=200, width=600)
+
         self.canvasBead = tk.Canvas(self.deconPSF_plot)
-        self.canvasBead.configure( width=200)
+        widgets["beadImageCanvas"] = self.canvasBead
+        self.canvasBead.configure( width=180,height=560)
         self.canvasBead.grid(column=0, padx=2, pady=2, row=1)
+
         self.canvasPSF = tk.Canvas(self.deconPSF_plot)
-        self.canvasPSF.configure( width=200)
+        widgets["beadPSFCanvas"] = self.canvasPSF
+        self.canvasPSF.configure( width=180,height=560)
         self.canvasPSF.grid(column=1, padx=2, pady=2, row=1)
+
         self.deconPSF_plot.pack(expand=True, fill="both", side="left")
         self.deconPSF_plot.grid_anchor("center")
         self.deconPSF_plot.rowconfigure(0, uniform=0)
