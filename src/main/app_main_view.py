@@ -325,14 +325,17 @@ class MainAppView(tk.Tk):
             return
         self.mainPhotoCanvas.delete("all")
         self._img_width, self._img_height = img.size
-        # Calculate the aspect ratio
-        aspect_ratio = self._img_width / self._img_height
+        if self._img_width < self._img_height:
+            aspect_ratio = self._img_height / self._img_width
+            canvas_height = int(self.mainPhotoCanvas.winfo_height() * self._imageScaleFactor)
+            # Calculate the new height while keeping the aspect ratio constant
+            canvas_width = int(canvas_height / aspect_ratio)
+        else:
+            aspect_ratio = self._img_width / self._img_height
+            canvas_width = int(self.mainPhotoCanvas.winfo_width() * self._imageScaleFactor)
+            canvas_height = int(canvas_width / aspect_ratio)
 
-        # Get the width and height of the canvas
-        canvas_width = int(self.mainPhotoCanvas.winfo_width()*self._imageScaleFactor)
-        # Calculate the new height while keeping the aspect ratio constant
-        canvas_height = int(canvas_width / aspect_ratio)
-        # canvas_height = int(self.mainPhotoCanvas.winfo_height()*self._imageScaleFactor)
+
         # Resize the image to the size of the canvas
         imgResized = img.resize((canvas_width, canvas_height))
         self.imgCnv = ImageTk.PhotoImage(image=imgResized, master=self.mainPhotoCanvas)

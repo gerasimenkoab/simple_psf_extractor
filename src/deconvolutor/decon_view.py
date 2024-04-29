@@ -196,7 +196,7 @@ class DeconView(tk.Toplevel):
         canvas.delete("all")
         self._img_width, self._img_height = img.size
 
-        if self._img_width > self._img_height:
+        if self._img_width < self._img_height:
             aspect_ratio = self._img_height / self._img_width
             canvas_height = int(canvas.winfo_height() * _imageScaleFactor)
             # Calculate the new height while keeping the aspect ratio constant
