@@ -1,11 +1,17 @@
 import tkinter as tk
 # from common.base_controller import BaseController
 import logging
-from common.base_controller import BaseController
+# from common.base_controller import BaseController
+from common.Extention_package_base_classes import BaseController
 
 from example_package.view  import View
 from example_package.model import Model
 
+"""To create new widget need to create new class in view.py and add it to the view object in the constructor.
+To create new model need to create new class in model.py and add it to the model object in the constructor.
+Call constructor of the base controller with view and model objects.
+
+To bind events need to add new event in the bindEvents method."""
 class Controller(BaseController):
     def __init__(self, masterView = None) -> None:
         # super().__init__()

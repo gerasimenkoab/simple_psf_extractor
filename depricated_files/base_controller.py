@@ -1,5 +1,4 @@
 
-# from common.base_controller import BaseController
 import logging
 try: # if running from main
     from common.LogTextHandler_class import LogTextHandler

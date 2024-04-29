@@ -1,5 +1,5 @@
-from common.base_model import BaseModel
-
+# from common.base_model import BaseModel
+from common.Extention_package_base_classes import BaseModel
 class Model(BaseModel):
     def __init__(self, controller) -> None:
         super().__init__(controller)

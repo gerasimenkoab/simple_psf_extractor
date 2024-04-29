@@ -1,13 +1,13 @@
-2024-04-29 11:50:43,977 __main__.main.app_main_controller INFO: Main App started.
-2024-04-29 11:50:43,977 __main__.main.app_main_model INFO: Image Editor opened
-2024-04-29 11:50:43,978 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-29 11:50:44,063 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-04-29 11:50:44,064 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-04-29 11:50:44,064 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-04-29 11:50:46,272 __main__.common.base_model INFO: Model created
-2024-04-29 11:50:46,273 __main__.common.base_view INFO: View created
-2024-04-29 11:50:52,030 __main__.common.base_controller INFO: Number entered. Processing
-2024-04-29 11:50:52,032 __main__.common.base_model INFO: Processing number
-2024-04-29 11:50:52,033 __main__.common.base_controller INFO: Number processed. Showing response
-2024-04-29 11:50:54,833 __main__.common.base_controller INFO: Closing application
-2024-04-29 11:50:54,872 __main__.main.app_main_controller INFO: Main App running.
+2024-04-29 12:25:12,285 __main__.main.app_main_controller INFO: Main App started.
+2024-04-29 12:25:12,285 __main__.main.app_main_model INFO: Image Editor opened
+2024-04-29 12:25:12,285 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-04-29 12:25:12,387 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-04-29 12:25:12,387 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-04-29 12:25:12,388 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-04-29 12:25:15,486 __main__.common.Extention_package_base_classes INFO: Model created
+2024-04-29 12:25:15,487 __main__.common.Extention_package_base_classes INFO: View created
+2024-04-29 12:25:18,993 __main__.common.Extention_package_base_classes INFO: Number entered. Processing
+2024-04-29 12:25:18,995 __main__.common.Extention_package_base_classes INFO: Processing number
+2024-04-29 12:25:18,995 __main__.common.Extention_package_base_classes INFO: Number processed. Showing response
+2024-04-29 12:25:22,442 __main__.common.Extention_package_base_classes INFO: Closing application
+2024-04-29 12:25:22,486 __main__.main.app_main_controller INFO: Main App running.

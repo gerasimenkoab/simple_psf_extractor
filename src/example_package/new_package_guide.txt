@@ -1,0 +1,20 @@
+To create new package:
+
+1. Create  package folder in ./src with corresponding name. Example package could me taken as a template.
+    Package should contain files:
+        __init__.py - empty
+        view.py with View class extends common.Extention_package_base_classes.BaseView
+        model.py with Model class extending common..Extention_package_base_classes.BaseModel
+        controller.py - extends common..Extention_package_base_classes.BaseController
+        main.py - containing Run function which creates new package controller.
+
+2. View and Model and Controller are extentions of corresponding inheriting base classes.
+    To create new widget need to create new class in view.py and add it to the view object in the Controller constructor.
+    To create new model need to create new class in model.py and add it to the model object in the Controller constructor.
+    Call constructor of the base_controller class with view and model objects.
+    Bind function in controller may be overridden for new funcitonality.
+3. In main.py in the package update imported Controller
+4. Add new package to the package list in packages.conf file in the root of project.
+
+5. Package should be automatically added under module menu in main app during runtime.
+
