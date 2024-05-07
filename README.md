@@ -1,5 +1,5 @@
 # simple_psf_extractor
-implementation of simple extractor of experimental PSF
+Implementation of simple experimental PSF extractor and deconvolutor
 
  - help in all modules
- - remove unused interface elements in deconvolutor 
+ - array metrics usage and additional image intensity analysis 
