@@ -164,7 +164,7 @@ class DeconImageModel:
         else:
             target.VisibleLayerNumberDown()
  
-    def DeconvolveImage(self, deconMethodIn: str, progBarIn, masterWidget):
+    def DeconvolveImage(self, deconMethodIn: str, progBarIn=None, masterWidget=None):
         doRescalePSF = True
         self.logger.debug("step 1: rescale PSF to match image voxel size. "+ str(doRescalePSF))
         image = self._model["Image"].mainImageRaw

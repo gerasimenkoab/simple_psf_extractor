@@ -4,7 +4,7 @@ from scipy import signal
 from scipy.special import jv
 from scipy.ndimage import laplace
 from itertools import product, repeat
-from multiprocessing import Pool
+from multiprocessing import Pool, Manager
 from os import cpu_count, getpid
 
 import time
@@ -81,6 +81,17 @@ class DeconMethods:
         return imagePSF
 
     @staticmethod
+    def _checkQueue(q, progBar, parentWin):
+        """Auxilary function to check queue and update progressbar"""
+        while progBar['value'] < progBar.cget("maximum"):
+            progress = q.get() * DeconMethods.pb_step
+            progBar['value'] += progress
+            # print("Progress: ", progBar['value'])
+            parentWin.update_idletasks()
+
+        
+ 
+    @staticmethod
     def DeconImage(
         image: np.ndarray, 
         kernell: np.ndarray,
@@ -106,7 +117,8 @@ class DeconMethods:
         """
         imageDeconvolved = np.copy(image)
         poolSize = cpu_count() - 2
-        chunkNumber = int(sqrt(poolSize))
+        # chunkNumber = int(sqrt(poolSize))
+        chunkNumber = int((poolSize))
         chunkDimX = image.shape[2] // chunkNumber # chunk size X
         chunkDimY = image.shape[1] // chunkNumber # chunk size Y
         chunkList = [] 
@@ -122,35 +134,55 @@ class DeconMethods:
                 else:
                     jEnd= j + image.shape[2] % chunkDimX
                 chunkList.append(image[:,i:iEnd, j:jEnd])
-        # run multiprocess computations.
-        with Pool(processes = poolSize) as workers:
-            if deconType == "RL":
-                # Richardson Lucy
-                argsList = zip(chunkList,
-                            repeat(kernell),
-                            repeat(iterNum),
-                            repeat(False),
-                            )
-                chunkListDec = workers.starmap(DeconMethods.MaxLikelhoodEstimationFFT_3D, argsList)
-            elif deconType == "RLTMR":
-                # Richardson Lucy with Tikhonov-Miller regularisation
-                argsList = zip(chunkList,
-                    repeat(kernell),
-                    repeat(lambdaR),
-                    repeat(iterNum),
-                    ) 
-                chunkListDec = workers.starmap(DeconMethods.DeconvolutionRLTMR, argsList)
-            elif deconType == "RLTVR":
-                # Richardson Lucy with Total Variation regularisation
-                argsList = zip(chunkList,
-                    repeat(kernell),
-                    repeat(lambdaR),
-                    repeat(iterNum),
-                    ) 
-                chunkListDec = workers.starmap(DeconMethods.DeconvolutionRLTVR, argsList)
-            else:
-                chunkListDec = None
-                print("DeconImage: Invalid option. Please choose a valid option.")
+
+        DeconMethods.totalChunks = len(chunkList)
+        DeconMethods.pb_step = progBar.cget("maximum") / DeconMethods.totalChunks
+        progBar['value'] = 0
+        parentWin.update_idletasks()
+        # Don't use  tkinter progressbar with Pool() since tkinter is not thread safe and elements cant be
+        # shared between threads. Use Manager() and Queue() to get values from threads and update progressbar.
+        with Manager() as manager:
+            q = manager.Queue()
+            with Pool(processes = poolSize) as workers:
+                if deconType == "RL":
+                    # Richardson Lucy
+                    argsList = zip(chunkList,
+                                repeat(kernell),
+                                repeat(iterNum),
+                                repeat(False),
+                                repeat(q)
+                                )
+                    # chunkListDec = workers.starmap(DeconMethods.MaxLikelhoodEstimationFFT_3D, argsList)
+                    asyncResult = workers.starmap_async(DeconMethods.MaxLikelhoodEstimationFFT_3D, argsList)
+                    DeconMethods._checkQueue(q, progBar, parentWin)
+                    chunkListDec = asyncResult.get() 
+                elif deconType == "RLTMR":
+                    # Richardson Lucy with Tikhonov-Miller regularisation
+                    argsList = zip(chunkList,
+                        repeat(kernell),
+                        repeat(lambdaR),
+                        repeat(iterNum),
+                        repeat(False),
+                        repeat(q)
+                        ) 
+                    asyncResult = workers.starmap_async(DeconMethods.DeconvolutionRLTMR, argsList)
+                    DeconMethods._checkQueue(q, progBar, parentWin)
+                    chunkListDec = asyncResult.get() 
+                elif deconType == "RLTVR":
+                    # Richardson Lucy with Total Variation regularisation
+                    argsList = zip(chunkList,
+                        repeat(kernell),
+                        repeat(lambdaR),
+                        repeat(iterNum),
+                        repeat(False),
+                        repeat(q)
+                        ) 
+                    asyncResult = workers.starmap_async(DeconMethods.DeconvolutionRLTVR, argsList)
+                    DeconMethods._checkQueue(q, progBar, parentWin)
+                    chunkListDec = asyncResult.get() 
+                else:
+                    chunkListDec = None
+                    print("DeconImage: Invalid option. Please choose a valid option.")
 
         # collect chunks into array.
         chunkID = 0
@@ -262,7 +294,7 @@ class DeconMethods:
         return tiffDraw
 
     @staticmethod
-    def MaxLikelhoodEstimationFFT_3D(image, kernell, iterLimit=20, debug_flag=False, pb = None , parentWin=None):
+    def MaxLikelhoodEstimationFFT_3D(image, kernell, iterLimit=20, debug_flag=False,  q=None):
         """
         Function for  convolution with (Maximum likelihood estimaton)Richardson-Lucy method
         For psf calculation kernell = ideal sphere
@@ -284,10 +316,6 @@ class DeconMethods:
             print(f_0[0, 0, 56], f_0[0, 56, 0], f_0[56, 0, 0])
         # preparing for start of iteration cycle
         f_i = f_0
-        # initializing progressbar
-        if pb != None:
-            pb['value'] = 0
-            pb_step = 100 / iterLimit
         # starting iteration cycle
         for i in range(0, iterLimit):
             try:
@@ -314,12 +342,10 @@ class DeconMethods:
             except:
                 print("Deconvolution failed on iteration number: %d" %i)
                 raise ValueError("Deconvolution failed")
-            # updaiting progressbar
-            if pb != None: 
-                pb.step(pb_step)
-                parentWin.update_idletasks()
 
         # end of iteration cycle
+        if q!= None:
+            q.put(1)
         return f_i[padSize[0]:-padSize[0], padSize[1]:-padSize[1], padSize[2]:-padSize[2]]
 
     @staticmethod
@@ -328,7 +354,8 @@ class DeconMethods:
         psf: np.ndarray,
         lambdaTM: float = 0.0001,
         iterLimit: int = 20,
-        debug_flag=False, pb = None , parentWin=None
+        debug_flag=False,
+        q = None
     ):
         """
         Function for  convolution Richardson Lucy Tikhonov Miller Regularization
@@ -365,10 +392,6 @@ class DeconMethods:
                 f_0.shape,
                 psf.shape,
             )
-        if pb != None:
-            # initializing progressbar
-            pb['value'] = 0
-            pb_step = 100 / iterLimit
         # preparing for start of iteration cycle
         f_old = f_0
         # starting iteration cycle
@@ -386,11 +409,9 @@ class DeconMethods:
             regTM = 1.0 + 2.0 * lambdaTM * laplace(f_old)
             f_old = f_old * rnew / regTM
             f_old = f_old / np.amax(f_old) * beadMaxInt
-            if pb != None:
-                # updating progressbar
-                pb.step(pb_step)
-                parentWin.update_idletasks()
 
+        if q!= None:
+            q.put(1)
         f_old = f_old[padSize[0]:-padSize[0], padSize[1]:-padSize[1], padSize[2]:-padSize[2]]
 
         if debug_flag:
@@ -407,7 +428,8 @@ class DeconMethods:
         psf: np.ndarray,
         lambdaTV=0.0001,
         iterLimit=10,
-        debug_flag=False, pb = None , parentWin=None
+        debug_flag=False,
+        q = None
     ):
         """
         Perform Richardson-Lucy deconvolution on a 3D image using a given point spread function (psf)
@@ -446,10 +468,6 @@ class DeconMethods:
                 psf.shape,
             )
         #    b_noize = 0.1
-        if pb != None:
-            # initializing progressbar
-            pb['value'] = 0
-            pb_step = 100 / iterLimit
         # preparing for start of iteration cycle
         f_old = f_0
         # starting iteration cycle
@@ -470,10 +488,8 @@ class DeconMethods:
             regTV = 1.0 - lambdaTV * np.sqrt(gr[0] ** 2 + gr[1] ** 2 + gr[2] ** 2)
             f_old = f_old * rnew / regTV
             f_old = f_old / np.amax(f_old) * beadMaxInt
-            if pb != None:
-                # updaiting progressbar
-                pb.step(pb_step)
-                parentWin.update_idletasks()
+        if q!= None:
+            q.put(1)
         # end of iteration cycle
         f_old = f_old[padSize[0]:-padSize[0], padSize[1]:-padSize[1], padSize[2]:-padSize[2]]
 

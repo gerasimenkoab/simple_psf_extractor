@@ -1,23 +1,24 @@
-2024-04-30 00:45:59,394 __main__.main.app_main_controller INFO: Main App started.
-2024-04-30 00:45:59,395 __main__.main.app_main_model INFO: Image Editor opened
-2024-04-30 00:45:59,395 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-30 00:45:59,488 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-04-30 00:45:59,488 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-04-30 00:45:59,488 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-04-30 00:46:42,530 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
-2024-04-30 00:46:42,537 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
-2024-04-30 00:46:42,537 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-30 00:46:42,541 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-30 00:46:42,545 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-30 00:46:42,594 __main__.deconvolutor.decon_view INFO: Decon widget created
-2024-04-30 00:46:42,605 __main__.deconvolutor.decon_controller INFO: Deconvolution widget inititalized. Select images.
-2024-04-30 00:46:49,018 __main__.deconvolutor.decon_controller INFO: Image File Loaded: D:/tmp/test_beads/test_crop1.tiff
-2024-04-30 00:46:58,785 __main__.deconvolutor.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
-2024-04-30 00:47:04,224 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RL
-2024-04-30 00:47:07,154 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-04-30 00:47:07,185 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 2.9154345989227295 seconds 
-2024-04-30 00:47:07,190 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
-2024-04-30 00:47:09,944 __main__.editor.editor_controller INFO: Initializing Bead Extractor module.
-2024-04-30 00:47:09,945 __main__.editor.editor_model INFO: Image Editor opened
-2024-04-30 00:47:10,071 __main__.editor.editor_controller INFO: _bind: Binding buttons and entries is done.
-2024-04-30 00:47:16,415 __main__.deconvolutor.decon_controller INFO: Deconvolution widget closed.
+2024-05-10 01:46:34,351 __main__.main.app_main_controller INFO: Main App started.
+2024-05-10 01:46:34,351 __main__.main.app_main_model INFO: Image Editor opened
+2024-05-10 01:46:34,353 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-05-10 01:46:34,440 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-05-10 01:46:34,440 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-05-10 01:46:34,441 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-05-10 01:46:36,517 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
+2024-05-10 01:46:36,519 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
+2024-05-10 01:46:36,520 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-05-10 01:46:36,524 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-05-10 01:46:36,526 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-05-10 01:46:36,561 __main__.deconvolutor.decon_view INFO: Decon widget created
+2024-05-10 01:46:36,571 __main__.deconvolutor.decon_controller INFO: Deconvolution widget inititalized. Select images.
+2024-05-10 01:46:41,905 __main__.deconvolutor.decon_controller INFO: Image File Loaded: D:/tmp/test_beads/image256x256.tif
+2024-05-10 01:46:44,618 __main__.deconvolutor.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
+2024-05-10 01:46:46,970 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RLTMR
+2024-05-10 01:46:59,912 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-05-10 01:46:59,969 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 12.9707670211792 seconds 
+2024-05-10 01:46:59,975 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
+2024-05-10 01:47:08,223 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RLTVR
+2024-05-10 01:47:22,358 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-05-10 01:47:22,416 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 14.164480209350586 seconds 
+2024-05-10 01:47:22,422 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
+2024-05-10 01:47:29,053 __main__.deconvolutor.decon_controller INFO: Deconvolution widget closed.

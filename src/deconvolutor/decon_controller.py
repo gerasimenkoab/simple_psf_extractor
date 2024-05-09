@@ -370,22 +370,18 @@ class DeconController:
         button = event.widget
         button.config(text = "Processing", state = "disabled")
 
+        self.viewDecon.update()
         self.deconvolutionInProgress = True
-        self.viewDecon.after(100, self.startDeconvolution)
-        self.waitForExectionEnd(button)
+        self.viewDecon.after(100, self.startDeconvolution(event))
+        button.config(text = "Start", state = "normal")
 
-    def waitForExectionEnd(self, button):
-        if self.deconvolutionInProgress:
-            # If deconvolution is still in progress, check again after 100 ms
-            self.viewDecon.after(500, self.waitForExectionEnd, button)
-        else:
-            # If deconvolution is finished, update the button
-            button.config(text = "Start", state = "normal")
 
-    def startDeconvolution(self):
+    def startDeconvolution(self,event=None):
         try:
             progBar = self.viewDecon.GetDeconImageProgressbar()
             method = self.viewDecon.GetImageDeconMethod()
+            print("Method: ", method)
+            print("Progress bar: ", progBar)
         except Exception as e:
             self.logger.info("Can not get parameters for deconvolution. " + str(e))
             self.deconvolutionInProgress = True
