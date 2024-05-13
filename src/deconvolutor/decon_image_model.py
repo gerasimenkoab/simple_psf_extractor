@@ -197,7 +197,6 @@ class DeconImageModel:
         try:
             self._model["Result"] = BaseModel(ImageRaw( None, list(self._model["Image"].mainImageRaw.GetVoxel()), PSFArray ))
         except ValueError as e:
-            print("Deconvolution result assign failed" + str(e))
-            self.logger.debug(str(e))
+            self.logger.error("Deconvolution result assign failed" + str(e))
             raise RuntimeError("Deconvolution result assign failed", "deconvolution-result-assign-failed")
         self.logger.info("Deconvolution time: %s seconds " % (time.time() - start_time))

@@ -2,6 +2,7 @@ import logging
 import logging.config
 import os
 from main.app_main_controller import MainAppController
+from multiprocessing import freeze_support
 
 
 def startApplication():
@@ -19,4 +20,8 @@ def startApplication():
     
 
 if __name__=="__main__":
+    # IMPORTANT: freeze_support() is needed to prevent multiply windows opening when prepare distribution by pyinstaller
+    # also for this purposw multiprocessing manager singleton class was created to avoid intersections of 
+    # multiprocessing event loop and tkinter eventloop
+    freeze_support()
     startApplication()

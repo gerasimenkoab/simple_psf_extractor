@@ -1,12 +1,17 @@
 # -*- mode: python ; coding: utf-8 -*-
+# file for automatic creation of app with pyinstaller. After app can be packed with InsallForge
 
+added_files = [
+         ( 'src/logging.conf', '.' ),
+         ( 'src/packages.conf', '.' )
+         ]
 
 a = Analysis(
     ['src\\app_main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
-    hiddenimports=[],
+    datas=added_files,
+    hiddenimports=['deconvolutor.main', 'extractor.main', 'example_package.main'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

@@ -4,9 +4,10 @@ from scipy import signal
 from scipy.special import jv
 from scipy.ndimage import laplace
 from itertools import product, repeat
-from multiprocessing import Pool, Manager
+from multiprocessing import Pool
 from os import cpu_count, getpid
 
+from common.MultiprocessingManager import SingletonManager
 import time
 
 class DeconMethods:
@@ -50,12 +51,11 @@ class DeconMethods:
         match deconType:
             case "RL":
                 # Richardson Lucy
-                print(deconType," selected")
-                            
+                progBar['value'] = 0            
                 imagePSF = DeconMethods.MaxLikelhoodEstimationFFT_3D(
                     image,
                     idealSphereArray,
-                    iterNum, False, progBar, parentWin
+                    iterNum, False, None
                 )
             case "RLTMR":
                 # Richardson Lucy with Tikhonov-Miller regularisation
@@ -63,7 +63,7 @@ class DeconMethods:
                     image,
                     idealSphereArray,
                     lambdaR,
-                    iterNum, False, progBar, parentWin
+                    iterNum, False,  None
                 )
             case "RLTVR":
                 # Richardson Lucy with Total Variation regularisation
@@ -71,23 +71,24 @@ class DeconMethods:
                     image,
                     idealSphereArray,
                     lambdaR,
-                    iterNum, False, progBar, parentWin
+                    iterNum, False,  None
                 )
             case _:
                 imagePSF = None
-                print("DeconPSF: Invalid option. Please choose a valid option.")
+                raise ValueError("DeconPSF: Invalid option. Please choose a valid option.")
 
+        progBar['value'] = 100
 
         return imagePSF
 
     @staticmethod
-    def _checkQueue(q, progBar, parentWin):
+    def _checkQueue(q, progBar):
         """Auxilary function to check queue and update progressbar"""
         while progBar['value'] < progBar.cget("maximum"):
-            progress = q.get() * DeconMethods.pb_step
-            progBar['value'] += progress
-            # print("Progress: ", progBar['value'])
-            parentWin.update_idletasks()
+            if q.get() == 1:
+            # progress = q.get() * DeconMethods.pb_step
+                progBar['value'] += DeconMethods.pb_step
+                progBar.master.update_idletasks()
 
         
  
@@ -138,51 +139,51 @@ class DeconMethods:
         DeconMethods.totalChunks = len(chunkList)
         DeconMethods.pb_step = progBar.cget("maximum") / DeconMethods.totalChunks
         progBar['value'] = 0
-        parentWin.update_idletasks()
+        # progBar.master.update_idletasks()
         # Don't use  tkinter progressbar with Pool() since tkinter is not thread safe and elements cant be
         # shared between threads. Use Manager() and Queue() to get values from threads and update progressbar.
-        with Manager() as manager:
-            q = manager.Queue()
-            with Pool(processes = poolSize) as workers:
-                if deconType == "RL":
-                    # Richardson Lucy
-                    argsList = zip(chunkList,
-                                repeat(kernell),
-                                repeat(iterNum),
-                                repeat(False),
-                                repeat(q)
-                                )
-                    # chunkListDec = workers.starmap(DeconMethods.MaxLikelhoodEstimationFFT_3D, argsList)
-                    asyncResult = workers.starmap_async(DeconMethods.MaxLikelhoodEstimationFFT_3D, argsList)
-                    DeconMethods._checkQueue(q, progBar, parentWin)
-                    chunkListDec = asyncResult.get() 
-                elif deconType == "RLTMR":
-                    # Richardson Lucy with Tikhonov-Miller regularisation
-                    argsList = zip(chunkList,
-                        repeat(kernell),
-                        repeat(lambdaR),
-                        repeat(iterNum),
-                        repeat(False),
-                        repeat(q)
-                        ) 
-                    asyncResult = workers.starmap_async(DeconMethods.DeconvolutionRLTMR, argsList)
-                    DeconMethods._checkQueue(q, progBar, parentWin)
-                    chunkListDec = asyncResult.get() 
-                elif deconType == "RLTVR":
-                    # Richardson Lucy with Total Variation regularisation
-                    argsList = zip(chunkList,
-                        repeat(kernell),
-                        repeat(lambdaR),
-                        repeat(iterNum),
-                        repeat(False),
-                        repeat(q)
-                        ) 
-                    asyncResult = workers.starmap_async(DeconMethods.DeconvolutionRLTVR, argsList)
-                    DeconMethods._checkQueue(q, progBar, parentWin)
-                    chunkListDec = asyncResult.get() 
-                else:
-                    chunkListDec = None
-                    print("DeconImage: Invalid option. Please choose a valid option.")
+        # with SingletonManager().manager as manager:
+        q = SingletonManager().manager.Queue()
+        with Pool(processes = poolSize) as workers:
+            if deconType == "RL":
+                # Richardson Lucy
+                argsList = zip(chunkList,
+                            repeat(kernell),
+                            repeat(iterNum),
+                            repeat(False),
+                            repeat(q)
+                            )
+                # chunkListDec = workers.starmap(DeconMethods.MaxLikelhoodEstimationFFT_3D, argsList)
+                asyncResult = workers.starmap_async(DeconMethods.MaxLikelhoodEstimationFFT_3D, argsList)
+                DeconMethods._checkQueue(q, progBar)
+                chunkListDec = asyncResult.get() 
+            elif deconType == "RLTMR":
+                # Richardson Lucy with Tikhonov-Miller regularisation
+                argsList = zip(chunkList,
+                    repeat(kernell),
+                    repeat(lambdaR),
+                    repeat(iterNum),
+                    repeat(False),
+                    repeat(q)
+                    ) 
+                asyncResult = workers.starmap_async(DeconMethods.DeconvolutionRLTMR, argsList)
+                DeconMethods._checkQueue(q, progBar)
+                chunkListDec = asyncResult.get() 
+            elif deconType == "RLTVR":
+                # Richardson Lucy with Total Variation regularisation
+                argsList = zip(chunkList,
+                    repeat(kernell),
+                    repeat(lambdaR),
+                    repeat(iterNum),
+                    repeat(False),
+                    repeat(q)
+                    ) 
+                asyncResult = workers.starmap_async(DeconMethods.DeconvolutionRLTVR, argsList)
+                DeconMethods._checkQueue(q, progBar)
+                chunkListDec = asyncResult.get() 
+            else:
+                chunkListDec = None
+                raise ValueError("DeconImage: Invalid option. Please choose a valid option.")
 
         # collect chunks into array.
         chunkID = 0

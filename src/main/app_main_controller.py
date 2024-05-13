@@ -9,6 +9,7 @@ from main.app_main_model import MainAppModel
 # from cnn.cnn_deconvolution_gui import *
 import logging
 from common.PackageManager import PackageManager
+from common.MultiprocessingManager import SingletonManager
 
 
 class MainAppController():
@@ -77,7 +78,8 @@ class MainAppController():
         self.logger.debug("_bind: Binding buttons and entries is done.")
 
     def Run(self):
-        self.view.mainloop()
+        with SingletonManager().manager as manager:
+            self.view.mainloop()
         self.logger.info("Main App running.")
 
     def CropSelected(self, event=None):
