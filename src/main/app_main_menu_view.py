@@ -46,5 +46,5 @@ class AppMainMenu(tk.Menu):
 
     def show_about(self):
         print("Showing about...")
-        tk.messagebox.showinfo("About", "This is a simple application")
+        tk.messagebox.showinfo("About", "Deconvolutor and Extractor are in Modules Menu.")
         self.parentWindow.event_generate("<<Main-Help>>")
