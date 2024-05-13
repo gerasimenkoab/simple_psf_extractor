@@ -175,7 +175,7 @@ class DeconController:
             self.viewDecon.SetValueWidgetNormal( eventWgt, self.modelDeconPSF.voxel[axisName] )
             return
         self.viewDecon.SetValueWidgetNormal( eventWgt, newValue )
-        elf.logger.info("Voxel size set to: " + str(newValue) + " \u03BCm")
+        self.logger.info("Voxel size set to: " + str(newValue) + " \u03BCm")
         
 
 

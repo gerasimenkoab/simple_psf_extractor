@@ -1,27 +1,16 @@
-2024-05-13 21:27:47,968 __main__.main.app_main_controller INFO: Main App started.
-2024-05-13 21:27:47,969 __main__.main.app_main_model INFO: Image Editor opened
-2024-05-13 21:27:47,970 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-05-13 21:27:48,068 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-05-13 21:27:48,069 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-05-13 21:27:48,070 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-05-13 21:27:51,234 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
-2024-05-13 21:27:51,236 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
-2024-05-13 21:27:51,237 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-05-13 21:27:51,241 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-05-13 21:27:51,243 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-05-13 21:27:51,287 __main__.deconvolutor.decon_view INFO: Decon widget created
-2024-05-13 21:27:51,296 __main__.deconvolutor.decon_controller INFO: Deconvolution widget inititalized. Select images.
-2024-05-13 21:27:55,825 __main__.deconvolutor.decon_controller INFO: Image File Loaded: D:/tmp/test_beads/image256x256.tif
-2024-05-13 21:27:58,502 __main__.deconvolutor.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
-2024-05-13 21:28:03,612 __main__.deconvolutor.decon_controller INFO: Iteration number set to: 2
-2024-05-13 21:28:05,144 __main__.deconvolutor.decon_controller INFO: Starting image deconvolution. Method code: RL
-2024-05-13 21:28:26,932 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-05-13 21:28:26,996 __main__.deconvolutor.decon_image_model INFO: Deconvolution time: 21.817465782165527 seconds 
-2024-05-13 21:28:27,003 __main__.deconvolutor.decon_controller INFO: Image deconvolution finished.
-2024-05-13 21:28:27,113 __main__.deconvolutor.decon_controller INFO: Regularization parameter set to: 1e-06
-2024-05-13 21:28:30,216 __main__.editor.editor_controller INFO: Initializing Bead Extractor module.
-2024-05-13 21:28:30,218 __main__.editor.editor_model INFO: Image Editor opened
-2024-05-13 21:28:30,337 __main__.editor.editor_controller INFO: _bind: Binding buttons and entries is done.
-2024-05-13 21:28:33,253 __main__.deconvolutor.decon_controller INFO: Deconvolution widget closed.
-2024-05-13 21:28:37,022 __main__.main.app_main_controller INFO: Application Closed.
-2024-05-13 21:28:37,120 __main__.main.app_main_controller INFO: Main App running.
+2024-05-13 22:10:48,598 __main__.main.app_main_controller INFO: Main App started.
+2024-05-13 22:10:48,598 __main__.main.app_main_model INFO: Image Editor opened
+2024-05-13 22:10:48,599 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-05-13 22:10:48,681 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-05-13 22:10:48,682 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
+2024-05-13 22:10:48,683 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
+2024-05-13 22:10:50,958 __main__.deconvolutor.decon_psf_model INFO: Decon PSF object created
+2024-05-13 22:10:50,961 __main__.deconvolutor.decon_image_model INFO: Decon Image Model object created
+2024-05-13 22:10:50,962 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-05-13 22:10:50,966 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-05-13 22:10:50,970 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-05-13 22:10:51,017 __main__.deconvolutor.decon_view INFO: Decon widget created
+2024-05-13 22:10:51,027 __main__.deconvolutor.decon_controller INFO: Deconvolution widget inititalized. Select images.
+2024-05-13 22:11:04,100 __main__.deconvolutor.decon_controller INFO: PSF File Loaded: D:/tmp/test_beads/beads_psf.tif
+2024-05-13 22:11:09,707 __main__.deconvolutor.decon_controller INFO: Image File Loaded: D:/tmp/test_beads/image256x256.tif
+2024-05-13 22:11:11,176 __main__.deconvolutor.decon_controller INFO: Deconvolution widget closed.

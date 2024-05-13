@@ -152,6 +152,7 @@ class DeconvolveImageFrame(ttk.Frame):
         self.headerPsfFrame.grid(column=2, row=0)
 
         self.psfFrame = BodyFrame(self, widgets = widgets, frameName="PSF")
+        self.psfFrame.imageLayer_spinbox.config(state=tk.DISABLED)
         self.psfFrame.grid(column=2, row=1,sticky="nsew")
 
         ttk.Separator(self, orient="vertical").grid(column=3, ipady=200, padx=1, row=0, rowspan=2)
