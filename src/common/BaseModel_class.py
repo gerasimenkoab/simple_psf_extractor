@@ -49,10 +49,8 @@ class BaseModel:
     def SetMainImage(self, fname=None, voxel=None, array=None)->None:
         try:
             self._mainImageRaw = ImageRaw(fname, voxel, array)
-        except Exception as e:
-            self.logger.error("Can't set main image. "+str(e))
-            raise ValueError("Can't set main image", "image-setting-failed")
-
+        except ValueError as e:
+            raise
         try:
             self._ConvertMainImageRawToPILImage()
         except Exception as e:
