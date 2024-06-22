@@ -1,7 +1,13 @@
-2024-05-09 10:12:43,012 __main__.main.app_main_controller INFO: Main App started.
-2024-05-09 10:12:43,013 __main__.main.app_main_model INFO: Image Editor opened
-2024-05-09 10:12:43,013 __main__.common.BaseModel_class INFO: Image Editor opened
-2024-05-09 10:12:43,313 __main__.main.app_main_view INFO: App DPI Awareness set to False
-2024-05-09 10:12:43,314 __main__.main.app_main_view INFO: TK Screen dimensions: 1920 x 1200
-2024-05-09 10:12:43,314 __main__.main.app_main_view INFO: user32 Screen dimensions: 1920 x 1200
-2024-05-09 10:12:50,059 __main__.main.app_main_controller INFO: Main App running.
+2024-06-22 11:26:35,099 __main__.main.app_main_controller INFO: Main App started.
+2024-06-22 11:26:35,099 __main__.main.app_main_model INFO: Image Editor opened
+2024-06-22 11:26:35,099 __main__.common.BaseModel_class INFO: Image Editor opened
+2024-06-22 11:26:35,166 __main__.main.app_main_view INFO: App DPI Awareness set to False
+2024-06-22 11:26:35,166 __main__.main.app_main_view INFO: TK Screen dimensions: 1536 x 864
+2024-06-22 11:26:35,166 __main__.main.app_main_view INFO: user32 Screen dimensions: 1536 x 864
+2024-06-22 11:26:39,727 __main__.extractor.extractor_controller INFO: Initializing Bead Extractor module.
+2024-06-22 11:26:39,727 __main__.extractor.extractor_model INFO: Extractor object created
+2024-06-22 11:26:39,788 __main__.extractor.extractor_controller INFO: _bind: Binding buttons and entries is done.
+2024-06-22 11:27:00,277 __main__.extractor.extractor_controller INFO: File(s) load success. 
+2024-06-22 11:27:03,773 __main__.extractor.extractor_controller INFO: Beads segmented.
+2024-06-22 11:27:08,232 __main__.extractor.extractor_controller INFO: Beads processed.
+2024-06-22 11:27:16,186 __main__.main.app_main_controller INFO: Main App running.

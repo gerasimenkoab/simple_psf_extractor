@@ -55,6 +55,7 @@ class ExtractorController:
         # Help:
         self.view.bind("<<ShowHelp>>",self.ShowExtractorHelp)
         # buttons:
+        self.view.autoSegmentBeads_btn.config(command=self.AutosegmBeads)
         self.view.processBeads_btn.config(command=self.ProcessBeads)
         # entries bind at two events:
         self.view.mainPhotoCanvas.bind("<Button-3>", self.BeadMarkOnClick)
@@ -67,6 +68,8 @@ class ExtractorController:
             )
         self.view.beadSizeEntry.bind("<FocusOut>", self.UpdateBeadSizeValue)
         self.view.beadSizeEntry.bind("<Return>", self.UpdateBeadSizeValue)
+        self.view.maxAreaEntry.bind("<FocusOut>", self.UpdateMaxAreaEntry)
+        self.view.maxAreaEntry.bind("<Return>", self.UpdateMaxAreaEntry)
         self.view.selectSizeEntry.bind("<FocusOut>", self.UpdateSelectionSizeEntry)
         self.view.selectSizeEntry.bind("<Return>", self.UpdateSelectionSizeEntry)
         self.logger.info("_bind: Binding buttons and entries is done.")
@@ -153,6 +156,15 @@ class ExtractorController:
             self.logger.error("SaveExtractedBeads: can't save " + str(e))
             raise IOError("Cant save extracted beads")
 
+    def AutosegmBeads(self, event=None):
+        try:
+            self.model.AutoSegmentBeads()
+            self.view.AutoSegmentation(self.model.beadCoords)
+            self.logger.info("Beads segmented.")
+        except Exception as e:
+            self.logger.error("AutosegmBeads: can't process " + str(e))
+            raise IOError("Cant segment beads")
+
     def ProcessBeads(self, event=None):
         if self.model.isExtractedBeadsEmpty():
             showerror("Error", "No beads to save")
@@ -222,6 +234,12 @@ class ExtractorController:
     def UpdateSelectionSizeEntry(self, event = None):
         try:
             self.model.selectionFrameHalf = int(self.view.selectSizeEntry.get()) // 2
+        except:
+            self.logger.debug("Wrong selection size value.")
+
+    def UpdateMaxAreaEntry(self, event = None):
+        try:
+            self.model.maxArea = int(self.view.maxAreaEntry.get()) // 2
         except:
             self.logger.debug("Wrong selection size value.")
 

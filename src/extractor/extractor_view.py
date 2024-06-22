@@ -44,6 +44,7 @@ class ExtractorView(tk.Toplevel):
             "ClearAllMark": "Clear All Marks",
             "ExtractSelectedBeads": "Extract Selected Beads",
             "SaveExtractedBeads": "Save Extracted Beads",
+            "AutoSegmentBeads": "Auto-segment Beads",
             "ProcessExtractedBeads": "Process Extracted Beads",
             "SaveAverageBead": "Save Bead",
             "AverageSeveralBeads": "Average Several Beads",
@@ -219,14 +220,14 @@ class ExtractorView(tk.Toplevel):
             font="Helvetica 10 bold",
         ).grid(row=0, column=0, sticky="n")
 
-        selectSizeFrame = Frame(f2)
-        ttk.Label(selectSizeFrame, width=14, text="Selection Size: ", anchor="w").pack(
+        selectionFrame = Frame(f2)
+        ttk.Label(selectionFrame, width=14, text="Selection Size: ", anchor="w").pack(
             side=LEFT, padx=2, pady=2
         )
-        self.selectSizeEntry = ttk.Entry(selectSizeFrame, width=5)
+        self.selectSizeEntry = ttk.Entry(selectionFrame, width=5)
         self.selectSizeEntry.pack(side=LEFT, padx=2, pady=2)
-        ttk.Label(selectSizeFrame, text="px").pack(side=LEFT, padx=2, pady=2)
-        selectSizeFrame.grid(row=1, column=0, sticky="n")
+        ttk.Label(selectionFrame, text="px").pack(side=LEFT, padx=2, pady=2)
+        selectionFrame.grid(row=1, column=0, sticky="n")
 
         frameMarks = Frame(f2)
         self.autocorrectSelection = IntVar(value=1)
@@ -242,6 +243,25 @@ class ExtractorView(tk.Toplevel):
 
         f2.pack(side=TOP)
         ttk.Separator(parametersFrame, orient="horizontal").pack(ipadx=100, pady=10)
+
+
+        ttk.Label(selectionFrame, width=14, text="Max area size: ", anchor="w").pack(
+            side=LEFT, padx=2, pady=2
+        )
+        self.maxAreaEntry = ttk.Entry(selectionFrame, width=5)
+        self.selectSizeEntry.pack(side=LEFT, padx=2, pady=2)
+        ttk.Label(selectionFrame, text="px").pack(side=LEFT, padx=2, pady=2)
+        selectionFrame.grid(row=1, column=0, sticky="n")
+
+        frameAutosegmBeads = Frame(selectionFrame)
+        self.autoSegmentBeads_btn = ttk.Button(
+            frameAutosegmBeads,
+            text="Auto-segment Beads",
+        )
+        self.autoSegmentBeads_btn.pack(side=LEFT, padx=2, pady=2, fill=BOTH, expand=1)
+        frameAutosegmBeads.pack(side=TOP)
+
+
 
         # --------------- Average Beads Frame --------------------------
         frameAvrageBeads = Frame(parametersFrame)
@@ -662,6 +682,12 @@ class ExtractorView(tk.Toplevel):
     def CloseExtractor(self, event=None):
         """Default close window method """
         self.destroy()
+
+    def AutoSegmentation(self, beadCoords):
+        self.beadCoords = beadCoords
+        self._beadMarksCounter = len(self.beadCoords)
+        self.DrawAllMarks()
+        self.SetMarkedBeadList()
 
 
 if __name__ == "__main__":

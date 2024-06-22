@@ -6,6 +6,8 @@ from common.ImageRaw_class import ImageRaw
 import logging
 
 from common.DenoiseImage_class import ImageDenoiser
+from extractor.auto_segmenter import AutoSegmenter
+
 
 class ExtractorModel:
     def __init__(self, image: ImageRaw = None):
@@ -23,7 +25,9 @@ class ExtractorModel:
         self._extractedBeads = []
         self._beadDiameter = 0.2
         self._selectionFrameHalf:int = 18
+        self._maxArea = 500
         self._denoiser = ImageDenoiser()
+        self._segmenter = AutoSegmenter()
 
 
     @property
@@ -86,6 +90,18 @@ class ExtractorModel:
             self._selectionFrameHalf = value
         else:
             raise ValueError("Wrong selection frame size value", "selectionFrameHalf_incorrect")
+
+    @property
+    def maxArea(self):
+        return self._maxArea
+
+    @maxArea.setter
+    def maxArea(self, value):
+        if value > 0 and type(value) == int or float:
+            self._maxArea = value
+        else:
+            raise ValueError("Wrong max area value", "maxArea_incorrect")
+
 
     def beadMarkAdd(self, beadMarkCoords: list):
         """Append mouse event coordinates to global list. Center is adjusted according to max intensity."""
@@ -168,14 +184,19 @@ class ExtractorModel:
         bound4 = int(beadCoords[0] + d)
         bound1 = int(beadCoords[1] - d)
         bound2 = int(beadCoords[1] + d)
-        elem = self._mainImage.GetIntensities()[:, bound1:bound2, bound3:bound4]
-        if elem.shape[1] < 128: # dont shift if selection bigger than 128x128
-            # shifting array max intesity toward center along Z axis
-            iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
-            zc = int(elem.shape[0] / 2)
-            shift = zc - iMax[0]
-            elem = np.roll(elem, shift=shift, axis=0)
-        self._extractedBeads.append(ImageRaw(None, voxel, elem))
+        if bound1 > 0 and bound2 > 0 and bound3 > 0 and bound4 > 0:
+            elem = self._mainImage.GetIntensities()[:, bound1:bound2, bound3:bound4]
+            if elem.shape[1] == elem.shape[2]:
+                if elem.shape[1] < 128: # dont shift if selection bigger than 128x128
+                    # shifting array max intesity toward center along Z axis
+                    iMax = np.unravel_index(np.argmax(elem, axis=None), elem.shape)
+                    zc = int(elem.shape[0] / 2)
+                    shift = zc - iMax[0]
+                    elem = np.roll(elem, shift=shift, axis=0)
+                self._extractedBeads.append(ImageRaw(None, voxel, elem))
+                return True
+        else:
+            return False
 
     def ExtractedBeadsSave(self, txt_folder_enquiry="", txt_prefix="", tiffBit="uint8"):
         """Save selected beads as multi-page tiffs as is."""
@@ -294,3 +315,16 @@ class ExtractorModel:
             )
         except:
             raise RuntimeError("Failed to average beads")
+
+    def AutoSegmentBeads(self):
+        """
+        Some description.
+        Output: some output.
+        """
+        self._segmenter.binarize(own_img=self.mainImage.GetIntensities(), is_show=False)
+        bead_centers = self._segmenter.find_bead_centers(max_area=self._maxArea)
+        self.beadCoords = []
+        for center in bead_centers:
+            if self.MarkedBeadExtract(center):
+                self.beadCoords.append(center)
+        print(len(self._extractedBeads))
