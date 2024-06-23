@@ -31,6 +31,7 @@ class ExtractorController:
         self.view.SetVoxelValues(self.model.mainImage.GetVoxelDict())
         self.view.SetBeadSize(self.model.beadDiameter)
         self.view.SetSelectionFrameSize(2 * self.model.selectionFrameHalf)
+        self.view.SetMaxArea(self.model.maxArea)
         # binding buttons and entries events
         self._bind()
 
@@ -239,7 +240,7 @@ class ExtractorController:
 
     def UpdateMaxAreaEntry(self, event = None):
         try:
-            self.model.maxArea = int(self.view.maxAreaEntry.get()) // 2
+            self.model.maxArea = int(self.view.maxAreaEntry.get())
         except:
             self.logger.debug("Wrong selection size value.")
 
