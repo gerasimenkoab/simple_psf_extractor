@@ -51,10 +51,13 @@ class AutoSegmenter:
     def load_image(self, image_path: str) -> None:
         """Load the source image using the image path."""
         try:
-            assert image_path, "Source image path is None."
-            assert os.path.exists(image_path), f"File not found: {image_path}"
+            if image_path is None:
+                raise ValueError("Source image path is None.")
+            if os.path.exists(image_path) is None:
+                raise ValueError(f"File not found: {image_path}")
             ret, images = cv2.imreadmulti(image_path, [], cv2.IMREAD_ANYCOLOR)
-            assert ret and len(images) > 0, f"Failed to read the source image from path: {image_path}"
+            if ret is None or len(images) == 0:
+                raise ValueError(f"Failed to read the source image from path: {image_path}")
             self.__source_img = np.asarray(images)
             self.__mid_layer_idx = self.__source_img.shape[0] // 2
         except (ValueError, FileNotFoundError, Exception) as e:
@@ -72,17 +75,14 @@ class AutoSegmenter:
         """
         try:
             if own_img is not None:
-                print(own_img.shape, own_img.shape[0])
                 self.__source_img = np.asarray(own_img)
                 self.__mid_layer_idx = self.__source_img.shape[0] // 2
-                print(self.__mid_layer_idx)
 
-            # Ensure the source image and mid layer are valid
-            assert self.__source_img is not None and len(
-                self.__source_img) > 0, "Source image is None. Run load_image first."
-            assert self.__mid_layer_idx < len(self.__source_img), "Mid layer index out of bounds."
+            if self.__source_img is None or len(self.__source_img) == 0:
+                raise ValueError("Source image is None. Run load_image first.")
+            if self.__mid_layer_idx >= len(self.__source_img):
+                raise ValueError("Mid layer index out of bounds.")
 
-            # Convert the middle layer to grayscale
             mono_img = self.__source_img[self.__mid_layer_idx].astype(np.uint8)
             self.__blur_img = cv2.GaussianBlur(mono_img, BLUR_RAD, 0)
             self.__bin_img = cv2.threshold(
@@ -109,9 +109,10 @@ class AutoSegmenter:
             np.ndarray: Centroid coordinates of detected bead centers.
         """
         try:
-            # assert self.__blur_img, "Blur image is None. Run binarize first."
-            assert self.__bin_img is not None, "Binarized image is None. Run binarize first."
-            assert max_area >= 0, "Max area cannot be negative."
+            if self.__bin_img is None:
+                raise ValueError("Binarized image is None. Run binarize first.")
+            if max_area < 0:
+                raise ValueError("Max area cannot be negative.")
 
             self.__analysis = cv2.connectedComponentsWithStats(self.__bin_img, 4, cv2.CV_32S)
             (total_labels, _, _, centroid) = self.__analysis
@@ -137,9 +138,12 @@ class AutoSegmenter:
             bead_idx (int): Index of the detected beads(analysis) to be checked.
         """
         try:
-            assert self.__thread_area > 0, "Max area cannot be negative."
-            assert self.__analysis, "Analysis is None. Run binarize find_bead_centers."
-            assert bead_idx >= 0, "Bead index cannot be negative."
+            if self.__thread_area < 0:
+                raise ValueError("Max area cannot be negative.")
+            if self.__analysis is None:
+                raise ValueError("Analysis is None. Run binarize find_bead_centers.")
+            if bead_idx < 0:
+                raise ValueError("Bead index cannot be negative.")
 
             (_, _, values, _) = self.__analysis
             area = values[bead_idx, cv2.CC_STAT_AREA]
@@ -158,9 +162,13 @@ class AutoSegmenter:
             Tuple[List[np.ndarray], np.ndarray]: A tuple with the list of extracted beads and updated bead centers.
         """
         try:
-            assert box_size > 0, "Max area cannot be negative."
-            assert self.__source_img, "Source image is None. Run binarize load_image."
-            assert self.__bead_centers, "Bead centers is None. Run binarize find_bead_centers."
+            if box_size < 0:
+                raise ValueError("Box size cannot be negative.")
+            if self.__source_img is None:
+                raise ValueError("Source image is None. Run binarize load_image.")
+            if self.__bead_centers is None:
+                raise ValueError("Bead centers is None. Run binarize find_bead_centers.")
+
             self.__extracted_beads = []
             valid_centers = []
             for center in self.__bead_centers:
@@ -179,8 +187,10 @@ class AutoSegmenter:
             -> Optional[np.ndarray]:
         """Extract a single bead based on its center coordinates."""
         try:
-            assert self.__source_img, "Source image is None. Run binarize load_image."
-            assert center, "Center coordinates is None."
+            if self.__source_img is None:
+                raise ValueError("Source image is None. Run binarize load_image.")
+            if center is None:
+                raise ValueError("Center coordinates is None.")
 
             bound1, bound2, bound3, bound4 = self.get_bounds(center=center, bound_size=bound_size,
                                                              img=self.__source_img, is_weak_check=is_weak_check)
@@ -224,9 +234,12 @@ class AutoSegmenter:
         """Check if a given bead center is within the bounds of the source image."""
         try:
             x, y = center
-            assert x > 0 and y > 0, "Center coordinates cannot be negative."
-            assert self.__source_img, "Source image is None. Run binarize load_image."
-            assert bound_size, "Bound size is None."
+            if x < 0 and y < 0:
+                raise ValueError("Center coordinates cannot be negative.")
+            if self.__source_img is None:
+                raise ValueError("Source image is None. Run binarize load_image.")
+            if bound_size is None:
+                raise ValueError("Bound size is None.")
             return (bound_size // 2 <= y < self.__source_img.shape[1] - bound_size // 2
                     and bound_size // 2 <= x < self.__source_img.shape[2] - bound_size // 2)
         except (ValueError, Exception) as e:
@@ -236,7 +249,8 @@ class AutoSegmenter:
     def average_bead(self, is_show: bool = False) -> np.ndarray:
         """Calculate and show the average bead."""
         try:
-            assert self.__extracted_beads, "Extracted beads is None. Run binarize extract_beads."
+            if self.__extracted_beads is None:
+                raise ValueError("Extracted beads is None. Run binarize extract_beads.")
             self.__averaged_bead = np.mean(self.__extracted_beads, axis=0).astype("uint8")
             if is_show:
                 cv2.imshow("Averaged bead", self.__averaged_bead)
