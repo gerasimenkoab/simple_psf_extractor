@@ -1,12 +1,12 @@
 import numpy as np
 import os
 from scipy.ndimage import gaussian_filter, median_filter
-from common.ImageRaw_class import ImageRaw
+from ..common.ImageRaw_class import ImageRaw
 
 import logging
 
-from common.DenoiseImage_class import ImageDenoiser
-from extractor.auto_segmenter import AutoSegmenter
+from ..common.DenoiseImage_class import ImageDenoiser
+from .auto_segmenter import AutoSegmenter
 
 
 class ExtractorModel:
@@ -54,6 +54,10 @@ class ExtractorModel:
     @property
     def extractedBeads(self):
         return self._extractedBeads
+
+    @extractedBeads.setter
+    def extractedBeads(self, value):
+        self._extractedBeads = value
     
     def isExtractedBeadsEmpty(self):
         if len(self._extractedBeads) == 0:
@@ -327,4 +331,3 @@ class ExtractorModel:
         for center in bead_centers:
             if self.MarkedBeadExtract(center):
                 self.beadCoords.append(center)
-        print(len(self._extractedBeads))

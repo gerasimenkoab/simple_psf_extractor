@@ -89,7 +89,7 @@ class FileManipulation:
             raise IOError("Can't load file: {} "+ str(e).format(fileNameList) )
         return imgArray, tagReturn
 
-    def SaveAsTiff( imageArray: np.ndarray = None, fileName:str = "img", tagString:str = None, outType:str = "uint8")->None:
+    def SaveAsTiff( imageArray: np.ndarray = None, fileName:str = "img", tagString:str = None, outType:str = "uint8"):
         """
         Save Image as TIFF file
         Input: fileName - path to file, including file name
@@ -111,5 +111,6 @@ class FileManipulation:
             imlist[0].save(
                 fileName, tiffinfo={tagID:tagString}, save_all=True, append_images=imlist[1:]
             )
+            return imlist
         except IOError as e:
             raise IOError("Error during file write. Cannot save file "+fileName,"file_not_saved")

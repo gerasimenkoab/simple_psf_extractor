@@ -1,9 +1,10 @@
 import numpy as np
-from common.ImageRaw_class import ImageRaw
-from common.DeconMethods_class import DeconMethods
+from ..common.ImageRaw_class import ImageRaw
+from ..common.DeconMethods_class import DeconMethods
 
 import logging
 import time
+
 
 class DeconPsfModel():
     """
@@ -115,7 +116,7 @@ class DeconPsfModel():
         else:
             raise ValueError("Wrong regularisation parameter value", "regularization-parameter-incorrect")
 
-    def CalculatePSF(self, deconMethodIn : str, progBarIn, masterWidget):
+    def CalculatePSF(self, deconMethodIn : str):
         start_time = time.time()
         try:
             PSF = DeconMethods.DeconPSF(
@@ -125,9 +126,7 @@ class DeconPsfModel():
                 self._psfImage.GetVoxelDict(),
                 self._iterationNumber,
                 deconMethodIn,
-                self._regularizationParameter,
-                progBar=progBarIn,
-                parentWin=masterWidget
+                self._regularizationParameter
                 )
         except Exception as e:
             self.logger.debug(str(e))

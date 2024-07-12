@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.ndimage import zoom
-from common.ImageRaw_class import ImageRaw
-from common.DeconMethods_class import DeconMethods
-from common.BaseModel_class import BaseModel
-from common.AuxTkPlot_class import AuxCanvasPlot
+from ..common.ImageRaw_class import ImageRaw
+from ..common.DeconMethods_class import DeconMethods
+from ..common.BaseModel_class import BaseModel
+from ..common.AuxTkPlot_class import AuxCanvasPlot
 
 import logging
 import time
@@ -164,7 +164,7 @@ class DeconImageModel:
         else:
             target.VisibleLayerNumberDown()
  
-    def DeconvolveImage(self, deconMethodIn: str, progBarIn=None, masterWidget=None):
+    def DeconvolveImage(self, deconMethodIn: str):
         doRescalePSF = True
         self.logger.debug("step 1: rescale PSF to match image voxel size. "+ str(doRescalePSF))
         image = self._model["Image"].mainImageRaw
@@ -186,9 +186,7 @@ class DeconImageModel:
                 kernell, # psf.GetIntensities(),
                 self._iterationNumber,
                 deconMethodIn,
-                self._regularizationParameter,
-                progBar=progBarIn,
-                parentWin=masterWidget,
+                self._regularizationParameter
             )
 
         except Exception as e:

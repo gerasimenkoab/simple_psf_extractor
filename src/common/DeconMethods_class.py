@@ -7,7 +7,7 @@ from itertools import product, repeat
 from multiprocessing import Pool
 from os import cpu_count, getpid
 
-from common.MultiprocessingManager import SingletonManager
+from ..common.MultiprocessingManager import SingletonManager
 import time
 
 class DeconMethods:
@@ -25,9 +25,7 @@ class DeconMethods:
         beadVoxel: dict = None,
         iterNum: int = 1,
         deconType: str = "RL", 
-        lambdaR: float = 0.000001, 
-        progBar = None,
-        parentWin = None
+        lambdaR: float = 0.000001
     ):
         """
         General function for restoration of PSF. Singlethreaded since image size is small.
@@ -51,7 +49,6 @@ class DeconMethods:
         match deconType:
             case "RL":
                 # Richardson Lucy
-                progBar['value'] = 0            
                 imagePSF = DeconMethods.MaxLikelhoodEstimationFFT_3D(
                     image,
                     idealSphereArray,
@@ -77,8 +74,6 @@ class DeconMethods:
                 imagePSF = None
                 raise ValueError("DeconPSF: Invalid option. Please choose a valid option.")
 
-        progBar['value'] = 100
-
         return imagePSF
 
     @staticmethod
@@ -98,9 +93,7 @@ class DeconMethods:
         kernell: np.ndarray,
         iterNum: int, 
         deconType: str, 
-        lambdaR: float, 
-        progBar = None, 
-        parentWin = None
+        lambdaR: float
     ):
         """
         General function for restoration of image with known PSF(kernell) with multiprocessing usage
@@ -137,8 +130,8 @@ class DeconMethods:
                 chunkList.append(image[:,i:iEnd, j:jEnd])
 
         DeconMethods.totalChunks = len(chunkList)
-        DeconMethods.pb_step = progBar.cget("maximum") / DeconMethods.totalChunks
-        progBar['value'] = 0
+        # DeconMethods.pb_step = progBar.cget("maximum") / DeconMethods.totalChunks
+        # progBar['value'] = 0
         # progBar.master.update_idletasks()
         # Don't use  tkinter progressbar with Pool() since tkinter is not thread safe and elements cant be
         # shared between threads. Use Manager() and Queue() to get values from threads and update progressbar.
@@ -155,7 +148,7 @@ class DeconMethods:
                             )
                 # chunkListDec = workers.starmap(DeconMethods.MaxLikelhoodEstimationFFT_3D, argsList)
                 asyncResult = workers.starmap_async(DeconMethods.MaxLikelhoodEstimationFFT_3D, argsList)
-                DeconMethods._checkQueue(q, progBar)
+                # DeconMethods._checkQueue(q, progBar)
                 chunkListDec = asyncResult.get() 
             elif deconType == "RLTMR":
                 # Richardson Lucy with Tikhonov-Miller regularisation
@@ -167,7 +160,7 @@ class DeconMethods:
                     repeat(q)
                     ) 
                 asyncResult = workers.starmap_async(DeconMethods.DeconvolutionRLTMR, argsList)
-                DeconMethods._checkQueue(q, progBar)
+                # DeconMethods._checkQueue(q, progBar)
                 chunkListDec = asyncResult.get() 
             elif deconType == "RLTVR":
                 # Richardson Lucy with Total Variation regularisation
@@ -179,7 +172,7 @@ class DeconMethods:
                     repeat(q)
                     ) 
                 asyncResult = workers.starmap_async(DeconMethods.DeconvolutionRLTVR, argsList)
-                DeconMethods._checkQueue(q, progBar)
+                # DeconMethods._checkQueue(q, progBar)
                 chunkListDec = asyncResult.get() 
             else:
                 chunkListDec = None

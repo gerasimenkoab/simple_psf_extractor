@@ -1,7 +1,7 @@
 import logging
 import copy
 import numpy as np
-from common.ImageRaw_class import ImageRaw
+from ..common.ImageRaw_class import ImageRaw
 # from common.DenoiseImage_class import ImageDenoiser, DenoiseImage
 
 from PIL import Image, ImageEnhance, ImageOps, TiffImagePlugin

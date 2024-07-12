@@ -5,7 +5,7 @@ import logging
 import ctypes
 from PIL import ImageTk, Image
 try:
-    from main.app_main_menu_view import AppMainMenu
+    from main import AppMainMenu
 except ImportError:
     from app_main_menu_view import AppMainMenu
 

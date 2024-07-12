@@ -8,9 +8,9 @@ from scipy.interpolate import RegularGridInterpolator
 
 import json
 try: # for running as package
-    from common.Voxel_class import Voxel
-    from common.intensities_class import IntensityValues
-    from common.FileManipulation_class import FileManipulation
+    from .Voxel_class import Voxel
+    from .intensities_class import IntensityValues
+    from .FileManipulation_class import FileManipulation
 except: # for testing purposes
     from Voxel_class import Voxel
     from intensities_class import IntensityValues
@@ -276,17 +276,18 @@ class ImageRaw:
         print( " voxel(micrometres): ", self._voxel.GetValuesStr() )
         print( " image shape: ", self._intensities.GetShape() )
 
-    def SaveAsTiff(self, filename:str = "img", outtype:str = "uint8")->None:
+    def SaveAsTiff(self, filename:str = "img", outtype:str = "uint8"):
         """
         Save Image as TIFF file
         Input: filename - path to file, including file name
                outtype - bit type for output
         """
         try:
-            FileManipulation.SaveAsTiff(imageArray =  self._intensities.Get(),
+            img_tiff = FileManipulation.SaveAsTiff(imageArray =  self._intensities.Get(),
                                         fileName = filename, 
                                         tagString = json.dumps(self._voxel.GetDict()),
                                         outType = outtype)
+            return img_tiff
         except IOError as e:
             self.logger.error("Can't save file "+filename)
             raise IOError("File save failed: "+filename,"file_not_saved")

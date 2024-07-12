@@ -1,12 +1,10 @@
 import copy
-import tkinter as tk
-import tkinter.ttk as ttk
 
 import numpy as np
 
-from cnn.CNN_Deconvolution.BigImageManager import BigImageManager
-from cnn.CNN_Deconvolution.DeblurCNNModel2D import DeblurCNNModel2D
-from cnn.CNN_Deconvolution.DeblurCNNModelMini3D import DeblurCNNModelMini3D
+from ..CNN_Deconvolution.BigImageManager import BigImageManager
+from ..CNN_Deconvolution.DeblurCNNModel2D import DeblurCNNModel2D
+from ..CNN_Deconvolution.DeblurCNNModelMini3D import DeblurCNNModelMini3D
 
 
 # Class, which provides predicting of output data
@@ -55,7 +53,7 @@ class DeblurPredictor:
         return result
 
     # Method which provides 2d prediction on each layer
-    def make2dStackPrediction(self, imgToPredict, window):
+    def make2dStackPrediction(self, imgToPredict):
         layers = imgToPredict.shape[0]
         rows = imgToPredict.shape[1]
         cols = imgToPredict.shape[2]
@@ -64,14 +62,14 @@ class DeblurPredictor:
         imgLayers = [imgToPredict[i] for i in range(layers)]
 
         # make graphic indication progressbar
-        pb = ttk.Progressbar(
-            window,
-            orient="horizontal",
-            mode="determinate",
-            maximum=len(imgLayers),
-            value=0,
-        )
-        pb.grid(row=10, column=2)
+        # pb = ttk.Progressbar(
+        #     window,
+        #     orient="horizontal",
+        #     mode="determinate",
+        #     maximum=len(imgLayers),
+        #     value=0,
+        # )
+        # pb.grid(row=10, column=2)
 
         # deconvolve layers
         resLayers = []
@@ -79,30 +77,30 @@ class DeblurPredictor:
             resLayers.append(
                 self.model.predict(layer.reshape(1, rows, cols, 1)).reshape(rows, cols)
             )
-            pb["value"] = len(resLayers)
-            window.update()
+            # pb["value"] = len(resLayers)
+            # window.update()
 
         # concatenate layers
         predictedImage = np.zeros(shape=(layers, rows, cols), dtype=np.float32)
         for i in range(len(resLayers)):
             predictedImage[i, :, :] = resLayers[i][:, :]
-        return predictedImage, pb
+        return predictedImage
 
     # Method which provides 3d prediction in whole image
-    def make3dPrediction(self, imgToPredict, window):
+    def make3dPrediction(self, imgToPredict):
         # make chunks
         chunksMaker = BigImageManager(imgToPredict, self.CHUNK_SIZE, self.OFFSET_SIZE)
         chunks = chunksMaker.SeparateInChunks()
 
         # make graphic indication progressbar
-        pb = ttk.Progressbar(
-            window,
-            orient="horizontal",
-            mode="determinate",
-            maximum=len(chunks),
-            value=0,
-        )
-        pb.grid(row=10, column=2)
+        # pb = ttk.Progressbar(
+        #     window,
+        #     orient="horizontal",
+        #     mode="determinate",
+        #     maximum=len(chunks),
+        #     value=0,
+        # )
+        # pb.grid(row=10, column=2)
 
         results = []
         for chunk in chunks:
@@ -119,15 +117,15 @@ class DeblurPredictor:
             )
 
             results.append(chunkToPredict)
-            pb["value"] = len(results)
-            window.update()
+            # pb["value"] = len(results)
+            # window.update()
 
         # Init back to save
         result = chunksMaker.ConcatenateChunksIntoImage(results)
-        return result, pb
+        return result
 
     # Method which provides image's prediction
-    def makePrediction(self, img, window):
+    def makePrediction(self, img):
         if not self.isInited:
             raise Exception("Model isnt inited!")
 
@@ -136,15 +134,13 @@ class DeblurPredictor:
         imgToPredict = img.copy()
 
         if self.currentType == "3d deconvolution":
-            result, pb = self.make3dPrediction(imgToPredict, window)
+            result= self.make3dPrediction(imgToPredict)
         elif self.currentType == "2d stack deconvolution":
-            result, pb = self.make2dStackPrediction(imgToPredict, window)
+            result= self.make2dStackPrediction(imgToPredict)
 
         result = self.makePostprocessing(
             result, result.shape[0], result.shape[1], result.shape[2]
         )
         result = (result * 255).astype("uint8")
 
-        # destroy progress bar
-        pb.grid_remove()
         return result

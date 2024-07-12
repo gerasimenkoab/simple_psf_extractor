@@ -1,11 +1,8 @@
 from tkinter.filedialog import askopenfilenames, asksaveasfilename
 from tkinter.simpledialog import askstring
-import logging
 
-import tkinter as tk
-import tkinter.ttk as ttk
-from main.app_main_view import MainAppView
-from main.app_main_model import MainAppModel
+from main import MainAppView
+from main import MainAppModel
 # from cnn.cnn_deconvolution_gui import *
 import logging
 from common.PackageManager import PackageManager

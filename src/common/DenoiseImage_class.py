@@ -145,7 +145,7 @@ class Wiener(DenoiseMethod):
 
 @registerDenoiseMethodSubclass    
 class TotalVariation(DenoiseMethod):
-    _methodName = "Total Variation"
+    _methodName = "Totaial Vartion"
     def __init__(self, weight:float = None) -> None:
         if weight is None:
             self._weight = 0.1
