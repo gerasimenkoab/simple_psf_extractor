@@ -9,11 +9,11 @@ from scipy.interpolate import RegularGridInterpolator
 import json
 try: # for running as package
     from common.Voxel_class import Voxel
-    from common.Intensities_class import IntensityValues
+    from common.intensities_class import IntensityValues
     from common.FileManipulation_class import FileManipulation
 except: # for testing purposes
     from Voxel_class import Voxel
-    from Intensities_class import IntensityValues
+    from intensities_class import IntensityValues
     from FileManipulation_class import FileManipulation
 
 class ImageRaw:
