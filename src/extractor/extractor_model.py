@@ -34,6 +34,10 @@ class ExtractorModel:
     def mainImage(self):
         return self._mainImage
 
+    @mainImage.setter
+    def mainImage(self, value: ImageRaw):
+        self._mainImage = value
+
     def SetMainImage(self, fname=None, voxel=None, array=None):
         self._mainImage = ImageRaw(fname, voxel, array)
         self._averageBead = None

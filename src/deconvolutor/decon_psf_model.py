@@ -25,6 +25,10 @@ class DeconPsfModel():
     def PSFImage(self):
         return self._psfImage
 
+    @PSFImage.setter
+    def PSFImage(self, value: ImageRaw):
+        self._psfImage = value
+
     def SetPSFImage(self, fname=None, voxel=None, array=None):
         self._psfImage = ImageRaw(fname, voxel, array)
 
