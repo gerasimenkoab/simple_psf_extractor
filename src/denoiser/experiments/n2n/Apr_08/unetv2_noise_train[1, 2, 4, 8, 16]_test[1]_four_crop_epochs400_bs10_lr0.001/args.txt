@@ -1,0 +1,43 @@
+{
+    "exp_name": "n2n",
+    "exp_dir": "./experiments",
+    "post": false,
+    "debug": false,
+    "net": "unetv2",
+    "data_root": "./dataset",
+    "imsize": 256,
+    "in_channels": 1,
+    "out_channels": 1,
+    "transform": "four_crop",
+    "noise_levels_train": [
+        1,
+        2,
+        4,
+        8,
+        16
+    ],
+    "noise_levels_test": [
+        1
+    ],
+    "test_group": 19,
+    "captures": 50,
+    "epochs": 400,
+    "batch_size": 10,
+    "lr": 0.001,
+    "wd": 0.0,
+    "test_batch_size": 10,
+    "seed": 1,
+    "cuda": 0,
+    "ckpt_freq": 50,
+    "print_freq": 100,
+    "log_freq": 1,
+    "plot_epochs": 5,
+    "cmap": "inferno",
+    "run_dir": "./experiments/n2n/Apr_08/unetv2_noise_train[1, 2, 4, 8, 16]_test[1]_four_crop_epochs400_bs10_lr0.001",
+    "ckpt_dir": "./experiments/n2n/Apr_08/unetv2_noise_train[1, 2, 4, 8, 16]_test[1]_four_crop_epochs400_bs10_lr0.001/checkpoints",
+    "train_dir": "./experiments/n2n/Apr_08/unetv2_noise_train[1, 2, 4, 8, 16]_test[1]_four_crop_epochs400_bs10_lr0.001/training",
+    "pred_dir": "./experiments/n2n/Apr_08/unetv2_noise_train[1, 2, 4, 8, 16]_test[1]_four_crop_epochs400_bs10_lr0.001/training/predictions",
+    "training_time": 5534.405771255493,
+    "n_params": 989712,
+    "n_layers": 18
+}
