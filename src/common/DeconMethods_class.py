@@ -476,7 +476,6 @@ class DeconMethods:
         # preparing for start of iteration cycle
         f_old = f_0
         # starting iteration cycle
-        lambdaTV = 0.005
         for k in range(0, iterLimit):
             # first convolution
             e = signal.fftconvolve(f_old, p, mode="same")
