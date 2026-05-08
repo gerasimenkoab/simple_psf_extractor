@@ -12,6 +12,7 @@ class DeconController:
         # setup logger
         self.logger = logging.getLogger("__main__." + __name__)
         self._master = parentView
+        self.deconvolutionInProgress = False
         try:
             self.modelDeconPSF = DeconPsfModel()
         except Exception as e:
@@ -371,41 +372,45 @@ class DeconController:
         button.config(text = "Processing", state = "disabled")
 
         self.viewDecon.update()
-        self.deconvolutionInProgress = True
-        self.viewDecon.after(100, self.startDeconvolution(event))
-        button.config(text = "Start", state = "normal")
-
-
-    def startDeconvolution(self,event=None):
-        try:
-            progBar = self.viewDecon.GetDeconImageProgressbar()
-            method = self.viewDecon.GetImageDeconMethod()
-            print("Method: ", method)
-            print("Progress bar: ", progBar)
-        except Exception as e:
-            self.logger.info("Can not get parameters for deconvolution. " + str(e))
+        if not self.deconvolutionInProgress:
             self.deconvolutionInProgress = True
-            return 
-       
-        self.logger.info("Starting image deconvolution. Method code: " + method)
+            self.viewDecon.after( 100, lambda: self.startDeconvolution(button) )
+
+    def startDeconvolution(self,button = None):
+        try:
+            try:
+                progBar = self.viewDecon.GetDeconImageProgressbar()
+                method = self.viewDecon.GetImageDeconMethod()
+                print("Method: ", method)
+                print("Progress bar: ", progBar)
+            except Exception as e:
+                self.logger.info("Can not get parameters for deconvolution. " + str(e))
+                self.deconvolutionInProgress = False
+                return 
         
-        try:
-            self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon )
-        except Exception as e:
-            self.logger.error("Image deconvolution failed."+str(e))
-            self.deconvolutionInProgress = True
-            return  
+            self.logger.info("Starting image deconvolution. Method code: " + method)
+            
+            try:
+                self.modelDeconImage.DeconvolveImage( method, progBar, self.viewDecon )
+            except Exception as e:
+                self.logger.error("Image deconvolution failed."+str(e))
+                self.deconvolutionInProgress = False
+                return  
 
-        try:
-            self.viewDecon.widgets["ResultLayerSpinbox"].set(self.modelDeconImage.GetVisibleLayerNumberFor("Result"))
-            self.viewDecon.SetFileInfoPsfDeconImage(self.modelDeconImage.GetInfoStringFor("Result") )
-            self.viewDecon.DrawImageOnCanvas(canvasName = "Result",img = self.modelDeconImage.GetVisibleLayerImageFor("Result"))
-        except Exception as e:
-            self.logger.error("Can not draw deconvolution resulting image. " + str(e))
-            self.deconvolutionInProgress = True
-            return 
-        self.logger.info("Image deconvolution finished.")
-        self.deconvolutionInProgress = False
+            try:
+                self.viewDecon.widgets["ResultLayerSpinbox"].set(self.modelDeconImage.GetVisibleLayerNumberFor("Result"))
+                self.viewDecon.SetFileInfoPsfDeconImage(self.modelDeconImage.GetInfoStringFor("Result") )
+                self.viewDecon.DrawImageOnCanvas(canvasName = "Result",img = self.modelDeconImage.GetVisibleLayerImageFor("Result"))
+            except Exception as e:
+                self.logger.error("Can not draw deconvolution resulting image. " + str(e))
+                self.deconvolutionInProgress = False
+                return 
+        finally:
+            self.logger.info("Image deconvolution finished.")
+            self.deconvolutionInProgress = False
+            if button is not None:
+                button.config(text = "Start", state = "normal")
+
 
     def SaveDeconImage_clb(self, event=None):
         if self.modelDeconImage.deconResult == None:
