@@ -375,6 +375,10 @@ class DeconController:
         if not self.deconvolutionInProgress:
             self.deconvolutionInProgress = True
             self.viewDecon.after( 100, lambda: self.startDeconvolution(button) )
+        else:
+            #if deconvolution is in progress, leave the button disabled with processing text and show info in the log
+            self.logger.info("Deconvolution is already in progress. Please wait.")
+            button.config(text = "Processing", state = "disabled")
 
     def startDeconvolution(self,button = None):
         try:

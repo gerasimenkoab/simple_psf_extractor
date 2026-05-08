@@ -117,11 +117,15 @@ class DeconMethods:
             imagePSF: np.ndarray
         """
         imageDeconvolved = np.copy(image)
-        poolSize = cpu_count() - 2
-        # chunkNumber = int(sqrt(poolSize))
+        #fast check of input paremeters.
+        if min(image.shape) < 1 or min(kernell.shape) < 1 or iterNum < 1 or image.ndim < 3 or kernell.ndim < 3:
+            raise ValueError("DeconImage: Invalid input. Please check the input parameters.")
+        availableCpu = cpu_count() or 1
+        poolSize = max(1, availableCpu - 2)
         chunkNumber = int((poolSize))
-        chunkDimX = image.shape[2] // chunkNumber # chunk size X
-        chunkDimY = image.shape[1] // chunkNumber # chunk size Y
+        
+        chunkDimX = image.shape[2] if image.shape[2]<=chunkNumber else image.shape[2] // chunkNumber # chunk size X
+        chunkDimY = image.shape[1] if image.shape[1]<=chunkNumber else image.shape[1] // chunkNumber # chunk size Y
         chunkList = [] 
         # crating list of image chunks
         for i in range(0, image.shape[1], chunkDimY):
@@ -300,7 +304,7 @@ class DeconMethods:
         Function for  convolution with (Maximum likelihood estimaton)Richardson-Lucy method
         For psf calculation kernell = ideal sphere
         """
-        f_0 = image
+        f_0 = image.copy()
         # if there is NAN in image array(seems from source image) replace it with zeros
         f_0[np.isnan(f_0)] = 1.e-11
         f_0[f_0<1.e-11] = 1.e-11
@@ -374,7 +378,7 @@ class DeconMethods:
             ndarray: The deconvolved image.    
         """
 
-        f_0 = image
+        f_0 = image.copy()
         # if there is NAN in image array(seems from source image) replace it with zeros
         f_0[np.isnan(f_0)] = 1.e-11
         f_0[f_0<1.e-11] = 1.e-11
@@ -449,7 +453,7 @@ class DeconMethods:
             ndarray: The deconvolved image.    
         """
 
-        f_0 = image
+        f_0 = image.copy()
         # if there is NAN in image array(seems from source image) replace it with zeros
         f_0[np.isnan(f_0)] = 1.e-11
         f_0[f_0<1.e-11] = 1.e-11
