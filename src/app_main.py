@@ -11,12 +11,16 @@ def startApplication():
     try:
         logging_conf_path = os.path.join(os.path.dirname(__file__), 'logging.conf')
         logging.config.fileConfig(logging_conf_path)
-    except FileNotFoundError as e:
+    except Exception as e:
         print("Logging.conf file missing." + str(e))
-        return
+        print("Creating default logging configuration.")
+        logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
-    MainAppController().Run()
+    try:
+        MainAppController().Run()
+    except Exception as e:
+        logger.exception("An error occurred while running the application: %s", e)
     
 
 if __name__=="__main__":

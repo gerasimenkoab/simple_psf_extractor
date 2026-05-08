@@ -308,7 +308,7 @@ class DeconMethods:
         # if there is NAN in image array(seems from source image) replace it with zeros
         f_0[np.isnan(f_0)] = 1.e-11
         f_0[f_0<1.e-11] = 1.e-11
-        beadMaxInt = np.amax(image)
+        beadMaxInt = np.nanmax(image)
         padSize = kernell.shape
         f_0 = np.pad(f_0, list(zip(padSize, padSize)), "edge")
         b_noize = (np.mean(f_0[0, 0, :]) + np.mean(f_0[0, :, 0]) + np.mean(f_0[:, 0, 0])) / 3
@@ -342,8 +342,9 @@ class DeconMethods:
                 rConv = np.real(rConv)
                 rConv = rConv.clip(min=0)
                 f_i = f_i * rConv
-
                 f_i = f_i / np.amax(f_i) * beadMaxInt
+                if not np.isfinite(f_i).all():
+                    raise ValueError(f"Deconvolution failed: non finite values in result on iteration number: {i}")   
             except:
                 print("Deconvolution failed on iteration number: %d" %i)
                 raise ValueError("Deconvolution failed")
@@ -385,7 +386,7 @@ class DeconMethods:
         padSize = psf.shape
         b_noize = (np.mean(f_0[0, 0, :]) + np.mean(f_0[0, :, 0]) + np.mean(f_0[:, 0, 0])) / 3
         f_0 = np.pad(f_0, list(zip(padSize, padSize)), "edge")
-        beadMaxInt = np.amax(image)
+        beadMaxInt = np.nanmax(image)
         p = psf
 
         if debug_flag:
@@ -414,6 +415,8 @@ class DeconMethods:
             regTM = 1.0 + 2.0 * lambdaTM * laplace(f_old)
             f_old = f_old * rnew / regTM
             f_old = f_old / np.amax(f_old) * beadMaxInt
+            if not np.isfinite(f_old).all():
+                raise ValueError(f"Deconvolution failed: non finite values in result on iteration number: {i}")   
 
         if q!= None:
             q.put(1)
@@ -459,7 +462,7 @@ class DeconMethods:
         f_0[f_0<1.e-11] = 1.e-11
         padSize = psf.shape
         f_0 = np.pad(f_0, list(zip(padSize, padSize)), "edge")
-        beadMaxInt = np.amax(image)
+        beadMaxInt = np.nanmax(image)
         p = psf
         b_noize = (np.mean(f_0[0, 0, :]) + np.mean(f_0[0, :, 0]) + np.mean(f_0[:, 0, 0])) / 3
 
@@ -492,6 +495,9 @@ class DeconMethods:
             regTV = 1.0 - lambdaTV * np.sqrt(gr[0] ** 2 + gr[1] ** 2 + gr[2] ** 2)
             f_old = f_old * rnew / regTV
             f_old = f_old / np.amax(f_old) * beadMaxInt
+            if not np.isfinite(f_old).all():
+                raise ValueError(f"Deconvolution failed: non finite values in result on iteration number: {k}")   
+
         if q!= None:
             q.put(1)
         # end of iteration cycle
